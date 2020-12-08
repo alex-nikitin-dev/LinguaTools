@@ -35,9 +35,9 @@
             this.mainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MM_NeedUrbanDictionary = new System.Windows.Forms.ToolStripMenuItem();
             this.loginToOALDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cbxCategory = new System.Windows.Forms.ComboBox();
             this.historyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.updateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cbxCategory = new System.Windows.Forms.ComboBox();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -45,9 +45,10 @@
             // 
             this.txtToSearch.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtToSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtToSearch.Location = new System.Drawing.Point(1, 32);
             this.txtToSearch.Name = "txtToSearch";
-            this.txtToSearch.Size = new System.Drawing.Size(742, 20);
+            this.txtToSearch.Size = new System.Drawing.Size(742, 26);
             this.txtToSearch.TabIndex = 1;
             this.txtToSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtToSearch_KeyDown);
             // 
@@ -68,9 +69,10 @@
             this.chkHotKeyEnabled.AutoSize = true;
             this.chkHotKeyEnabled.Checked = true;
             this.chkHotKeyEnabled.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkHotKeyEnabled.Location = new System.Drawing.Point(1091, 34);
+            this.chkHotKeyEnabled.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkHotKeyEnabled.Location = new System.Drawing.Point(1048, 34);
             this.chkHotKeyEnabled.Name = "chkHotKeyEnabled";
-            this.chkHotKeyEnabled.Size = new System.Drawing.Size(111, 17);
+            this.chkHotKeyEnabled.Size = new System.Drawing.Size(154, 24);
             this.chkHotKeyEnabled.TabIndex = 3;
             this.chkHotKeyEnabled.Text = "Hot key\'s enabled";
             this.chkHotKeyEnabled.UseVisualStyleBackColor = true;
@@ -109,16 +111,6 @@
             this.loginToOALDToolStripMenuItem.Text = "Login to OALD";
             this.loginToOALDToolStripMenuItem.Click += new System.EventHandler(this.loginToOALDToolStripMenuItem_Click);
             // 
-            // cbxCategory
-            // 
-            this.cbxCategory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbxCategory.FormattingEnabled = true;
-            this.cbxCategory.Location = new System.Drawing.Point(814, 32);
-            this.cbxCategory.Name = "cbxCategory";
-            this.cbxCategory.Size = new System.Drawing.Size(248, 21);
-            this.cbxCategory.TabIndex = 5;
-            this.cbxCategory.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cbxCategory_KeyDown);
-            // 
             // historyToolStripMenuItem
             // 
             this.historyToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -130,9 +122,20 @@
             // updateToolStripMenuItem
             // 
             this.updateToolStripMenuItem.Name = "updateToolStripMenuItem";
-            this.updateToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.updateToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.updateToolStripMenuItem.Text = "Update";
             this.updateToolStripMenuItem.Click += new System.EventHandler(this.updateToolStripMenuItem_Click);
+            // 
+            // cbxCategory
+            // 
+            this.cbxCategory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbxCategory.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cbxCategory.FormattingEnabled = true;
+            this.cbxCategory.Location = new System.Drawing.Point(749, 30);
+            this.cbxCategory.Name = "cbxCategory";
+            this.cbxCategory.Size = new System.Drawing.Size(248, 28);
+            this.cbxCategory.TabIndex = 5;
+            this.cbxCategory.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cbxCategory_KeyDown);
             // 
             // MainForm
             // 

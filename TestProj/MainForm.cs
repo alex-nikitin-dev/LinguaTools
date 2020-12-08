@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
@@ -65,7 +66,7 @@ namespace TestProj
             AddToFile(text);
             
             _browsers[0].Load($"https://www.oxfordlearnersdictionaries.com/search/english/?q={text}");
-            _browsers[1].Load($"https://translate.google.com/#view=home&op=translate&sl=en&tl=ru&text={text}");
+            _browsers[1].Load($"https://translate.google.am/?hl=en#view=home&op=translate&sl=en&tl=ru&text={text}");
             if(MM_NeedUrbanDictionary.Checked) _browsers[2].Load($"https://www.urbandictionary.com/define.php?term={text}");
         }
 
@@ -101,7 +102,7 @@ namespace TestProj
             table.Controls.Add(_browsers[0], 0, 0);
             table.Controls.Add(_browsers[1], 1, 0);
             
-            
+            tabControl1.Font = new Font(tabControl1.Font.FontFamily,12,FontStyle.Regular);
             tabControl1.TabPages.Add("OALD");
             tabControl1.TabPages.Add("Urban");
             tabControl1.TabPages[0].Controls.Add(table);
@@ -120,14 +121,19 @@ namespace TestProj
         private void InitHistory()
         {
             tabControl1.TabPages.Add("tabHistory", "History");
-            _lstHistory = new ListView() { View = View.Details, Dock = DockStyle.Fill };
+            _lstHistory = new ListView()
+            {
+                View = View.Details, 
+                Dock = DockStyle.Fill, 
+                Font = new Font(Font.FontFamily, 12, FontStyle.Regular),
+                FullRowSelect = true
+            };
+          
             tabControl1.TabPages["tabHistory"].Controls.Add(_lstHistory);
-            _lstHistory.Columns.Add(new ColumnHeader("phrase"));
-            _lstHistory.Columns.Add(new ColumnHeader("category"));
-            _lstHistory.Columns.Add(new ColumnHeader("date"));
-            _lstHistory.FullRowSelect = true;
-
-
+            _lstHistory.Columns.Add("phrase", "phrase");
+            _lstHistory.Columns.Add("category", "category");
+            _lstHistory.Columns.Add("date", "date");
+            
             var menuItems = new List<MenuItem>
             {
                 new MenuItem("Update", UpdateHistory),
@@ -171,6 +177,7 @@ namespace TestProj
             {
                 var group = new ListViewGroup(dataItem.Key, dataItem.Key);
                 _lstHistory.Groups.Add(group);
+                
                 foreach (var item in dataItem.Value)
                 {
                     var li = new ListViewItem { Text = item.Phrase };
