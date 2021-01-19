@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using CefSharp;
 using CefSharp.WinForms;
@@ -14,6 +15,7 @@ namespace TestProj
     {
         public MainForm()
         {
+            SetStyle(ControlStyles.SupportsTransparentBackColor, true);
             InitializeComponent();
             CefSettings settingsBrowser = new CefSettings
             {
@@ -59,12 +61,22 @@ namespace TestProj
             return cbxCategory.Text;
         }
 
+
+        string PrepareTextToProceed(string text)
+        {
+            text = text.Trim(',', '.', '!', ':', ';','-','"','\'',' ','\n');
+            text = text.Replace(Environment.NewLine, " ");
+            text = new Regex("[ ]{2,}", RegexOptions.None).Replace( text, " ");
+            return text;
+        }
+
         void GoBrowsers(string text)
         {
             if (string.IsNullOrEmpty(text)) return;
 
-            AddToFile(text);
-            
+            text = PrepareTextToProceed(text);
+
+            txtToSearch.Text = text;
             _browsers[0].Load($"https://www.oxfordlearnersdictionaries.com/search/english/?q={text}");
             _browsers[1].Load($"https://translate.google.am/?hl=en#view=home&op=translate&sl=en&tl=ru&text={text}");
             if(MM_NeedUrbanDictionary.Checked) _browsers[2].Load($"https://www.urbandictionary.com/define.php?term={text}");
@@ -94,6 +106,8 @@ namespace TestProj
             {
                 _browsers.Add(new ChromiumWebBrowser(""));
                 _browsers[i].Dock = DockStyle.Fill;
+                _browsers[i].LoadingStateChanged += LoadingStateChangedAnyBrowser;
+                _browsers[i].FrameLoadEnd += MainForm_FrameLoadEnd;
             }
 
             var table = new TableLayoutPanel() {ColumnCount = 2, RowCount = 1, Dock = DockStyle.Fill};
@@ -101,7 +115,8 @@ namespace TestProj
             table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30));
             table.Controls.Add(_browsers[0], 0, 0);
             table.Controls.Add(_browsers[1], 1, 0);
-            
+
+            //tabControl1.Appearance = TabAppearance.Buttons;
             tabControl1.Font = new Font(tabControl1.Font.FontFamily,12,FontStyle.Regular);
             tabControl1.TabPages.Add("OALD");
             tabControl1.TabPages.Add("Urban");
@@ -115,7 +130,106 @@ namespace TestProj
             InitHistory();
             FillHistory();
             LoginToOALD();
+            GoBrowsers("test");
+            SetColorTheme(ColorTheme.Dark);
         }
+
+        private void MainForm_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
+        {
+            if (_currentColorTheme == ColorTheme.Dark)
+            {
+                var browser = (ChromiumWebBrowser)sender;
+                SetBrowserColors(browser, "#282828", "#dadada");
+            }
+            
+        }
+
+        enum ColorTheme
+        {
+            Dark,
+            Light
+        }
+
+        ColorTheme _currentColorTheme = ColorTheme.Light;
+
+        void ReloadAllBrowsers()
+        {
+            foreach (var browser in _browsers)
+            {
+                if (browser.IsBrowserInitialized)
+                {
+                    browser.Reload();
+                }
+                    
+            }
+        }
+
+
+        void SetColorsRecursively(Control parent,Color backColor, Color foreColor)
+        {
+            parent.BackColor = backColor;
+            parent.ForeColor = foreColor;
+            if (!parent.HasChildren) return;
+
+            foreach (Control child in parent.Controls)
+            {
+                SetColorsRecursively(child, backColor, foreColor);
+            }
+        }
+
+        void SetColorTheme(ColorTheme theme)
+        {
+            _currentColorTheme = theme;
+
+            switch (theme)
+            {
+                case ColorTheme.Dark:
+                    SetColorsRecursively(this, ColorTranslator.FromHtml("#282828"), ColorTranslator.FromHtml("#dadada"));
+                    break;
+                case ColorTheme.Light:
+                    SetColorsRecursively(this, SystemColors.Control, SystemColors.ControlText);
+                    break;
+            }
+
+            ReloadAllBrowsers();
+        }
+
+        void SetBrowserColors(ChromiumWebBrowser browser, string backColor,string foreColor)
+        {
+            browser.EvaluateScriptAsync($@"function SetBackgroundForAll(backColor, foreColor){{
+                var elements = document.querySelectorAll('*');
+                for (var i = 0; i < elements.length; i++) {{
+                elements[i].style.background=backColor;
+                elements[i].style.color = foreColor;
+                }}
+            }}
+            SetBackgroundForAll('{backColor}','{foreColor}');
+            ");
+        }
+
+        private void LoadingStateChangedAnyBrowser(object sender, LoadingStateChangedEventArgs e)
+        {
+            //if (!e.IsLoading && _currentColorTheme == ColorTheme.Dark)
+            //{
+            //    var browser = (ChromiumWebBrowser)sender;
+            //    SetBrowserColors(browser, "#282828", "#dadada");
+            //}
+        }
+
+        //private void FrameLoadEndAnyBrowser(object sender, FrameLoadEndEventArgs e)
+        //{
+        //    var browser = (ChromiumWebBrowser)sender;
+        //    browser.EvaluateScriptAsync(@"function SetBackgroundForAll(backColor, foreColor){
+        //        var elements = document.querySelectorAll('*');
+        //        for (var i = 0; i < elements.length; i++) {
+        //        elements[i].style.background=backColor;
+        //        elements[i].style.color = foreColor;
+        //        }
+        //    }
+        //    SetBackgroundForAll('black','white');
+        //    ");
+
+        //}
 
         private ListView _lstHistory;
         private void InitHistory()
@@ -321,6 +435,20 @@ namespace TestProj
         {
             LoadData(Settings.Default.DataPath);
             FillHistory();
+        }
+
+        private void darkToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SetColorTheme(ColorTheme.Dark);
+        }
+
+        private void MM_NeedUrbanDictionary_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void lightToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SetColorTheme(ColorTheme.Light);
         }
     }
 }
