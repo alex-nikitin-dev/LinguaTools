@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using CefSharp;
@@ -36,10 +37,9 @@ namespace TestProj
             }
         }
 
-
         bool IsThereItem(string phrase, string category)
         {
-            foreach (var item in _data)
+            foreach (var item in _historyData)
             {
                 foreach (var row in item.Value)
                 {
@@ -70,31 +70,111 @@ namespace TestProj
             return text;
         }
 
-        void GoBrowsers(string text)
+        void GoOALD(string text)
         {
-            if (string.IsNullOrEmpty(text)) return;
-
-            text = PrepareTextToProceed(text);
-
-            txtToSearch.Text = text;
             _browsers[0].Load($"https://www.oxfordlearnersdictionaries.com/search/english/?q={text}");
-            _browsers[1].Load($"https://translate.google.am/?hl=en#view=home&op=translate&sl=en&tl=ru&text={text}");
-            if(MM_NeedUrbanDictionary.Checked) _browsers[2].Load($"https://www.urbandictionary.com/define.php?term={text}");
         }
 
-        private void AddToFile(string text)
+        void GoGoogleTranslate(string text)
         {
-            if (!IsThereItem(text, GetCategory()))
+            _browsers[1].Load($"https://translate.google.am/?hl=en#view=home&op=translate&sl=en&tl=ru&text={text}");
+        }
+
+        void GoUrbanDictionary(string text)
+        {
+             _browsers[2].Load($"https://www.urbandictionary.com/define.php?term={text}");
+        }
+
+        void GoBrowsers(string text, bool saveHistory = true)
+        {
+            text = PrepareTextToProceed(text);
+            if (string.IsNullOrEmpty(text)) return;
+
+            txtToSearch.Text = text;
+            if(saveHistory)
+                AddHistoryItem(text, GetCategory());
+            
+            GoOALD(text);
+            GoGoogleTranslate(text);
+            if(MM_NeedUrbanDictionary.Checked) GoUrbanDictionary(text);
+        }
+
+        //[Obsolete]
+        //private void AddToFile(string text)
+        //{
+        //    if (!IsThereItem(text, GetCategory()))
+        //    {
+        //        File.AppendAllText(Settings.Default.DataPath,
+        //            $@"{text};;{GetCategory()};;{GetTimeStampNow()}{Environment.NewLine}"
+        //        );
+        //        UpdateHistory();
+        //    }
+        //}
+
+        private string GetTimeStampNow()
+        {
+            return GetDataTimeFormatted(DateTime.Now);
+        }
+
+        private string GetDataTimeFormatted(DateTime dt)
+        {
+            return dt.ToString(_dateTimeFormat, CultureInfo.InvariantCulture);
+        }
+
+        private string GetCopyPath()
+        {
+            var path = Settings.Default.DataPath;
+            var copyName = Path.GetFileNameWithoutExtension(path) + "_copy_" + GetTimeStampNow();
+            var copyExt = Path.GetExtension(path);
+            var copyPath = Path.GetDirectoryName(path);
+
+            return Path.Combine(copyPath ?? throw new InvalidOperationException(), copyName, copyExt);
+        }
+
+        void CreateHistoryFileCopy()
+        {
+            File.Copy(Settings.Default.DataPath, GetCopyPath());
+        }
+
+        private void SaveHistoryToFile(string path)
+        {
+            foreach (var (category, data) in _historyData.Select(x => (x.Key, x.Value)))
             {
-                File.AppendAllText(Settings.Default.DataPath,
-                    $@"{text};;{GetCategory()};;{DateTime.Now.ToString(_dateTimeFormat, CultureInfo.InvariantCulture)}{Environment.NewLine}"
-                );
-                UpdateHistory();
+                foreach (var dataItem in data)
+                {
+                    File.AppendAllText(path,
+                        $@"{dataItem.Phrase};;{category};;{GetDataTimeFormatted(dataItem.Date)}{Environment.NewLine}");
+                }
+            }
+        }
+
+        private void SaveHistoryToFileAsACopy()
+        {
+            SaveHistoryToFile(GetCopyPath());
+        }
+
+        private void SaveHistoryToFile(bool saveTheCopy=true)
+        {
+            if (saveTheCopy)
+                CreateHistoryFileCopy(); 
+
+            SaveHistoryToFile(Settings.Default.DataPath);
+        }
+
+        private void AddHistoryItem(string text,string category)
+        {
+            if (!IsThereItem(text, category))
+            {
+                if (!_historyData.ContainsKey(category))
+                    _historyData.Add(category, new List<HistoryDataItem>());
+                if (_historyData[category] == null)
+                    _historyData[category] = new List<HistoryDataItem>();
+
+                _historyData[category].Add(new HistoryDataItem(text, DateTime.Now));
             }
         }
 
         private List<ChromiumWebBrowser> _browsers;
-       // private readonly List<string> _tabNames = new List<string>() {"OALD", "Translate", "Urban"};
 
         private int? _hotKeyId;
         private void MainForm_Load(object sender, EventArgs e)
@@ -106,7 +186,6 @@ namespace TestProj
             {
                 _browsers.Add(new ChromiumWebBrowser(""));
                 _browsers[i].Dock = DockStyle.Fill;
-                _browsers[i].LoadingStateChanged += LoadingStateChangedAnyBrowser;
                 _browsers[i].FrameLoadEnd += MainForm_FrameLoadEnd;
             }
 
@@ -130,7 +209,7 @@ namespace TestProj
             InitHistory();
             FillHistory();
             LoginToOALD();
-            GoBrowsers("test");
+            GoGoogleTranslate("test");
             SetColorTheme(ColorTheme.Dark);
         }
 
@@ -141,7 +220,6 @@ namespace TestProj
                 var browser = (ChromiumWebBrowser)sender;
                 SetBrowserColors(browser, "#282828", "#dadada");
             }
-            
         }
 
         enum ColorTheme
@@ -160,10 +238,8 @@ namespace TestProj
                 {
                     browser.Reload();
                 }
-                    
             }
         }
-
 
         void SetColorsRecursively(Control parent,Color backColor, Color foreColor)
         {
@@ -194,42 +270,40 @@ namespace TestProj
             ReloadAllBrowsers();
         }
 
+        void DeleteAdOALD(ChromiumWebBrowser browser)
+        {
+            browser.EvaluateScriptAsync($@"
+            polls = document.querySelectorAll('[id ^= ""ad_""]');
+            Array.prototype.forEach.call(polls, callback);
+
+            function callback(element, iterator)
+            {{
+                element.remove();
+            }}
+            ");
+        }
+
         void SetBrowserColors(ChromiumWebBrowser browser, string backColor,string foreColor)
         {
             browser.EvaluateScriptAsync($@"function SetBackgroundForAll(backColor, foreColor){{
                 var elements = document.querySelectorAll('*');
                 for (var i = 0; i < elements.length; i++) {{
-                elements[i].style.background=backColor;
+                elements[i].style.backgroundColor=backColor;
                 elements[i].style.color = foreColor;
                 }}
             }}
             SetBackgroundForAll('{backColor}','{foreColor}');
+
+            var style1 = document.createElement('style');
+            style1.innerHTML = `
+                * {{
+                    color: {foreColor}!important;
+                    background-color: {backColor};
+                 }}
+              `;
+            document.head.appendChild(style1);
             ");
         }
-
-        private void LoadingStateChangedAnyBrowser(object sender, LoadingStateChangedEventArgs e)
-        {
-            //if (!e.IsLoading && _currentColorTheme == ColorTheme.Dark)
-            //{
-            //    var browser = (ChromiumWebBrowser)sender;
-            //    SetBrowserColors(browser, "#282828", "#dadada");
-            //}
-        }
-
-        //private void FrameLoadEndAnyBrowser(object sender, FrameLoadEndEventArgs e)
-        //{
-        //    var browser = (ChromiumWebBrowser)sender;
-        //    browser.EvaluateScriptAsync(@"function SetBackgroundForAll(backColor, foreColor){
-        //        var elements = document.querySelectorAll('*');
-        //        for (var i = 0; i < elements.length; i++) {
-        //        elements[i].style.background=backColor;
-        //        elements[i].style.color = foreColor;
-        //        }
-        //    }
-        //    SetBackgroundForAll('black','white');
-        //    ");
-
-        //}
 
         private ListView _lstHistory;
         private void InitHistory()
@@ -287,7 +361,7 @@ namespace TestProj
         private void FillHistory()
         {
             _lstHistory.Items.Clear();
-            foreach (var dataItem in _data)
+            foreach (var dataItem in _historyData)
             {
                 var group = new ListViewGroup(dataItem.Key, dataItem.Key);
                 _lstHistory.Groups.Add(group);
@@ -312,26 +386,25 @@ namespace TestProj
         private void FillCategories()
         {
             cbxCategory.Items.Clear();
-            foreach (var dataItem in _data)
+            foreach (var dataItem in _historyData)
             {
                 cbxCategory.Items.Add(dataItem.Key);
             }
         }
 
-
-        class DataItem
+        class HistoryDataItem
         {
             internal readonly string Phrase;
             internal DateTime Date;
 
-            public DataItem(string phrase, DateTime date)
+            public HistoryDataItem(string phrase, DateTime date)
             {
                 Phrase = phrase;
                 Date = date;
             }
         }
 
-        private Dictionary<string,List<DataItem>> _data = new Dictionary<string, List<DataItem>>();
+        private readonly Dictionary<string,List<HistoryDataItem>> _historyData = new Dictionary<string, List<HistoryDataItem>>();
 
         private void LoadData(string path)
         {
@@ -342,19 +415,19 @@ namespace TestProj
                     File.CreateText(path).Close();
                 }
                 var rows = File.ReadAllLines(path);
-                _data.Clear();
+                _historyData.Clear();
 
                 foreach (var row in rows)
                 {
                     if(string.IsNullOrEmpty(row)) continue;
                     var items = row.Split(new[] {";;"}, StringSplitOptions.RemoveEmptyEntries);
                     var category = items[1];
-                    if (!_data.ContainsKey(category))
+                    if (!_historyData.ContainsKey(category))
                     {
-                        _data.Add(category, new List<DataItem>());
+                        _historyData.Add(category, new List<HistoryDataItem>());
                     }
 
-                    _data[category].Add(new DataItem(items[0],
+                    _historyData[category].Add(new HistoryDataItem(items[0],
                         DateTime.ParseExact(items[2], _dateTimeFormat, CultureInfo.InvariantCulture)));
                 }
             }
@@ -377,6 +450,8 @@ namespace TestProj
                 _preparingOALD = false;
                 PrepareOALD((ChromiumWebBrowser)sender);
             }
+
+            DeleteAdOALD((ChromiumWebBrowser)sender);
         }
 
         private bool _preparingOALD;
@@ -393,7 +468,6 @@ namespace TestProj
             ");
         }
 
-
         delegate void HotKeyPressedDelegate(object sender, HotKeyEventArgs e);
 
         void HotKeyManager_HotKeyPressed(object sender, HotKeyEventArgs e)
@@ -408,8 +482,25 @@ namespace TestProj
             GoBrowsers(Clipboard.GetText());
         }
 
+        private void SaveHistoryDialog()
+        {
+            var wannaSave = MessageBox.Show(@"Do you want to save data before exit?", Application.ProductName,
+                MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+
+            if (wannaSave == DialogResult.Yes)
+            {
+                SaveHistoryToFile();
+            }
+            else
+            {
+                SaveHistoryToFileAsACopy();
+            }
+        }
+
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            SaveHistoryDialog();
+
             if (_hotKeyId != null)
                 HotKeyManager.UnregisterHotKey(_hotKeyId.Value);
         }
@@ -433,8 +524,13 @@ namespace TestProj
 
         private void updateToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            LoadData(Settings.Default.DataPath);
-            FillHistory();
+            var sure = MessageBox.Show(@"You will lose all unsaved data. Are you sure?", Application.ProductName,
+                MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (sure == DialogResult.Yes)
+            {
+                LoadData(Settings.Default.DataPath);
+                FillHistory();
+            }
         }
 
         private void darkToolStripMenuItem_Click(object sender, EventArgs e)
@@ -449,6 +545,11 @@ namespace TestProj
         private void lightToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetColorTheme(ColorTheme.Light);
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveHistoryToFile();
         }
     }
 }
