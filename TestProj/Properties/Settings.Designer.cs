@@ -34,5 +34,29 @@ namespace TestProj.Properties {
                 this["DataPath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DarkTheme {
+            get {
+                return ((bool)(this["DarkTheme"]));
+            }
+            set {
+                this["DarkTheme"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ReverseOrderHistory {
+            get {
+                return ((bool)(this["ReverseOrderHistory"]));
+            }
+            set {
+                this["ReverseOrderHistory"] = value;
+            }
+        }
     }
 }

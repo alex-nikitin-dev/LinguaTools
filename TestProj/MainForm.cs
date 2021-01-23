@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using CefSharp;
 using CefSharp.WinForms;
@@ -35,23 +35,6 @@ namespace TestProj
             {
                 GoBrowsers(txtToSearch.Text);
             }
-        }
-
-        bool IsThereItem(string phrase, string category)
-        {
-            foreach (var item in _historyData)
-            {
-                foreach (var row in item.Value)
-                {
-                    if (string.CompareOrdinal(row.Phrase, phrase) == 0 &&
-                        string.CompareOrdinal(item.Key, category) == 0)
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
         }
 
         string GetCategory()
@@ -92,95 +75,64 @@ namespace TestProj
 
             txtToSearch.Text = text;
             if(saveHistory)
-                AddHistoryItem(text, GetCategory());
+                _history.AddHistoryItem(text, GetCategory());
             
             GoOALD(text);
             GoGoogleTranslate(text);
             if(MM_NeedUrbanDictionary.Checked) GoUrbanDictionary(text);
         }
 
-        //[Obsolete]
-        //private void AddToFile(string text)
-        //{
-        //    if (!IsThereItem(text, GetCategory()))
-        //    {
-        //        File.AppendAllText(Settings.Default.DataPath,
-        //            $@"{text};;{GetCategory()};;{GetTimeStampNow()}{Environment.NewLine}"
-        //        );
-        //        UpdateHistory();
-        //    }
-        //}
-
-        private string GetTimeStampNow()
-        {
-            return GetDataTimeFormatted(DateTime.Now);
-        }
-
-        private string GetDataTimeFormatted(DateTime dt)
-        {
-            return dt.ToString(_dateTimeFormat, CultureInfo.InvariantCulture);
-        }
-
-        private string GetCopyPath()
-        {
-            var path = Settings.Default.DataPath;
-            var copyName = Path.GetFileNameWithoutExtension(path) + "_copy_" + GetTimeStampNow();
-            var copyExt = Path.GetExtension(path);
-            var copyPath = Path.GetDirectoryName(path);
-
-            return Path.Combine(copyPath ?? throw new InvalidOperationException(), copyName, copyExt);
-        }
-
-        void CreateHistoryFileCopy()
-        {
-            File.Copy(Settings.Default.DataPath, GetCopyPath());
-        }
-
-        private void SaveHistoryToFile(string path)
-        {
-            foreach (var (category, data) in _historyData.Select(x => (x.Key, x.Value)))
-            {
-                foreach (var dataItem in data)
-                {
-                    File.AppendAllText(path,
-                        $@"{dataItem.Phrase};;{category};;{GetDataTimeFormatted(dataItem.Date)}{Environment.NewLine}");
-                }
-            }
-        }
-
-        private void SaveHistoryToFileAsACopy()
-        {
-            SaveHistoryToFile(GetCopyPath());
-        }
-
-        private void SaveHistoryToFile(bool saveTheCopy=true)
-        {
-            if (saveTheCopy)
-                CreateHistoryFileCopy(); 
-
-            SaveHistoryToFile(Settings.Default.DataPath);
-        }
-
-        private void AddHistoryItem(string text,string category)
-        {
-            if (!IsThereItem(text, category))
-            {
-                if (!_historyData.ContainsKey(category))
-                    _historyData.Add(category, new List<HistoryDataItem>());
-                if (_historyData[category] == null)
-                    _historyData[category] = new List<HistoryDataItem>();
-
-                _historyData[category].Add(new HistoryDataItem(text, DateTime.Now));
-            }
-        }
-
         private List<ChromiumWebBrowser> _browsers;
-
+        private History _history;
         private int? _hotKeyId;
+
         private void MainForm_Load(object sender, EventArgs e)
+        {
+            Text = Application.ProductName;
+
+            InitHotKeys();
+            InitBrowsers();
+            InitTabs();
+            InitHistory();
+            SetDateTimeFilterNow();
+            FillCategoriesComboBox();
+            InitHistoryListView();
+            FillHistoryListView();
+            //LoginToOALD();
+            GoOALD("test");
+            GoGoogleTranslate("test");
+            SetThemeFromSettings();
+        }
+
+        private void SetThemeFromSettings()
+        {
+            if (Settings.Default.DarkTheme)
+                SetColorTheme(ColorTheme.Dark);
+        }
+
+        private void InitHotKeys()
         {
             _hotKeyId = HotKeyManager.RegisterHotKey(Keys.X, KeyModifiers.Control | KeyModifiers.Shift);
             HotKeyManager.HotKeyPressed += HotKeyManager_HotKeyPressed;
+        }
+
+        private void InitTabs()
+        {
+            var table = new TableLayoutPanel() { ColumnCount = 2, RowCount = 1, Dock = DockStyle.Fill };
+            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70));
+            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30));
+            table.Controls.Add(_browsers[0], 0, 0);
+            table.Controls.Add(_browsers[1], 1, 0);
+
+            tabControl1.Font = new Font(tabControl1.Font.FontFamily, 12, FontStyle.Regular);
+            tabControl1.TabPages.Add("OALD");
+            tabControl1.TabPages.Add("Urban");
+            tabControl1.TabPages[0].Controls.Add(table);
+            tabControl1.TabPages[1].Controls.Add(_browsers[2]);
+        }
+
+        private void InitBrowsers()
+        {
             _browsers = new List<ChromiumWebBrowser>();
             for (int i = 0; i < 3; i++)
             {
@@ -189,28 +141,80 @@ namespace TestProj
                 _browsers[i].FrameLoadEnd += MainForm_FrameLoadEnd;
             }
 
-            var table = new TableLayoutPanel() {ColumnCount = 2, RowCount = 1, Dock = DockStyle.Fill};
-            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70));
-            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30));
-            table.Controls.Add(_browsers[0], 0, 0);
-            table.Controls.Add(_browsers[1], 1, 0);
-
-            //tabControl1.Appearance = TabAppearance.Buttons;
-            tabControl1.Font = new Font(tabControl1.Font.FontFamily,12,FontStyle.Regular);
-            tabControl1.TabPages.Add("OALD");
-            tabControl1.TabPages.Add("Urban");
-            tabControl1.TabPages[0].Controls.Add(table);
-            tabControl1.TabPages[1].Controls.Add(_browsers[2]);
-
             _browsers[0].FrameLoadEnd += OALD_Browser_LoadingStateChanged;
+        }
 
-            LoadData(Settings.Default.DataPath);
-            FillCategories();
-            InitHistory();
-            FillHistory();
-            LoginToOALD();
-            GoGoogleTranslate("test");
-            SetColorTheme(ColorTheme.Dark);
+        private void InitHistory()
+        {
+            _history = new History(_dateTimeFormat,
+                _dateTimeFormatForFile,
+                Settings.Default.DataPath,
+                !Settings.Default.ReverseOrderHistory);
+
+            _history.NewCategoryAdded += _history_NewCategoryAdded;
+            _history.NewHistoryItemAdded += _history_NewHistoryItemAdded;
+            _history.LoadData(Settings.Default.DataPath);
+        }
+
+       private void _history_NewHistoryItemAdded(object sender, NewHistoryItemAddedEventArgs e)
+        {
+            AddItemAndGroupToHistoryListView(e.HistoryItem,e.IsCategoryNew);
+        }
+
+
+        private delegate void AddHistoryItemToListViewDelegate(HistoryDataItem historyItem,bool isCategoryNew);
+
+        private void AddItemAndGroupToHistoryListView(HistoryDataItem historyItem, bool isCategoryNew)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new AddHistoryItemToListViewDelegate(AddItemAndGroupToHistoryListView));
+                return;
+            }
+
+            if (isCategoryNew && AreTheGroupsNeeded())
+            {
+                AddGroupToHistoryListView(historyItem.Category);
+            }
+
+            AddItemToHistoryListView(historyItem, _history.EnumerateForward);
+            //_lstHistory.Update();
+            HistoryListViewResize();
+        }
+
+        private void AddGroupToHistoryListView(string groupName)
+        {
+            var group = new ListViewGroup(groupName, groupName);
+            _lstHistory.Groups.Add(group);
+        }
+
+        private void AddItemToHistoryListView(HistoryDataItem historyItem,bool insertToTheEnd)
+        {
+            var li = new ListViewItem() { Text = historyItem.Phrase };
+            li.SubItems.Add(historyItem.Category);
+            li.SubItems.Add(historyItem.Date.ToString(_dateTimeFormat, CultureInfo.InvariantCulture));
+
+            if (AreTheGroupsNeeded())
+                li.Group = _lstHistory.Groups[historyItem.Category];
+
+            var index = insertToTheEnd ? _lstHistory.Items.Count : 0;
+
+
+            _lstHistory.Items.Insert(index, li);
+
+            //li.Group.Items.Insert(index, li);
+            //_lstHistory.Groups[li.Group.Name].Items.Insert(index, li);
+        }
+
+
+        bool AreTheGroupsNeeded()
+        {
+            return !MM_showChronologically.Checked;
+        }
+
+        private void _history_NewCategoryAdded(object sender, NewCategoryAddedEventArgs e)
+        {
+            AddCategoryCombobox(e.Category);
         }
 
         private void MainForm_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
@@ -268,6 +272,9 @@ namespace TestProj
             }
 
             ReloadAllBrowsers();
+
+            Settings.Default.DarkTheme = theme == ColorTheme.Dark;
+            Settings.Default.Save();
         }
 
         void DeleteAdOALD(ChromiumWebBrowser browser)
@@ -306,7 +313,7 @@ namespace TestProj
         }
 
         private ListView _lstHistory;
-        private void InitHistory()
+        private void InitHistoryListView()
         {
             tabControl1.TabPages.Add("tabHistory", "History");
             _lstHistory = new ListView()
@@ -324,7 +331,7 @@ namespace TestProj
             
             var menuItems = new List<MenuItem>
             {
-                new MenuItem("Update", UpdateHistory),
+                new MenuItem("Update", UpdateHistoryListView),
                 new MenuItem("Delete", DeleteHistoryItem)
             };
 
@@ -343,98 +350,121 @@ namespace TestProj
         private void DeleteHistoryItem(object sender, EventArgs e)
         {
             if (_lstHistory.SelectedItems.Count == 0) return;
-            throw new NotImplementedException();
+            var sure = MessageBox.Show(@"The selected entry will be deleted from the history. Are you sure?", Application.ProductName,
+                MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (sure == DialogResult.Yes)
+            {
+                foreach (ListViewItem lstItem in _lstHistory.SelectedItems)
+                {
+                    var phrase = lstItem.Text;
+                    var category = lstItem.SubItems[1].Text;
+                    _history.DeleteHistoryItem(phrase, category);
+                }
+
+                FillHistoryListView();
+            }
         }
 
-        private void UpdateHistory(object sender, EventArgs e)
+        private void UpdateHistoryListView(object sender, EventArgs e)
         {
-            UpdateHistory();
+            UpdateHistoryListView();
         }
 
-        void UpdateHistory()
+        void UpdateHistoryListView()
         {
-            LoadData(Settings.Default.DataPath);
-            FillHistory();
-            FillCategories();
+            _history.LoadData(Settings.Default.DataPath);
+            FillHistoryListView();
+            FillCategoriesComboBox();
         }
 
-        private void FillHistory()
+        private void AddGroupsToHistoryListView(string currentCategory)
+        {
+            foreach (var category in _history.Categories)
+            {
+                if (currentCategory != null && string.CompareOrdinal(currentCategory, category) != 0) continue;
+                AddGroupToHistoryListView(category);
+            }
+        }
+
+        private void AddItemsToHistoryListView(string currentCategory,bool filterByDate, DateTime beginDate, DateTime endDate)
+        {
+            if (beginDate > endDate) throw new ArgumentException("beginDate > endDate");
+            foreach (var item in _history)
+            {
+                if (currentCategory != null && string.CompareOrdinal(currentCategory, item.Category) != 0) continue;
+
+                if (filterByDate && (item.Date < beginDate || item.Date > endDate)) continue;
+
+                AddItemToHistoryListView(item, true);
+            }
+            HistoryListViewResize();
+        }
+
+        private string GetCurrentCategoryForListView(bool showCurrentCategoryOnly, bool chronologically)
+        {
+            string currentCategory = null;
+            if (showCurrentCategoryOnly && !chronologically)
+                currentCategory = GetCategory();
+
+            return currentCategory;
+        }
+
+
+        private bool IsFilterByDateNeed()
+        {
+            return MM_UseDateFilter.Checked || MM_showOnlyTodayEntries.Checked;
+        }
+
+        private void FillHistoryListView()
+        {
+            FillHistoryListView(MM_showCurrentCategory.Checked,MM_showChronologically.Checked,IsFilterByDateNeed(),dtBegin.Value, dtEnd.Value);
+        }
+
+        private void FillHistoryListView(bool showCurrentCategoryOnly, bool chronologically, bool filterByDate, DateTime beginDate, DateTime endDate)
         {
             _lstHistory.Items.Clear();
-            foreach (var dataItem in _historyData)
-            {
-                var group = new ListViewGroup(dataItem.Key, dataItem.Key);
-                _lstHistory.Groups.Add(group);
-                
-                foreach (var item in dataItem.Value)
-                {
-                    var li = new ListViewItem { Text = item.Phrase };
-                    li.SubItems.Add(dataItem.Key);
-                    li.SubItems.Add(item.Date.ToString(_dateTimeFormat, CultureInfo.InvariantCulture));
-                    li.Group = group;
-                    _lstHistory.Items.Add(li);
-                }
-            }
+            var currentCategory = GetCurrentCategoryForListView(showCurrentCategoryOnly, chronologically);
+            
+            if (AreTheGroupsNeeded()) 
+                AddGroupsToHistoryListView(currentCategory);
 
+            AddItemsToHistoryListView(currentCategory, filterByDate, beginDate, endDate);
+        }
+
+        private void HistoryListViewResize()
+        {
             _lstHistory.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
             _lstHistory.Columns[1].AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
             _lstHistory.Columns[2].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
        
         private string _dateTimeFormat = @"dd.MMMM.yyyy HH:mm:ss";
+        private string _dateTimeFormatForFile = @"dd.MMMM.yyyy_HH.mm.ss";
 
-        private void FillCategories()
+        private delegate void AddCategoryComboboxDelegate(string category);
+
+        private void AddCategoryCombobox(string category)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new AddCategoryComboboxDelegate(AddCategoryCombobox));
+                return;
+            }
+
+            var index = cbxCategory.Items.Add(category);
+            cbxCategory.SelectedIndex = index;
+        }
+
+        private void FillCategoriesComboBox()
         {
             cbxCategory.Items.Clear();
-            foreach (var dataItem in _historyData)
+
+            foreach (var category in _history.Categories)
             {
-                cbxCategory.Items.Add(dataItem.Key);
+                cbxCategory.Items.Add(category);
             }
-        }
 
-        class HistoryDataItem
-        {
-            internal readonly string Phrase;
-            internal DateTime Date;
-
-            public HistoryDataItem(string phrase, DateTime date)
-            {
-                Phrase = phrase;
-                Date = date;
-            }
-        }
-
-        private readonly Dictionary<string,List<HistoryDataItem>> _historyData = new Dictionary<string, List<HistoryDataItem>>();
-
-        private void LoadData(string path)
-        {
-            try
-            {
-                if (!File.Exists(path))
-                {
-                    File.CreateText(path).Close();
-                }
-                var rows = File.ReadAllLines(path);
-                _historyData.Clear();
-
-                foreach (var row in rows)
-                {
-                    if(string.IsNullOrEmpty(row)) continue;
-                    var items = row.Split(new[] {";;"}, StringSplitOptions.RemoveEmptyEntries);
-                    var category = items[1];
-                    if (!_historyData.ContainsKey(category))
-                    {
-                        _historyData.Add(category, new List<HistoryDataItem>());
-                    }
-
-                    _historyData[category].Add(new HistoryDataItem(items[0],
-                        DateTime.ParseExact(items[2], _dateTimeFormat, CultureInfo.InvariantCulture)));
-                }
-            }
-            catch (Exception)
-            {
-                MessageBox.Show(@"Error loading data from file");
-            }
+            cbxCategory.Sorted = true;
         }
 
         private void LoginToOALD()
@@ -482,25 +512,26 @@ namespace TestProj
             GoBrowsers(Clipboard.GetText());
         }
 
-        private void SaveHistoryDialog()
+        private async Task SaveHistoryDialog()
         {
             var wannaSave = MessageBox.Show(@"Do you want to save data before exit?", Application.ProductName,
                 MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
 
             if (wannaSave == DialogResult.Yes)
             {
-                SaveHistoryToFile();
+                await _history.SaveHistoryToFile();
             }
             else
             {
-                SaveHistoryToFileAsACopy();
+                await _history.SaveHistoryToFileAsACopy();
             }
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            SaveHistoryDialog();
-
+            if(_history.HistoryHasBeenChanged) 
+                _ = SaveHistoryDialog();
+            
             if (_hotKeyId != null)
                 HotKeyManager.UnregisterHotKey(_hotKeyId.Value);
         }
@@ -522,15 +553,20 @@ namespace TestProj
             }
         }
 
-        private void updateToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ReloadHistoryAndRefillListViewDialog()
         {
             var sure = MessageBox.Show(@"You will lose all unsaved data. Are you sure?", Application.ProductName,
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (sure == DialogResult.Yes)
             {
-                LoadData(Settings.Default.DataPath);
-                FillHistory();
+                _history.LoadData(Settings.Default.DataPath);
+                FillHistoryListView();
             }
+        }
+
+        private void updateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ReloadHistoryAndRefillListViewDialog();
         }
 
         private void darkToolStripMenuItem_Click(object sender, EventArgs e)
@@ -549,7 +585,130 @@ namespace TestProj
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SaveHistoryToFile();
+            _ = _history.SaveHistoryToFile();
+        }
+
+        private void saveAsCopyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _ = _history.SaveHistoryToFileAsACopy();
+        }
+
+        private void showCurrentCategoryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FillHistoryListView();
+        }
+
+        private void cbxCategory_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (MM_showCurrentCategory.Checked && !MM_showChronologically.Checked)
+                FillHistoryListView();
+        }
+
+        private void showChronoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FillHistoryListView();
+        }
+
+        private void MM_showChronologically_CheckedChanged(object sender, EventArgs e)
+        {
+            MM_showCurrentCategory.Enabled = !MM_showChronologically.Checked;
+            //_history.EnumerateForward = !MM_showChronologically.Checked;
+        }
+
+        private void showDatainiToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start(Settings.Default.DataPath);
+        }
+
+        private void showTheAppFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start(Application.StartupPath);
+        }
+
+        private void SetDateTimeFilter(DateTime begin, DateTime end)
+        {
+            dtBegin.Value = begin;
+            dtEnd.Value = end;
+        }
+
+        private void SetDateTimeFilterNow()
+        {
+            SetDateTimeFilter(DateTime.Now, DateTime.Now);
+        }
+
+        private void MM_showOnlyTodayEntries_Click(object sender, EventArgs e)
+        {
+            if (MM_showOnlyTodayEntries.Checked)
+            {
+                MM_UseDateFilter.Checked = false;
+                SetDateTimeFilterNow();
+                SwitchVisibleDateTimeFilter(false);
+            }
+
+            FillHistoryListView();
+        }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void MM_About_Click(object sender, EventArgs e)
+        {
+            new AboutForm().ShowDialog();
+        }
+
+
+        private void SwitchVisibleDateTimeFilter(bool needDateFilter)
+        {
+            dtBegin.Visible = needDateFilter;
+            dtEnd.Visible = needDateFilter;
+            lblFrom.Visible = needDateFilter;
+            lblTo.Visible = needDateFilter;
+            btnByDateFilter.Visible = needDateFilter;
+        }
+
+        private void MM_UseDateFilter_Click(object sender, EventArgs e)
+        {
+            SwitchVisibleDateTimeFilter(MM_UseDateFilter.Checked);
+
+            if (MM_UseDateFilter.Checked)
+            {
+                MM_showOnlyTodayEntries.Checked = false;
+            }
+            else
+            {
+                FillHistoryListView();
+            }
+                
+        }
+
+        private void btnByDateFilter_Click(object sender, EventArgs e)
+        {
+            FillHistoryListView();
+        }
+
+        private void ReverseOrderOptionSave(bool reverseOrder)
+        {
+            Settings.Default.ReverseOrderHistory = reverseOrder;
+            Settings.Default.Save();
+        }
+
+        private void MM_UseReverseOrder_Click(object sender, EventArgs e)
+        {
+            _history.EnumerateForward = !MM_UseReverseOrder.Checked;
+            ReverseOrderOptionSave(MM_UseReverseOrder.Checked);
+            FillHistoryListView();
+        }
+
+        private void MM_ShowTasks_Click(object sender, EventArgs e)
+        {
+            Process.Start("Tasks.docx");
+        }
+
+        private void txtToSearch_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

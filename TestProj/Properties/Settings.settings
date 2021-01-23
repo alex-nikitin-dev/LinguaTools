@@ -5,5 +5,11 @@
     <Setting Name="DataPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">data.ini</Value>
     </Setting>
+    <Setting Name="DarkTheme" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ReverseOrderHisroty" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
