@@ -445,9 +445,10 @@ namespace TestProj
         private void LstHistoryOnMouseDoubleClick(object sender, MouseEventArgs e)
         {
             if (_lstHistory.SelectedItems.Count == 0) return;
+            var selectedItem = _lstHistory.SelectedItems[0];
             tabControl1.SelectedTab = tabControl1.TabPages[0];
-            cbxCategory.Text = _lstHistory.SelectedItems[0].SubItems[1].Text;
-            GoBrowsers(_lstHistory.SelectedItems[0].Text);
+            cbxCategory.Text = selectedItem.SubItems[1].Text;
+            GoBrowsers(selectedItem.Text);
         }
 
         private void DeleteHistoryItem(object sender, EventArgs e)
