@@ -179,13 +179,15 @@ namespace TestProj
 
         public void DeleteHistoryItem(string phrase, string category)
         {
-            foreach (var dataItem in _historyData)
+            for (var i = 0; i < _historyData.Count; i++)
             {
+                var dataItem = _historyData[i];
                 if (string.CompareOrdinal(dataItem.Phrase, phrase) == 0 &&
                     string.CompareOrdinal(dataItem.Category, category) == 0)
                 {
                     _historyData.Remove(dataItem);
                     HistoryHasBeenChanged = true;
+                    i--;
                 }
             }
         }

@@ -25,6 +25,8 @@ namespace TestProj
                 
             };
             Cef.Initialize(settingsBrowser);
+            CefSharpSettings.LegacyJavascriptBindingEnabled = true;
+            CefSharpSettings.WcfEnabled = true;
             StartPosition = FormStartPosition.CenterScreen;
             WindowState = FormWindowState.Maximized;
         }
@@ -99,6 +101,8 @@ namespace TestProj
             InitHistoryListView();
             FillHistoryListView();
             //LoginToOALD();
+
+            //_browsers[0].Load("1.html");
             GoOALD("test");
             GoGoogleTranslate("test");
             SetThemeFromSettings();
@@ -129,11 +133,36 @@ namespace TestProj
             tabControl1.TabPages.Add("Urban");
             tabControl1.TabPages[0].Controls.Add(table);
             tabControl1.TabPages[1].Controls.Add(_browsers[2]);
+
+            tabControl1.TabPages.Add("tabHistory", "History");
         }
+
+
+        public class BoundObject
+        {
+            public string Text;
+            public event EventHandler<BrowserTextSelectedEventArgs> BrowserTextSelected;
+
+            protected virtual void OnBrowserTextSelected(BrowserTextSelectedEventArgs e)
+            {
+                var handler = BrowserTextSelected;
+                handler?.Invoke(this, e);
+            }
+            // ReSharper disable once InconsistentNaming
+            // ReSharper disable once IdentifierTypo
+            public void onselect(string msg)
+            {
+                if (!string.IsNullOrEmpty(msg))
+                    OnBrowserTextSelected(new BrowserTextSelectedEventArgs(msg));
+            }
+        }
+
+        private readonly BoundObject _boundObject = new BoundObject();
 
         private void InitBrowsers()
         {
             _browsers = new List<ChromiumWebBrowser>();
+            _boundObject.BrowserTextSelected += _boundObject_BrowserTextSelected;
             for (int i = 0; i < 3; i++)
             {
                 _browsers.Add(new ChromiumWebBrowser(""));
@@ -141,7 +170,21 @@ namespace TestProj
                 _browsers[i].FrameLoadEnd += MainForm_FrameLoadEnd;
             }
 
-            _browsers[0].FrameLoadEnd += OALD_Browser_LoadingStateChanged;
+            _browsers[0].JavascriptObjectRepository.Register("b1", _boundObject, false);
+            _browsers[0].FrameLoadEnd += OALD_Browser_FrameLoadEnd;
+        }
+
+        private delegate void BrowserTextSelectedDelegate(object sender, BrowserTextSelectedEventArgs e);
+
+        private void _boundObject_BrowserTextSelected(object sender, BrowserTextSelectedEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new BrowserTextSelectedDelegate(_boundObject_BrowserTextSelected), sender, e);
+                return;
+            }
+
+            GoGoogleTranslate(e.Text);
         }
 
         private void InitHistory()
@@ -149,7 +192,7 @@ namespace TestProj
             _history = new History(_dateTimeFormat,
                 _dateTimeFormatForFile,
                 Settings.Default.DataPath,
-                !Settings.Default.ReverseOrderHistory);
+                !Settings.Default.ReverseOrderHisroty);
 
             _history.NewCategoryAdded += _history_NewCategoryAdded;
             _history.NewHistoryItemAdded += _history_NewHistoryItemAdded;
@@ -168,7 +211,7 @@ namespace TestProj
         {
             if (InvokeRequired)
             {
-                Invoke(new AddHistoryItemToListViewDelegate(AddItemAndGroupToHistoryListView));
+                Invoke(new AddHistoryItemToListViewDelegate(AddItemAndGroupToHistoryListView),historyItem,isCategoryNew);
                 return;
             }
 
@@ -177,9 +220,16 @@ namespace TestProj
                 AddGroupToHistoryListView(historyItem.Category);
             }
 
-            AddItemToHistoryListView(historyItem, _history.EnumerateForward);
-            //_lstHistory.Update();
+            AddItemToHistoryListView(historyItem);
+            SortHistoryListViewByDateIfNeeded();
             HistoryListViewResize();
+            ShowHistoryCount();
+        }
+
+
+        private SortOrder GetHistorySortOrderByDate()
+        { 
+            return MM_UseReverseOrder.Checked ? SortOrder.Descending : SortOrder.Ascending;
         }
 
         private void AddGroupToHistoryListView(string groupName)
@@ -188,7 +238,7 @@ namespace TestProj
             _lstHistory.Groups.Add(group);
         }
 
-        private void AddItemToHistoryListView(HistoryDataItem historyItem,bool insertToTheEnd)
+        private void AddItemToHistoryListView(HistoryDataItem historyItem)
         {
             var li = new ListViewItem() { Text = historyItem.Phrase };
             li.SubItems.Add(historyItem.Category);
@@ -196,16 +246,22 @@ namespace TestProj
 
             if (AreTheGroupsNeeded())
                 li.Group = _lstHistory.Groups[historyItem.Category];
-
-            var index = insertToTheEnd ? _lstHistory.Items.Count : 0;
-
-
-            _lstHistory.Items.Insert(index, li);
-
-            //li.Group.Items.Insert(index, li);
-            //_lstHistory.Groups[li.Group.Name].Items.Insert(index, li);
+            
+            _lstHistory.Items.Add(li);
         }
 
+        private void SortHistoryListViewByDateIfNeeded()
+        {
+            if (MM_AutoSortByDate.Checked)
+                SortHistoryListView(GetHistorySortOrderByDate(), 2);
+        }
+
+        private void SortHistoryListView(SortOrder sortOrder, int sortColumn)
+        {
+            _lvwColumnSorter.SortColumn = sortColumn;
+            _lvwColumnSorter.Order = sortOrder;
+            SortHistoryListView();
+        }
 
         bool AreTheGroupsNeeded()
         {
@@ -216,6 +272,8 @@ namespace TestProj
         {
             AddCategoryCombobox(e.Category);
         }
+
+       
 
         private void MainForm_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
         {
@@ -312,18 +370,27 @@ namespace TestProj
             ");
         }
 
+        private void InitSorterListView()
+        {
+            _lvwColumnSorter = new ListViewColumnSorter {DateTimeFormat = _dateTimeFormat};
+            _lvwColumnSorter.ColumnTypes.Add(typeof(string));
+            _lvwColumnSorter.ColumnTypes.Add(typeof(string));
+            _lvwColumnSorter.ColumnTypes.Add(typeof(DateTime));
+        }
+
         private ListView _lstHistory;
         private void InitHistoryListView()
-        {
-            tabControl1.TabPages.Add("tabHistory", "History");
+        { 
+            InitSorterListView();
+
             _lstHistory = new ListView()
             {
                 View = View.Details, 
                 Dock = DockStyle.Fill, 
                 Font = new Font(Font.FontFamily, 12, FontStyle.Regular),
-                FullRowSelect = true
+                FullRowSelect = true,
             };
-          
+            
             tabControl1.TabPages["tabHistory"].Controls.Add(_lstHistory);
             _lstHistory.Columns.Add("phrase", "phrase");
             _lstHistory.Columns.Add("category", "category");
@@ -337,6 +404,42 @@ namespace TestProj
 
             _lstHistory.ContextMenu = new ContextMenu(menuItems.ToArray());
             _lstHistory.MouseDoubleClick += LstHistoryOnMouseDoubleClick;
+            _lstHistory.ColumnClick += _lstHistory_ColumnClick;
+        }
+
+        private ListViewColumnSorter _lvwColumnSorter;
+       
+        private void _lstHistory_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            // Determine if clicked column is already the column that is being sorted.
+            if (e.Column == _lvwColumnSorter.SortColumn)
+            {
+                // Reverse the current sort direction for this column.
+                if (_lvwColumnSorter.Order == SortOrder.Ascending)
+                {
+                    _lvwColumnSorter.Order = SortOrder.Descending;
+                }
+                else
+                {
+                    _lvwColumnSorter.Order = SortOrder.Ascending;
+                }
+            }
+            else
+            {
+                // Set the column number that is to be sorted; default to ascending.
+                _lvwColumnSorter.SortColumn = e.Column;
+                _lvwColumnSorter.Order = SortOrder.Ascending;
+            }
+
+            // Perform the sort with these new sort options.
+            SortHistoryListView();
+        }
+
+        private void SortHistoryListView()
+        {
+            _lstHistory.ListViewItemSorter = _lvwColumnSorter;
+            _lstHistory.Sort();
+            _lstHistory.ListViewItemSorter = null;
         }
 
         private void LstHistoryOnMouseDoubleClick(object sender, MouseEventArgs e)
@@ -393,11 +496,19 @@ namespace TestProj
             {
                 if (currentCategory != null && string.CompareOrdinal(currentCategory, item.Category) != 0) continue;
 
-                if (filterByDate && (item.Date < beginDate || item.Date > endDate)) continue;
+                if (filterByDate && (item.Date.Date < beginDate.Date || item.Date.Date > endDate.Date)) continue;
 
-                AddItemToHistoryListView(item, true);
+                AddItemToHistoryListView(item);
             }
+
+            SortHistoryListViewByDateIfNeeded();
             HistoryListViewResize();
+            ShowHistoryCount();
+        }
+
+        private void ShowHistoryCount()
+        {
+            stHistoryCountShown.Text = $@"{_lstHistory.Items.Count} in the History View";
         }
 
         private string GetCurrentCategoryForListView(bool showCurrentCategoryOnly, bool chronologically)
@@ -420,12 +531,13 @@ namespace TestProj
             FillHistoryListView(MM_showCurrentCategory.Checked,MM_showChronologically.Checked,IsFilterByDateNeed(),dtBegin.Value, dtEnd.Value);
         }
 
-        private void FillHistoryListView(bool showCurrentCategoryOnly, bool chronologically, bool filterByDate, DateTime beginDate, DateTime endDate)
+        private void FillHistoryListView(bool showCurrentCategoryOnly, bool chronologically, bool filterByDate,
+            DateTime beginDate, DateTime endDate)
         {
             _lstHistory.Items.Clear();
             var currentCategory = GetCurrentCategoryForListView(showCurrentCategoryOnly, chronologically);
-            
-            if (AreTheGroupsNeeded()) 
+
+            if (AreTheGroupsNeeded())
                 AddGroupsToHistoryListView(currentCategory);
 
             AddItemsToHistoryListView(currentCategory, filterByDate, beginDate, endDate);
@@ -447,7 +559,7 @@ namespace TestProj
         {
             if (InvokeRequired)
             {
-                Invoke(new AddCategoryComboboxDelegate(AddCategoryCombobox));
+                Invoke(new AddCategoryComboboxDelegate(AddCategoryCombobox),category);
                 return;
             }
 
@@ -473,7 +585,7 @@ namespace TestProj
             _browsers[0].Load("https://www.oxfordlearnersdictionaries.com/account/login");
         }
        
-        private void OALD_Browser_LoadingStateChanged(object sender, FrameLoadEndEventArgs e)
+        private void OALD_Browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
         {
             if (_preparingOALD && e.Frame.IsMain)
             {
@@ -481,7 +593,22 @@ namespace TestProj
                 PrepareOALD((ChromiumWebBrowser)sender);
             }
 
+            if (e.Frame.IsMain)
+            {
+                InsertOtherJavaScript((ChromiumWebBrowser)sender);
+            }
+
             DeleteAdOALD((ChromiumWebBrowser)sender);
+        }
+
+        private void InsertOtherJavaScript(ChromiumWebBrowser browser)
+        {
+            browser.ExecuteScriptAsyncWhenPageLoaded($@"
+              document.body.onmouseup = function()
+              {{
+                    b1.onselect(document.getSelection().toString());
+              }};
+            ");
         }
 
         private bool _preparingOALD;
@@ -612,7 +739,6 @@ namespace TestProj
         private void MM_showChronologically_CheckedChanged(object sender, EventArgs e)
         {
             MM_showCurrentCategory.Enabled = !MM_showChronologically.Checked;
-            //_history.EnumerateForward = !MM_showChronologically.Checked;
         }
 
         private void showDatainiToolStripMenuItem_Click(object sender, EventArgs e)
@@ -690,7 +816,13 @@ namespace TestProj
 
         private void ReverseOrderOptionSave(bool reverseOrder)
         {
-            Settings.Default.ReverseOrderHistory = reverseOrder;
+            Settings.Default.ReverseOrderHisroty = reverseOrder;
+            Settings.Default.Save();
+        }
+
+        private void AutoSortByDateOrderOptionSave(bool reverseOrder)
+        {
+            Settings.Default.AutoSortByDate = reverseOrder;
             Settings.Default.Save();
         }
 
@@ -709,6 +841,34 @@ namespace TestProj
         private void txtToSearch_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void MM_AutoSortByDate_Click(object sender, EventArgs e)
+        {
+            AutoSortByDateOrderOptionSave(MM_AutoSortByDate.Checked);
+            if(MM_AutoSortByDate.Checked)
+                SortHistoryListViewByDateIfNeeded();
+        }
+
+        private void btnClearInput_Click(object sender, EventArgs e)
+        {
+            txtToSearch.Clear();
+        }
+
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Control && e.Shift && e.KeyCode == Keys.C)
+                txtToSearch.Clear();
+        }
+
+        private void MM_ShortcutsHelp_Click(object sender, EventArgs e)
+        {
+            new ShortcutsForm().ShowDialog();
+        }
+
+        private void MM_Test_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(_boundObject.Text);
         }
     }
 }

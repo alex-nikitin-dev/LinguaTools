@@ -36,6 +36,8 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showDatainiToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showTheAppFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.MM_ShowTasks = new System.Windows.Forms.ToolStripMenuItem();
             this.mainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MM_NeedUrbanDictionary = new System.Windows.Forms.ToolStripMenuItem();
             this.loginToOALDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -45,27 +47,30 @@
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.MM_showCurrentCategory = new System.Windows.Forms.ToolStripMenuItem();
             this.MM_showChronologically = new System.Windows.Forms.ToolStripMenuItem();
+            this.MM_showOnlyTodayEntries = new System.Windows.Forms.ToolStripMenuItem();
+            this.MM_UseDateFilter = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.MM_UseReverseOrder = new System.Windows.Forms.ToolStripMenuItem();
+            this.MM_AutoSortByDate = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.MM_Update = new System.Windows.Forms.ToolStripMenuItem();
             this.styleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.darkToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lightToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MM_Help = new System.Windows.Forms.ToolStripMenuItem();
+            this.MM_About = new System.Windows.Forms.ToolStripMenuItem();
+            this.MM_ShortcutsHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.cbxCategory = new System.Windows.Forms.ComboBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.mainProgress = new System.Windows.Forms.ToolStripProgressBar();
-            this.MM_showOnlyTodayEntries = new System.Windows.Forms.ToolStripMenuItem();
-            this.MM_UseDateFilter = new System.Windows.Forms.ToolStripMenuItem();
+            this.stHistoryCountShown = new System.Windows.Forms.ToolStripStatusLabel();
             this.dtBegin = new System.Windows.Forms.DateTimePicker();
             this.dtEnd = new System.Windows.Forms.DateTimePicker();
-            this.MM_Help = new System.Windows.Forms.ToolStripMenuItem();
-            this.MM_About = new System.Windows.Forms.ToolStripMenuItem();
             this.lblFrom = new System.Windows.Forms.Label();
             this.lblTo = new System.Windows.Forms.Label();
             this.btnByDateFilter = new System.Windows.Forms.Button();
-            this.MM_UseReverseOrder = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.MM_ShowTasks = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnClearInput = new System.Windows.Forms.Button();
+            this.MM_Test = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -147,6 +152,18 @@
             this.showTheAppFolderToolStripMenuItem.Text = "Show the app folder";
             this.showTheAppFolderToolStripMenuItem.Click += new System.EventHandler(this.showTheAppFolderToolStripMenuItem_Click);
             // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(177, 6);
+            // 
+            // MM_ShowTasks
+            // 
+            this.MM_ShowTasks.Name = "MM_ShowTasks";
+            this.MM_ShowTasks.Size = new System.Drawing.Size(180, 22);
+            this.MM_ShowTasks.Text = "Show Tasks";
+            this.MM_ShowTasks.Click += new System.EventHandler(this.MM_ShowTasks_Click);
+            // 
             // mainToolStripMenuItem
             // 
             this.mainToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -183,6 +200,7 @@
             this.MM_UseDateFilter,
             this.toolStripSeparator3,
             this.MM_UseReverseOrder,
+            this.MM_AutoSortByDate,
             this.toolStripSeparator1,
             this.MM_Update});
             this.historyToolStripMenuItem.Name = "historyToolStripMenuItem";
@@ -227,6 +245,47 @@
             this.MM_showChronologically.CheckedChanged += new System.EventHandler(this.MM_showChronologically_CheckedChanged);
             this.MM_showChronologically.Click += new System.EventHandler(this.showChronoToolStripMenuItem_Click);
             // 
+            // MM_showOnlyTodayEntries
+            // 
+            this.MM_showOnlyTodayEntries.CheckOnClick = true;
+            this.MM_showOnlyTodayEntries.Name = "MM_showOnlyTodayEntries";
+            this.MM_showOnlyTodayEntries.Size = new System.Drawing.Size(225, 22);
+            this.MM_showOnlyTodayEntries.Text = "Show Only Today Entries";
+            this.MM_showOnlyTodayEntries.Click += new System.EventHandler(this.MM_showOnlyTodayEntries_Click);
+            // 
+            // MM_UseDateFilter
+            // 
+            this.MM_UseDateFilter.CheckOnClick = true;
+            this.MM_UseDateFilter.Name = "MM_UseDateFilter";
+            this.MM_UseDateFilter.Size = new System.Drawing.Size(225, 22);
+            this.MM_UseDateFilter.Text = "Use Date filter";
+            this.MM_UseDateFilter.Click += new System.EventHandler(this.MM_UseDateFilter_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(222, 6);
+            // 
+            // MM_UseReverseOrder
+            // 
+            this.MM_UseReverseOrder.Checked = true;
+            this.MM_UseReverseOrder.CheckOnClick = true;
+            this.MM_UseReverseOrder.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.MM_UseReverseOrder.Name = "MM_UseReverseOrder";
+            this.MM_UseReverseOrder.Size = new System.Drawing.Size(225, 22);
+            this.MM_UseReverseOrder.Text = "Use Reverse Order";
+            this.MM_UseReverseOrder.Click += new System.EventHandler(this.MM_UseReverseOrder_Click);
+            // 
+            // MM_AutoSortByDate
+            // 
+            this.MM_AutoSortByDate.Checked = true;
+            this.MM_AutoSortByDate.CheckOnClick = true;
+            this.MM_AutoSortByDate.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.MM_AutoSortByDate.Name = "MM_AutoSortByDate";
+            this.MM_AutoSortByDate.Size = new System.Drawing.Size(225, 22);
+            this.MM_AutoSortByDate.Text = "Auto Sort By Date";
+            this.MM_AutoSortByDate.Click += new System.EventHandler(this.MM_AutoSortByDate_Click);
+            // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
@@ -251,23 +310,47 @@
             // darkToolStripMenuItem
             // 
             this.darkToolStripMenuItem.Name = "darkToolStripMenuItem";
-            this.darkToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.darkToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
             this.darkToolStripMenuItem.Text = "Dark";
             this.darkToolStripMenuItem.Click += new System.EventHandler(this.darkToolStripMenuItem_Click);
             // 
             // lightToolStripMenuItem
             // 
             this.lightToolStripMenuItem.Name = "lightToolStripMenuItem";
-            this.lightToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.lightToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
             this.lightToolStripMenuItem.Text = "Light";
             this.lightToolStripMenuItem.Click += new System.EventHandler(this.lightToolStripMenuItem_Click);
+            // 
+            // MM_Help
+            // 
+            this.MM_Help.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.MM_About,
+            this.MM_ShortcutsHelp,
+            this.MM_Test});
+            this.MM_Help.Name = "MM_Help";
+            this.MM_Help.Size = new System.Drawing.Size(44, 20);
+            this.MM_Help.Text = "Help";
+            // 
+            // MM_About
+            // 
+            this.MM_About.Name = "MM_About";
+            this.MM_About.Size = new System.Drawing.Size(180, 22);
+            this.MM_About.Text = "About";
+            this.MM_About.Click += new System.EventHandler(this.MM_About_Click);
+            // 
+            // MM_ShortcutsHelp
+            // 
+            this.MM_ShortcutsHelp.Name = "MM_ShortcutsHelp";
+            this.MM_ShortcutsHelp.Size = new System.Drawing.Size(180, 22);
+            this.MM_ShortcutsHelp.Text = "Shortcuts";
+            this.MM_ShortcutsHelp.Click += new System.EventHandler(this.MM_ShortcutsHelp_Click);
             // 
             // cbxCategory
             // 
             this.cbxCategory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxCategory.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cbxCategory.FormattingEnabled = true;
-            this.cbxCategory.Location = new System.Drawing.Point(749, 30);
+            this.cbxCategory.Location = new System.Drawing.Point(794, 31);
             this.cbxCategory.Name = "cbxCategory";
             this.cbxCategory.Size = new System.Drawing.Size(248, 28);
             this.cbxCategory.TabIndex = 5;
@@ -277,7 +360,8 @@
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mainProgress});
+            this.mainProgress,
+            this.stHistoryCountShown});
             this.statusStrip1.Location = new System.Drawing.Point(0, 751);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1214, 22);
@@ -291,21 +375,10 @@
             this.mainProgress.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.mainProgress.Visible = false;
             // 
-            // MM_showOnlyTodayEntries
+            // stHistoryCountShown
             // 
-            this.MM_showOnlyTodayEntries.CheckOnClick = true;
-            this.MM_showOnlyTodayEntries.Name = "MM_showOnlyTodayEntries";
-            this.MM_showOnlyTodayEntries.Size = new System.Drawing.Size(225, 22);
-            this.MM_showOnlyTodayEntries.Text = "Show Only Today Entries";
-            this.MM_showOnlyTodayEntries.Click += new System.EventHandler(this.MM_showOnlyTodayEntries_Click);
-            // 
-            // MM_UseDateFilter
-            // 
-            this.MM_UseDateFilter.CheckOnClick = true;
-            this.MM_UseDateFilter.Name = "MM_UseDateFilter";
-            this.MM_UseDateFilter.Size = new System.Drawing.Size(225, 22);
-            this.MM_UseDateFilter.Text = "Use Date filter";
-            this.MM_UseDateFilter.Click += new System.EventHandler(this.MM_UseDateFilter_Click);
+            this.stHistoryCountShown.Name = "stHistoryCountShown";
+            this.stHistoryCountShown.Size = new System.Drawing.Size(0, 17);
             // 
             // dtBegin
             // 
@@ -324,21 +397,6 @@
             this.dtEnd.Size = new System.Drawing.Size(200, 20);
             this.dtEnd.TabIndex = 8;
             this.dtEnd.Visible = false;
-            // 
-            // MM_Help
-            // 
-            this.MM_Help.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.MM_About});
-            this.MM_Help.Name = "MM_Help";
-            this.MM_Help.Size = new System.Drawing.Size(44, 20);
-            this.MM_Help.Text = "Help";
-            // 
-            // MM_About
-            // 
-            this.MM_About.Name = "MM_About";
-            this.MM_About.Size = new System.Drawing.Size(180, 22);
-            this.MM_About.Text = "About";
-            this.MM_About.Click += new System.EventHandler(this.MM_About_Click);
             // 
             // lblFrom
             // 
@@ -374,38 +432,30 @@
             this.btnByDateFilter.Visible = false;
             this.btnByDateFilter.Click += new System.EventHandler(this.btnByDateFilter_Click);
             // 
-            // MM_UseReverseOrder
+            // btnClearInput
             // 
-            this.MM_UseReverseOrder.Checked = true;
-            this.MM_UseReverseOrder.CheckOnClick = true;
-            this.MM_UseReverseOrder.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.MM_UseReverseOrder.Name = "MM_UseReverseOrder";
-            this.MM_UseReverseOrder.Size = new System.Drawing.Size(225, 22);
-            this.MM_UseReverseOrder.Text = "Use Reverse Order";
-            this.MM_UseReverseOrder.Click += new System.EventHandler(this.MM_UseReverseOrder_Click);
+            this.btnClearInput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClearInput.Location = new System.Drawing.Point(749, 32);
+            this.btnClearInput.Name = "btnClearInput";
+            this.btnClearInput.Size = new System.Drawing.Size(39, 26);
+            this.btnClearInput.TabIndex = 12;
+            this.btnClearInput.Text = "Clear";
+            this.btnClearInput.UseVisualStyleBackColor = true;
+            this.btnClearInput.Click += new System.EventHandler(this.btnClearInput_Click);
             // 
-            // toolStripSeparator3
+            // MM_Test
             // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(222, 6);
-            // 
-            // MM_ShowTasks
-            // 
-            this.MM_ShowTasks.Name = "MM_ShowTasks";
-            this.MM_ShowTasks.Size = new System.Drawing.Size(180, 22);
-            this.MM_ShowTasks.Text = "Show Tasks";
-            this.MM_ShowTasks.Click += new System.EventHandler(this.MM_ShowTasks_Click);
-            // 
-            // toolStripSeparator4
-            // 
-            this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(177, 6);
+            this.MM_Test.Name = "MM_Test";
+            this.MM_Test.Size = new System.Drawing.Size(180, 22);
+            this.MM_Test.Text = "Test";
+            this.MM_Test.Click += new System.EventHandler(this.MM_Test_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1214, 773);
+            this.Controls.Add(this.btnClearInput);
             this.Controls.Add(this.btnByDateFilter);
             this.Controls.Add(this.lblTo);
             this.Controls.Add(this.lblFrom);
@@ -418,12 +468,14 @@
             this.Controls.Add(this.txtToSearch);
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
-            this.MinimumSize = new System.Drawing.Size(1200, 0);
+            this.MinimumSize = new System.Drawing.Size(1200, 39);
             this.Name = "MainForm";
             this.Text = "MainForm";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
@@ -471,6 +523,11 @@
         private System.Windows.Forms.ToolStripMenuItem MM_UseReverseOrder;
         private System.Windows.Forms.ToolStripMenuItem MM_ShowTasks;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripMenuItem MM_AutoSortByDate;
+        private System.Windows.Forms.ToolStripStatusLabel stHistoryCountShown;
+        private System.Windows.Forms.Button btnClearInput;
+        private System.Windows.Forms.ToolStripMenuItem MM_ShortcutsHelp;
+        private System.Windows.Forms.ToolStripMenuItem MM_Test;
     }
 }
 

@@ -50,12 +50,24 @@ namespace TestProj.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool ReverseOrderHistory {
+        public bool ReverseOrderHisroty {
             get {
-                return ((bool)(this["ReverseOrderHistory"]));
+                return ((bool)(this["ReverseOrderHisroty"]));
             }
             set {
-                this["ReverseOrderHistory"] = value;
+                this["ReverseOrderHisroty"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoSortByDate {
+            get {
+                return ((bool)(this["AutoSortByDate"]));
+            }
+            set {
+                this["AutoSortByDate"] = value;
             }
         }
     }
