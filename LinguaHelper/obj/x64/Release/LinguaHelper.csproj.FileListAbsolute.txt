@@ -1,0 +1,16 @@
+C:\Users\main\source\repos\LinguaTools 25.01.2021\LinguaHelper\bin\x64\Release\LinguaHelper.exe.config
+C:\Users\main\source\repos\LinguaTools 25.01.2021\LinguaHelper\bin\x64\Release\LinguaHelper.exe
+C:\Users\main\source\repos\LinguaTools 25.01.2021\LinguaHelper\bin\x64\Release\HotKeysRegistrator.dll
+C:\Users\main\source\repos\LinguaTools 25.01.2021\LinguaHelper\obj\x64\Release\LinguaHelper.csproj.AssemblyReference.cache
+C:\Users\main\source\repos\LinguaTools 25.01.2021\LinguaHelper\obj\x64\Release\LinguaHelper.csproj.SuggestedBindingRedirects.cache
+C:\Users\main\source\repos\LinguaTools 25.01.2021\LinguaHelper\obj\x64\Release\MainWindow.g.cs
+C:\Users\main\source\repos\LinguaTools 25.01.2021\LinguaHelper\obj\x64\Release\App.g.cs
+C:\Users\main\source\repos\LinguaTools 25.01.2021\LinguaHelper\obj\x64\Release\LinguaHelper_MarkupCompile.cache
+C:\Users\main\source\repos\LinguaTools 25.01.2021\LinguaHelper\obj\x64\Release\LinguaHelper_MarkupCompile.lref
+C:\Users\main\source\repos\LinguaTools 25.01.2021\LinguaHelper\obj\x64\Release\MainWindow.baml
+C:\Users\main\source\repos\LinguaTools 25.01.2021\LinguaHelper\obj\x64\Release\LinguaHelper.g.resources
+C:\Users\main\source\repos\LinguaTools 25.01.2021\LinguaHelper\obj\x64\Release\LinguaHelper.Properties.Resources.resources
+C:\Users\main\source\repos\LinguaTools 25.01.2021\LinguaHelper\obj\x64\Release\LinguaHelper.csproj.GenerateResource.cache
+C:\Users\main\source\repos\LinguaTools 25.01.2021\LinguaHelper\obj\x64\Release\LinguaHelper.csproj.CoreCompileInputs.cache
+C:\Users\main\source\repos\LinguaTools 25.01.2021\LinguaHelper\obj\x64\Release\LinguaHelper.csproj.CopyComplete
+C:\Users\main\source\repos\LinguaTools 25.01.2021\LinguaHelper\obj\x64\Release\LinguaHelper.exe

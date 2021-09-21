@@ -1,0 +1,18 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/LinguaHelper/bin
+/LinguaHelper/obj/Debug
+/LinguaHelper/obj/x86/Debug
+/LinguaHelper/obj/x86/Release
+/packages
+/TestProj/bin/x86
+/TestProj/bin/Release
+/TestProj/bin/Debug
+/TestProj/bin
+/TestProj/obj
+/.vs/LinguaHelper/v16
+/.vs
+/.vs/LinguaHelper/v17
+/TestProj/credentials.json
