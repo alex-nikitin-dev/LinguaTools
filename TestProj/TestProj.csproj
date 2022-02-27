@@ -93,6 +93,13 @@
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
     <Compile Include="BrowserTextSelectedEventArgs.cs" />
+    <Compile Include="Credentials.cs" />
+    <Compile Include="CredentialsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CredentialsForm.Designer.cs">
+      <DependentUpon>CredentialsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="History.cs" />
     <Compile Include="HistoryEnum.cs" />
     <Compile Include="HistoryItemHasBeenUpdatedArgs.cs" />
@@ -116,6 +123,9 @@
     </Compile>
     <EmbeddedResource Include="AboutForm.resx">
       <DependentUpon>AboutForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CredentialsForm.resx">
+      <DependentUpon>CredentialsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

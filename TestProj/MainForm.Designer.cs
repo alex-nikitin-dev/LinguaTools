@@ -79,6 +79,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.setOALDCredentialsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -103,7 +104,7 @@
             this.tabControl1.Location = new System.Drawing.Point(1, 90);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1213, 682);
+            this.tabControl1.Size = new System.Drawing.Size(1213, 658);
             this.tabControl1.TabIndex = 2;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
@@ -178,7 +179,8 @@
             this.mainToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.MM_NeedUrbanDictionary,
             this.loginToOALDToolStripMenuItem,
-            this.MM_LoginToOALDOnStart});
+            this.MM_LoginToOALDOnStart,
+            this.setOALDCredentialsToolStripMenuItem});
             this.mainToolStripMenuItem.Name = "mainToolStripMenuItem";
             this.mainToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.mainToolStripMenuItem.Text = "Browser";
@@ -404,7 +406,7 @@
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mainProgress,
             this.stHistoryCountShown});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 751);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 727);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1214, 22);
             this.statusStrip1.TabIndex = 6;
@@ -528,11 +530,18 @@
             this.label3.TabIndex = 16;
             this.label3.Text = "Category:";
             // 
+            // setOALDCredentialsToolStripMenuItem
+            // 
+            this.setOALDCredentialsToolStripMenuItem.Name = "setOALDCredentialsToolStripMenuItem";
+            this.setOALDCredentialsToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+            this.setOALDCredentialsToolStripMenuItem.Text = "Set OALD Credentials";
+            this.setOALDCredentialsToolStripMenuItem.Click += new System.EventHandler(this.setOALDCredentialsToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1214, 773);
+            this.ClientSize = new System.Drawing.Size(1214, 749);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -618,6 +627,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ToolStripMenuItem MM_SetBackupFolder;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripMenuItem setOALDCredentialsToolStripMenuItem;
     }
 }
 

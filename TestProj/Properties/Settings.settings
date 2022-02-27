@@ -26,5 +26,11 @@
     <Setting Name="DarkCSSColorThemePath" Type="System.String" Scope="User">
       <Value Profile="(Default)">css\dark.mode.css</Value>
     </Setting>
+    <Setting Name="OALDPass" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="OALDUser" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -855,12 +855,12 @@ namespace TestProj
         private bool _preparingOALD;
         static void PrepareOALD(ChromiumWebBrowser browser)
         {
-            browser.EvaluateScriptAsync(@"function setItem(itemId,itemValue){
+            browser.EvaluateScriptAsync($@"function setItem(itemId,itemValue){{
             document.getElementById(itemId).value = itemValue;
-            }
+            }}
             
-            setItem('j_username','alex.nikitin.gm@gmail.com');
-            setItem('j_password','txFfNTfAvgXDQ8q');
+            setItem('j_username','{Settings.Default.OALDUser}');
+            setItem('j_password','{Settings.Default.OALDPass}');
            // document.getElementsByTagName('form')[0].submit();
            document.getElementsByClassName('mdl-btn mdl-btn-main mdl-btn-left')[0].click();
             ");
@@ -1271,6 +1271,15 @@ namespace TestProj
             ChooseBackupFolderDialog();
         }
 
-       
+        private void setOALDCredentialsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var dialog = new CredentialsForm();
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                var stt = Settings.Default;
+                stt.OALDUser = dialog.Credentials.UserName;
+                stt.OALDPass = dialog.Credentials.Password;
+            }
+        }
     }
 }
