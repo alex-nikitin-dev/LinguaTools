@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TestProj
+﻿namespace TestProj
 {
     public class Credentials
     {
@@ -15,6 +9,11 @@ namespace TestProj
         {
             Password = password;
             UserName = userName;
+        }
+
+        public Credentials()
+        {
+
         }
     }
 }

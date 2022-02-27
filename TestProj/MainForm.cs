@@ -1273,13 +1273,16 @@ namespace TestProj
 
         private void setOALDCredentialsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var dialog = new CredentialsForm();
-            if (dialog.ShowDialog() == DialogResult.OK)
+            var stt = Settings.Default;
+            var dialog = new CredentialsForm
             {
-                var stt = Settings.Default;
-                stt.OALDUser = dialog.Credentials.UserName;
-                stt.OALDPass = dialog.Credentials.Password;
-            }
+                Credentials = new Credentials(stt.OALDUser, stt.OALDPass)
+            };
+
+            if (dialog.ShowDialog() != DialogResult.OK) return;
+            stt.OALDUser = dialog.Credentials.UserName;
+            stt.OALDPass = dialog.Credentials.Password;
+            stt.Save();
         }
     }
 }

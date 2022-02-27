@@ -8,6 +8,7 @@ namespace TestProj
         public CredentialsForm()
         {
             InitializeComponent();
+            Credentials = new Credentials();
         }
 
         private readonly char _passwordChar = '*';
@@ -28,6 +29,9 @@ namespace TestProj
         {
             DialogResult = DialogResult.None;
             txtPass.PasswordChar = _passwordChar;
+
+            txtUser.Text = Credentials.UserName;
+            txtPass.Text = Credentials.Password;
         }
     }
 }
