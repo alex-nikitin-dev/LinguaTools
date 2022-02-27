@@ -106,9 +106,12 @@ namespace TestProj
             FillCategoriesComboBox();
             InitHistoryListView();
             FillHistoryListView();
-           
-            GoOALD("");
             GoGoogleTranslate("");
+            if(MM_LoginToOALDOnStart.Checked)
+                LoginToOALD();
+            else
+                GoOALD("");
+
             SetThemeFromSettings();
         }
 
@@ -197,7 +200,6 @@ namespace TestProj
             if (e.KeyData == (Keys.Control | Keys.Shift | Keys.C))
             {
                 ClearTxtSearchAndFocus();
-                return;
             }
         }
 
@@ -828,8 +830,6 @@ namespace TestProj
         }
         private void OALD_Browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
         {
-            var browser = (ChromiumWebBrowser)sender;
-
             if (_preparingOALD && e.Frame.IsMain)
             {
                 _preparingOALD = false;
@@ -911,30 +911,51 @@ namespace TestProj
             await SaveHistoryBackup();
         }
 
-        private void SaveTasksBackup()
+/*
+        private string GetFileNameWithTimeStamp(string path)
         {
-            var stt = Settings.Default;
-            if (string.IsNullOrEmpty(stt.HistoryBackupPath))
-                return;
-            var dir = Path.GetDirectoryName(stt.HistoryBackupPath);
-            if (!Directory.Exists(dir))
-                return;
-            if (!File.Exists(stt.TaskFilePath))
-                return;
-            var taskFileName = Path.GetFileName(stt.TaskFilePath);
+            var fileNameWithoutExt = Path.GetFileNameWithoutExtension(path);
+            var fileExt = Path.GetExtension(path);
+            return $"{fileNameWithoutExt}_{_history.GetTimeStampNowForFile()}_{fileExt}";
+        }
+*/
 
-            File.Copy(stt.TaskFilePath, Path.Combine(dir, taskFileName),true);
+        private async Task SaveTasksBackup()
+        {
+            await Task.Run(() =>
+            {
+                var stt = Settings.Default;
+                if (string.IsNullOrEmpty(stt.HistoryBackupPath))
+                    return;
+                var dir = Path.GetDirectoryName(stt.HistoryBackupPath);
+                if (!Directory.Exists(dir))
+                    return;
+                if (!File.Exists(stt.TaskFilePath))
+                    return;
+
+                File.Copy(stt.TaskFilePath, Path.Combine(dir, Path.GetFileName(stt.TaskFilePath)), true);
+            });
         }
 
+        bool _readyToClosing;
+
         private async void MainForm_FormClosing(object sender, FormClosingEventArgs e)
-        { 
-            if(_history.HistoryHasBeenChanged) 
-                await SaveHistory(e.CloseReason == CloseReason.UserClosing);
+        {
+            e.Cancel = !_readyToClosing;
 
-            SaveTasksBackup();
+            if (!_readyToClosing)
+            {
+                if (_history.HistoryHasBeenChanged)
+                    await SaveHistory(e.CloseReason == CloseReason.UserClosing);
 
-            if (_hotKeyId != null)
-                HotKeyManager.UnregisterHotKey(_hotKeyId.Value);
+                await SaveTasksBackup();
+
+                if (_hotKeyId != null)
+                    HotKeyManager.UnregisterHotKey(_hotKeyId.Value);
+
+                _readyToClosing = true;
+                Close();
+            }
         }
 
         private void loginToOALDToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1222,14 +1243,14 @@ namespace TestProj
             {
                 dlg.InitialDirectory = Application.StartupPath;
                 dlg.FileName = "LinguaHelper_data_backup.ini";
-                dlg.Filter = "Ini Files (*.ini)|*.ini";
+                dlg.Filter = @"Ini Files (*.ini)|*.ini";
             }
             else
             {
                 dlg.InitialDirectory = Path.GetDirectoryName(stt.HistoryBackupPath);
                 dlg.FileName = Path.GetFileName(stt.HistoryBackupPath);
                 var ext = Path.GetExtension(stt.HistoryBackupPath);
-                dlg.Filter = $"(*{ext})|*{ext}";
+                dlg.Filter = $@"(*{ext})|*{ext}";
             }
 
             if (dlg.ShowDialog() == DialogResult.Cancel)
@@ -1237,7 +1258,7 @@ namespace TestProj
 
             if (string.Compare(Path.GetDirectoryName(dlg.FileName), Application.StartupPath, StringComparison.CurrentCultureIgnoreCase) == 0)
             {
-                MessageBox.Show("Choose a folder other than the startup folder", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show(@"Choose a folder other than the startup folder", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 ChooseBackupFolderDialog();
                 return;
             }

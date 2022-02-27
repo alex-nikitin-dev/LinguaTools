@@ -147,7 +147,7 @@ namespace TestProj
                 }
             });
         }
-        private string GetTimeStampNowForFile()
+        public string GetTimeStampNowForFile()
         {
             return GetDataTimeFormattedForFile(DateTime.Now);
         }
@@ -160,7 +160,6 @@ namespace TestProj
         {
             return dt.ToString(_dateTimeFileFormat, CultureInfo.InvariantCulture);
         }
-
         private string GetFileNameWithTimeStamp(string path)
         {
             return Path.GetFileNameWithoutExtension(path) + "." + GetTimeStampNowForFile();
