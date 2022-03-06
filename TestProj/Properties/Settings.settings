@@ -32,5 +32,14 @@
     <Setting Name="OALDUser" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="OALDUserID" Type="System.String" Scope="User">
+      <Value Profile="(Default)">teach_email</Value>
+    </Setting>
+    <Setting Name="OALDPassID" Type="System.String" Scope="User">
+      <Value Profile="(Default)">teach_password</Value>
+    </Setting>
+    <Setting Name="OALDSubmitID" Type="System.String" Scope="User">
+      <Value Profile="(Default)">teach_btn-login</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -142,5 +142,41 @@ namespace TestProj.Properties {
                 this["OALDUser"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("teach_email")]
+        public string OALDUserID {
+            get {
+                return ((string)(this["OALDUserID"]));
+            }
+            set {
+                this["OALDUserID"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("teach_password")]
+        public string OALDPassID {
+            get {
+                return ((string)(this["OALDPassID"]));
+            }
+            set {
+                this["OALDPassID"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("teach_btn-login")]
+        public string OALDSubmitID {
+            get {
+                return ((string)(this["OALDSubmitID"]));
+            }
+            set {
+                this["OALDSubmitID"] = value;
+            }
+        }
     }
 }
