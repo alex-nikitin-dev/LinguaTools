@@ -46,6 +46,14 @@ namespace TestProj
             return cbxCategory.Text;
         }
 
+        enum BrowserNames
+        {
+            OALD = 0,
+            GT_OALD,
+            Urban,
+            Cambridge,
+            GT_Cambridge
+        }
 
         string PrepareTextToProceed(string text)
         {
@@ -55,20 +63,7 @@ namespace TestProj
             return text;
         }
 
-        void GoOALD(string text)
-        {
-            _browsers[0].Load($"https://www.oxfordlearnersdictionaries.com/search/english/?q={text}");
-        }
-
-        void GoGoogleTranslate(string text)
-        {
-            _browsers[1].Load($"https://translate.google.am/?hl=en#view=home&op=translate&sl=en&tl=ru&text={text}");
-        }
-
-        void GoUrbanDictionary(string text)
-        {
-             _browsers[2].Load($"https://www.urbandictionary.com/define.php?term={text}");
-        }
+        
 
         void GoBrowsers(string text, bool saveHistory = true)
         {
@@ -78,13 +73,15 @@ namespace TestProj
             txtToSearch.Text = text;
             if(saveHistory)
                 _history.AddHistoryItem(text, GetCategory());
-            
-            GoOALD(text);
-            GoGoogleTranslate(text);
-            if(MM_NeedUrbanDictionary.Checked) GoUrbanDictionary(text);
+
+            foreach (var unit in _dictionaryTranslatorUnits)
+            {
+                unit.Go(text);
+            }
+            //if(MM_NeedUrbanDictionary.Checked) GoUrbanDictionary(text);
         }
 
-        private List<ChromiumWebBrowser> _browsers;
+        
         private History _history;
         private int? _hotKeyId;
 
@@ -106,16 +103,14 @@ namespace TestProj
             FillCategoriesComboBox();
             InitHistoryListView();
             FillHistoryListView();
-            GoGoogleTranslate("");
-            if(MM_LoginToOALDOnStart.Checked)
+            //GoGoogleTranslate("");
+            if (MM_LoginToOALDOnStart.Checked)
                 LoginToOALD();
-            else
-                GoOALD("");
+            //else
+            //    GoOALD("");
 
             SetThemeFromSettings();
         }
-
-
 
         private void LoadSettings()
         {
@@ -137,60 +132,37 @@ namespace TestProj
 
         private void InitTabs()
         {
-            var table = new TableLayoutPanel() { ColumnCount = 2, RowCount = 1, Dock = DockStyle.Fill };
-            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70));
-            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30));
-            table.Controls.Add(_browsers[0], 0, 0);
-            table.Controls.Add(_browsers[1], 1, 0);
-
             tabControl1.Font = new Font(tabControl1.Font.FontFamily, 12, FontStyle.Regular);
-            tabControl1.TabPages.Add("OALD","OALD");
-            tabControl1.TabPages["OALD"].Controls.Add(table);
+            for (int i = 0; i < _dictionaryTranslatorUnits.Count; i++)
+            {
+                var table = new TableLayoutPanel() { ColumnCount = 2, RowCount = 1, Dock = DockStyle.Fill };
+                table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70));
+                table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30));
+
+                table.Controls.Add(_dictionaryTranslatorUnits[i].Dictionary.Browser, 0, 0);
+                table.Controls.Add(_dictionaryTranslatorUnits[i].Translator.Browser, 1, 0);
+
+                var dictionaryName = _dictionaryTranslatorUnits[i].Dictionary.BrowserName;
+                tabControl1.TabPages.Add(dictionaryName, dictionaryName);
+                tabControl1.TabPages[dictionaryName].Controls.Add(table);
+            }
             tabControl1.TabPages.Add("tabHistory", "History");
 
             ShowUrban(MM_NeedUrbanDictionary.Checked);
         }
 
-        public class BoundObject
-        {
-            public string Text;
-            public event EventHandler<BrowserTextSelectedEventArgs> BrowserTextSelected;
-
-            protected virtual void OnBrowserTextSelected(BrowserTextSelectedEventArgs e)
-            {
-                var handler = BrowserTextSelected;
-                handler?.Invoke(this, e);
-            }
-            // ReSharper disable once InconsistentNaming
-            // ReSharper disable once IdentifierTypo
-            public void onselect(string msg)
-            {
-                if (!string.IsNullOrEmpty(msg))
-                    OnBrowserTextSelected(new BrowserTextSelectedEventArgs(msg));
-            }
-        }
-
-        private readonly BoundObject _boundObject = new BoundObject();
+        List<DictionaryTranslatorUnit> _dictionaryTranslatorUnits;
 
         private void InitBrowsers()
         {
-            _browsers = new List<ChromiumWebBrowser>();
-            _boundObject.BrowserTextSelected += _boundObject_BrowserTextSelected;
-            for (int i = 0; i < 3; i++)
-            {
-                _browsers.Add(new ChromiumWebBrowser(""));
-                _browsers[i].Dock = DockStyle.Fill;
-            }
+            var stt = Settings.Default;
+            DictionaryTranslatorUnit.DefaultTranslatorUrl = stt.GT_URL;
+            DictionaryTranslatorUnit.DefaultTranslatorName = stt.GT_Name;
+            _dictionaryTranslatorUnits = new List<DictionaryTranslatorUnit>();
 
-            _browsers[0].JavascriptObjectRepository.Register("b1", _boundObject, false);
-            _browsers[0].FrameLoadEnd += OALD_Browser_FrameLoadEnd;
-            _browsers[0].LoadingStateChanged += OALD_Browser_LoadingStateChanged;
-            _browsers[1].LoadingStateChanged += GTranslator_LoadingStateChanged;
+            var oald = new BrowserItem(stt.OALD_URL, "OALD", BrowsersJS.DictionaryOnSelectJS, BrowsersJS.OaldDeleteAdJS,stt.OALDPrepareURL, BrowsersJS.OaldPrepareJS);
 
-            _browsers[0].KeyDown += OALD_Browser_KeyDown;
-            _browsers[0].JavascriptObjectRepository.Settings.LegacyBindingEnabled = true;
-
-            _browsers[2].LoadingStateChanged += Urban_LoadingStateChanged;
+            _dictionaryTranslatorUnits.Add(new DictionaryTranslatorUnit(oald));
         }
 
        
@@ -217,18 +189,7 @@ namespace TestProj
             txtToSearch.Focus();
         }
 
-        private delegate void BrowserTextSelectedDelegate(object sender, BrowserTextSelectedEventArgs e);
-
-        private void _boundObject_BrowserTextSelected(object sender, BrowserTextSelectedEventArgs e)
-        {
-            if (InvokeRequired)
-            {
-                Invoke(new BrowserTextSelectedDelegate(_boundObject_BrowserTextSelected), sender, e);
-                return;
-            }
-
-            GoGoogleTranslate(e.Text);
-        }
+       
 
         private void InitHistory()
         {
@@ -368,33 +329,16 @@ namespace TestProj
             AddCategoryCombobox(e.Category);
         }
 
-        private void GTranslator_LoadingStateChanged(object sender, LoadingStateChangedEventArgs e)
-        {
-            if (e.IsLoading)
-                return;
-            if(_currentColorTheme == ColorTheme.Dark)
-            {
-                var browser = (ChromiumWebBrowser)sender;
-                SetBrowserColorsCSS(browser, _curCSSTheme);
-            }
-            
-        }
-        enum ColorTheme
-        {
-            Dark,
-            Light
-        }
+       
+        
 
         ColorTheme _currentColorTheme = ColorTheme.Light;
 
         void ReloadAllBrowsers()
         {
-            foreach (var browser in _browsers)
+            foreach (var unit in _dictionaryTranslatorUnits)
             {
-                if (browser.IsBrowserInitialized)
-                {
-                    browser.Reload();
-                }
+                unit.ReLoad();
             }
         }
 
@@ -461,18 +405,7 @@ namespace TestProj
             Settings.Default.Save();
         }
 
-        void DeleteAdOALD(ChromiumWebBrowser browser)
-        {
-            browser.EvaluateScriptAsync($@"
-            polls = document.querySelectorAll('[id ^= ""ad_""]');
-            Array.prototype.forEach.call(polls, callback);
-
-            function callback(element, iterator)
-            {{
-                element.remove();
-            }}
-            ");
-        }
+       
 
         //void SetBrowserColorsForAllElements(ChromiumWebBrowser browser, string backColor,string foreColor)
         //{
@@ -571,21 +504,7 @@ namespace TestProj
 
 
 
-        delegate void SetBrowserColorsCSSDelegate(ChromiumWebBrowser browser, string css);
-        void SetBrowserColorsCSS(ChromiumWebBrowser browser, string css)
-        {
-            if (InvokeRequired)
-            {
-                Invoke(new SetBrowserColorsCSSDelegate(SetBrowserColorsCSS), browser, css);
-                return;
-            }
-
-            browser.ExecuteScriptAsync($@"
-            var style1 = document.createElement('style');
-            style1.innerText = `{css}`;
-            document.head.appendChild(style1);
-            ");
-        }
+        
 
         private void InitSorterListView()
         {
@@ -799,8 +718,8 @@ namespace TestProj
 
         private void LoginToOALD()
         {
-            _preparingOALD = true;
-            _browsers[0].Load("https://www.oxfordlearnersdictionaries.com/account/login");
+            //if(InvokeRequired)
+            _dictionaryTranslatorUnits[0].Dictionary.Prepare();
         }
 
         private void Urban_LoadingStateChanged(object sender, LoadingStateChangedEventArgs e)
@@ -812,68 +731,17 @@ namespace TestProj
 
             if (_currentColorTheme == ColorTheme.Dark && MM_NeedUrbanDictionary.Checked)
             {
-                SetBrowserColorsCSS(browser, _curCSSTheme);
+                //SetBrowserColorsCSS(browser, _curCSSTheme);
             }
         }
 
-        private void OALD_Browser_LoadingStateChanged(object sender, LoadingStateChangedEventArgs e)
-        {
-            if (e.IsLoading)
-                return;
+      
+        
 
-            var browser = (ChromiumWebBrowser)sender;
-
-            if (_currentColorTheme == ColorTheme.Dark)
-            {
-                SetBrowserColorsCSS(browser, _curCSSTheme);
-            }
-        }
-        private void OALD_Browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
-        {
-            if (_preparingOALD && e.Frame.IsMain)
-            {
-                _preparingOALD = false;
-                PrepareOALD((ChromiumWebBrowser)sender);
-            }
-
-            if (e.Frame.IsMain)
-                InsertOtherJavaScript((ChromiumWebBrowser)sender);
-
-            DeleteAdOALD((ChromiumWebBrowser)sender);
-        }
-
-        private void InsertOtherJavaScript(ChromiumWebBrowser browser)
-        {
-            browser.ExecuteScriptAsyncWhenPageLoaded($@"
-              document.body.onmouseup = function()
-              {{
-                    b1.onselect(document.getSelection().toString());
-              }};
-            ");
-        }
+        
 
         private bool _preparingOALD;
-        static void PrepareOALD(ChromiumWebBrowser browser)
-        {
-           // browser.EvaluateScriptAsync($@"function setItem(itemId,itemValue){{
-           // document.getElementById(itemId).value = itemValue;
-           // }}
-            
-           // setItem('j_username','{Settings.Default.OALDUser}');
-           // setItem('j_password','{Settings.Default.OALDPass}');
-           //// document.getElementsByTagName('form')[0].submit();
-           //document.getElementsByClassName('mdl-btn mdl-btn-main mdl-btn-left')[0].click();
-           // ");
-
-           browser.EvaluateScriptAsync($@"function setItem(itemId,itemValue){{
-            document.getElementById(itemId).value = itemValue;
-            }}
-            
-            setItem('{Settings.Default.OALDUserID}','{Settings.Default.OALDUser}');
-            setItem('{Settings.Default.OALDPassID}','{Settings.Default.OALDPass}');
-            document.getElementById('{Settings.Default.OALDSubmitID}').click();
-            ");
-        }
+        
 
         delegate void HotKeyPressedDelegate(object sender, HotKeyEventArgs e);
 
@@ -1012,9 +880,8 @@ namespace TestProj
                 if (!tabControl1.TabPages.ContainsKey("Urban"))
                 {
                     tabControl1.TabPages.Add("Urban", "Urban");
-                    tabControl1.TabPages["Urban"].Controls.Add(_browsers[2]);
+                   // tabControl1.TabPages["Urban"].Controls.Add(_browsers[(int)BrowserNames.Urban]);
                 }
-                    
             }
             else
             {
@@ -1209,7 +1076,7 @@ namespace TestProj
 
         private void MM_Test_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(_boundObject.Text);
+           // MessageBox.Show(_boundObject.Text);
         }
 
         void SetLoginToOALDOnStart(bool predicate)
@@ -1228,11 +1095,11 @@ namespace TestProj
             if (txtFindText.Text.Length <= 0)
             {
                 //this will clear all search result
-                _browsers[0].StopFinding(true);
+               // _browsers[(int)BrowserNames.OALD].StopFinding(true);
             }
             else
             {
-                _browsers[0].Find(0, txtFindText.Text, true, false, false);
+               // _browsers[(int)BrowserNames.OALD].Find(txtFindText.Text, true, false, false);
             }
         }
 
@@ -1240,7 +1107,7 @@ namespace TestProj
         {
             if (e.KeyCode == Keys.Enter)
             {
-                _browsers[0].Find(0, txtFindText.Text, true, false, true);
+               //_browsers[(int)BrowserNames.OALD].Find(txtFindText.Text, true, false, true);
             }
         }
         private void ChooseBackupFolderDialog()

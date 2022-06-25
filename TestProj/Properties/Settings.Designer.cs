@@ -178,5 +178,65 @@ namespace TestProj.Properties {
                 this["OALDSubmitID"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://www.oxfordlearnersdictionaries.com/search/english/?q=")]
+        public string OALD_URL {
+            get {
+                return ((string)(this["OALD_URL"]));
+            }
+            set {
+                this["OALD_URL"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://translate.google.am/?hl=en#view=home&op=translate&sl=en&tl=ru&text=")]
+        public string GT_URL {
+            get {
+                return ((string)(this["GT_URL"]));
+            }
+            set {
+                this["GT_URL"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://www.urbandictionary.com/define.php?term=")]
+        public string Urban_URL {
+            get {
+                return ((string)(this["Urban_URL"]));
+            }
+            set {
+                this["Urban_URL"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Google Translator")]
+        public string GT_Name {
+            get {
+                return ((string)(this["GT_Name"]));
+            }
+            set {
+                this["GT_Name"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://www.oxfordlearnersdictionaries.com/account/login")]
+        public string OALDPrepareURL {
+            get {
+                return ((string)(this["OALDPrepareURL"]));
+            }
+            set {
+                this["OALDPrepareURL"] = value;
+            }
+        }
     }
 }

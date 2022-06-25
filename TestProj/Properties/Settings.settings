@@ -41,5 +41,20 @@
     <Setting Name="OALDSubmitID" Type="System.String" Scope="User">
       <Value Profile="(Default)">teach_btn-login</Value>
     </Setting>
+    <Setting Name="OALD_URL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://www.oxfordlearnersdictionaries.com/search/english/?q=</Value>
+    </Setting>
+    <Setting Name="GT_URL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://translate.google.am/?hl=en#view=home&amp;op=translate&amp;sl=en&amp;tl=ru&amp;text=</Value>
+    </Setting>
+    <Setting Name="Urban_URL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://www.urbandictionary.com/define.php?term=</Value>
+    </Setting>
+    <Setting Name="GT_Name" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Google Translator</Value>
+    </Setting>
+    <Setting Name="OALDPrepareURL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://www.oxfordlearnersdictionaries.com/account/login</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
