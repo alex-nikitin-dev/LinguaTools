@@ -14,10 +14,30 @@ namespace TestProj
         public static string DefaultTranslatorName { get; set; }
 
         private readonly BoundObject _boundObject;
+
+        private ColorTheme _colorTheme;
+        public ColorTheme ColorTheme
+        {
+            get
+            {
+                return _colorTheme;
+            }
+            set
+            {
+                _colorTheme = value;
+                ColorThemeUpdate();
+            }
+        }
+        private void ColorThemeUpdate()
+        {
+            _dictionary.ColorTheme = _colorTheme;
+            _translator.ColorTheme = _colorTheme;
+        }
+
         public DictionaryTranslatorUnit(BrowserItem dictionary, BrowserItem translator = null)
         {
             _dictionary = dictionary;
-            _translator = translator ?? new BrowserItem(DefaultTranslatorUrl, DefaultTranslatorName);
+            _translator = translator ?? new BrowserItem(DefaultTranslatorUrl, DefaultTranslatorName, dictionary.CSSDarkTheme);
 
             _boundObject = new BoundObject();
             _boundObject.BrowserTextSelected += _boundObject_BrowserTextSelected;

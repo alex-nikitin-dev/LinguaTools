@@ -160,9 +160,15 @@ namespace TestProj
             DictionaryTranslatorUnit.DefaultTranslatorName = stt.GT_Name;
             _dictionaryTranslatorUnits = new List<DictionaryTranslatorUnit>();
 
-            var oald = new BrowserItem(stt.OALD_URL, "OALD", BrowsersJS.DictionaryOnSelectJS, BrowsersJS.OaldDeleteAdJS,stt.OALDPrepareURL, BrowsersJS.OaldPrepareJS);
+            var cssDarkColorTheme = LoadCSSColorTheme(stt.DarkCSSColorThemePath);
+
+            var oald = new BrowserItem(stt.OALD_URL, "OALD", cssDarkColorTheme, BrowsersJS.DictionaryOnSelectJS, BrowsersJS.OaldDeleteAdJS,stt.OALDPrepareURL, BrowsersJS.OaldPrepareJS);
+            var cambridge = new BrowserItem(stt.Cambridge_URL, "Cambridge en-rus", cssDarkColorTheme, BrowsersJS.DictionaryOnSelectJS, BrowsersJS.OaldDeleteAdJS);
+            var wiki = new BrowserItem(stt.Wiki_URL, "Wikipedia en", cssDarkColorTheme, BrowsersJS.DictionaryOnSelectJS);
 
             _dictionaryTranslatorUnits.Add(new DictionaryTranslatorUnit(oald));
+            _dictionaryTranslatorUnits.Add(new DictionaryTranslatorUnit(cambridge));
+            _dictionaryTranslatorUnits.Add(new DictionaryTranslatorUnit(wiki));
         }
 
        
@@ -377,8 +383,6 @@ namespace TestProj
 
         }
 
-        string _curCSSTheme;
-
         string LoadCSSColorTheme(string path)
         {
             return File.ReadAllText(path);
@@ -392,20 +396,28 @@ namespace TestProj
             {
                 case ColorTheme.Dark:
                     SetColorsRecursively(this, ColorTranslator.FromHtml("#282828"), ColorTranslator.FromHtml("#dadada"));
-                    _curCSSTheme = LoadCSSColorTheme(Settings.Default.DarkCSSColorThemePath);
                     break;
                 case ColorTheme.Light:
                     SetColorsRecursively(this, _backColor, _foreColor);
                     break;
             }
 
+            SetColotThemeForAllUnits();
             ReloadAllBrowsers();
 
             Settings.Default.DarkTheme = theme == ColorTheme.Dark;
             Settings.Default.Save();
         }
 
-       
+        private void SetColotThemeForAllUnits()
+        {
+            foreach (var unit in _dictionaryTranslatorUnits)
+            {
+                unit.ColorTheme = _currentColorTheme;
+            }
+        }
+
+
 
         //void SetBrowserColorsForAllElements(ChromiumWebBrowser browser, string backColor,string foreColor)
         //{
@@ -504,7 +516,7 @@ namespace TestProj
 
 
 
-        
+
 
         private void InitSorterListView()
         {

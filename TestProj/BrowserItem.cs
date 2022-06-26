@@ -12,7 +12,7 @@ namespace TestProj
         string _prepareUrl;
         string _mainFrameJSCode;
         string _otherJSCode;
-        public string ColorCSSTheme { get; set; }
+        public string CSSDarkTheme { get; set; }
         public ColorTheme ColorTheme { get; set; }
 
 
@@ -23,7 +23,10 @@ namespace TestProj
 
         public string Url => _url;
 
-        private BrowserItem(ChromiumWebBrowser browser, string url, string browserName,
+        private BrowserItem(ChromiumWebBrowser browser, 
+            string url, 
+            string browserName,
+            string cssDarkTheme,
             string mainFrameJSCode,
             string otherJSCode,
             string prepareUrl, string prepareJSCode,
@@ -32,6 +35,7 @@ namespace TestProj
             _browser = browser;
             _url = url;
             _browserName = browserName;
+            CSSDarkTheme = cssDarkTheme;
             _needPreparing = false;
             _browser.FrameLoadEnd += _browser_FrameLoadEnd;
             _browser.LoadingStateChanged += _browser_LoadingStateChanged;
@@ -41,9 +45,21 @@ namespace TestProj
             _prepareJSCode = prepareJSCode;
             _browser.JavascriptObjectRepository.Settings.LegacyBindingEnabled = legacyBinding;
         }
-        public BrowserItem(string url, string browserName, string mainFrameJSCode = null,
-            string otherJSCode = null, string prepareUrl = null, string prepareJSCode = null)
-            : this(new ChromiumWebBrowser(), url, browserName, mainFrameJSCode,  otherJSCode, prepareUrl,prepareJSCode)
+        public BrowserItem(string url, 
+            string browserName, 
+            string cssDarkTheme,
+            string mainFrameJSCode = null,
+            string otherJSCode = null, 
+            string prepareUrl = null, 
+            string prepareJSCode = null)
+            : this(new ChromiumWebBrowser(), 
+                  url, 
+                  browserName,
+                  cssDarkTheme,
+                  mainFrameJSCode,  
+                  otherJSCode, 
+                  prepareUrl,
+                  prepareJSCode)
         {
             _browser.Dock = System.Windows.Forms.DockStyle.Fill;
         }
@@ -102,7 +118,7 @@ namespace TestProj
 
             if (ColorTheme == ColorTheme.Dark)
             {
-                SetBrowserColorsCSS(ColorCSSTheme);
+                SetBrowserColorsCSS(CSSDarkTheme);
             }
         }
         private void SetBrowserColorsCSS(string css)

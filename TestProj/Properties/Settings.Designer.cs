@@ -238,5 +238,29 @@ namespace TestProj.Properties {
                 this["OALDPrepareURL"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://dictionary.cambridge.org/dictionary/english-russian/")]
+        public string Cambridge_URL {
+            get {
+                return ((string)(this["Cambridge_URL"]));
+            }
+            set {
+                this["Cambridge_URL"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://en.wikipedia.org/wiki/")]
+        public string Wiki_URL {
+            get {
+                return ((string)(this["Wiki_URL"]));
+            }
+            set {
+                this["Wiki_URL"] = value;
+            }
+        }
     }
 }

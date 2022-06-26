@@ -56,5 +56,11 @@
     <Setting Name="OALDPrepareURL" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://www.oxfordlearnersdictionaries.com/account/login</Value>
     </Setting>
+    <Setting Name="Cambridge_URL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://dictionary.cambridge.org/dictionary/english-russian/</Value>
+    </Setting>
+    <Setting Name="Wiki_URL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://en.wikipedia.org/wiki/</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
