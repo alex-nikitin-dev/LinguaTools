@@ -98,6 +98,7 @@ namespace TestProj
             InitHotKeys();
             InitBrowsers();
             InitTabs();
+            FirstTabSelectionInit();
             InitHistory();
             SetDateTimeFilterNow();
             FillCategoriesComboBox();
@@ -149,6 +150,45 @@ namespace TestProj
             tabControl1.TabPages.Add("tabHistory", "History");
 
             ShowUrban(MM_NeedUrbanDictionary.Checked);
+        }
+
+        private void FirstTabSelectionInit()
+        {
+            FillFirstTabComboBox();
+            FirstTabComboboxSelectFromSettings();
+        }
+
+        private void FirstTabComboboxSelectFromSettings()
+        {
+            var stt = Settings.Default;
+
+            for (int i = 0; i < MM_cbxFirstTab.Items.Count; i++)
+            {
+                var item = MM_cbxFirstTab.Items[i] as string;
+                if (string.CompareOrdinal(item, stt.firstTabName) == 0)
+                {
+                    MM_cbxFirstTab.SelectedIndex = i;
+                }
+            }
+        }
+
+        private void FillFirstTabComboBox()
+        {
+            MM_cbxFirstTab.Items.Clear();
+            foreach (TabPage tab in tabControl1.TabPages)
+            {
+                MM_cbxFirstTab.Items.Add(tab.Name);
+            }
+        }
+
+        private bool SetFirstTab(string name)
+        {
+            if(!tabControl1.TabPages.ContainsKey(name))
+                return false;
+
+            tabControl1.SelectTab(name);
+
+            return true;
         }
 
         List<DictionaryTranslatorUnit> _dictionaryTranslatorUnits;
@@ -365,22 +405,69 @@ namespace TestProj
                 {
                     SetMenuStripColorsRecursively(menuItem, backColor, foreColor);
                 }
+
+                var highLightColors = GetHighLightColor(backColor, foreColor);
+                (parent as MenuStrip).Renderer = new MyRenderer(highLightColors.backColor/*,highLightColors.foreColor*/);
             }
+        }
+
+        private (Color backColor, Color foreColor) GetHighLightColor(Color backColor, Color foreColor)
+        {
+            switch (_currentColorTheme)
+            {
+                case ColorTheme.Dark:
+                    return (ControlPaint.Light(backColor),ControlPaint.Dark(foreColor));
+                case ColorTheme.Light:
+                    return (ControlPaint.Dark(backColor), ControlPaint.Light(foreColor));
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+        private class MyRenderer : ToolStripProfessionalRenderer
+        {
+            private Color _backColorOfHighlightedItem;
+            //private Color _foreColorOfHighlightedItem;
+            public MyRenderer(Color backColor/*,Color foreColor*/)
+            {
+                _backColorOfHighlightedItem = backColor;
+                //_foreColorOfHighlightedItem = foreColor;
+            }
+            protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e)
+            {
+                Rectangle rc = new Rectangle(Point.Empty, e.Item.Size);
+                Color backColor = e.Item.Selected ? _backColorOfHighlightedItem : e.Item.BackColor;
+
+                using (SolidBrush brush = new SolidBrush(backColor))
+                    e.Graphics.FillRectangle(brush, rc);
+            }
+
+            //protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
+            //{
+            //    e.TextColor = e.Item.Selected ? _foreColorOfHighlightedItem : e.Item.ForeColor;
+            //    base.OnRenderItemText(e);
+            //}
         }
         void SetMenuStripColorsRecursively(ToolStripItem parent, Color backColor, Color foreColor)
         {
             parent.BackColor = backColor;
             parent.ForeColor = foreColor;
+            
 
             if (parent is ToolStripMenuItem)
             {
-                foreach (object menuItem in ((ToolStripMenuItem)parent).DropDownItems)
-                {
-                    if (menuItem is ToolStripMenuItem)
-                        SetMenuStripColorsRecursively((ToolStripMenuItem)menuItem, backColor, foreColor);
-                }
+                var parentsDropDown = (parent as ToolStripMenuItem).DropDown;
+                (parentsDropDown as ToolStripDropDownMenu).ShowImageMargin = false;
+                parentsDropDown.BackColor = backColor;
+                parentsDropDown.ForeColor = foreColor;
             }
 
+            if (parent is ToolStripDropDownItem)
+            {
+                foreach (ToolStripItem childItem in (parent as ToolStripDropDownItem).DropDownItems)
+                {
+                    SetMenuStripColorsRecursively(childItem, backColor, foreColor);
+                }
+            }
         }
 
         string LoadCSSColorTheme(string path)
@@ -416,8 +503,6 @@ namespace TestProj
                 unit.ColorTheme = _currentColorTheme;
             }
         }
-
-
 
         //void SetBrowserColorsForAllElements(ChromiumWebBrowser browser, string backColor,string foreColor)
         //{
@@ -513,10 +598,6 @@ namespace TestProj
         //    //document.head.appendChild(style1);
         //    //// document.body.classList.toggle(style1);
         //}
-
-
-
-
 
         private void InitSorterListView()
         {
@@ -746,13 +827,6 @@ namespace TestProj
                 //SetBrowserColorsCSS(browser, _curCSSTheme);
             }
         }
-
-      
-        
-
-        
-
-        private bool _preparingOALD;
         
 
         delegate void HotKeyPressedDelegate(object sender, HotKeyEventArgs e);
@@ -1171,6 +1245,24 @@ namespace TestProj
             stt.OALDUser = dialog.Credentials.UserName;
             stt.OALDPass = dialog.Credentials.Password;
             stt.Save();
+        }
+
+        private void ShowErrorMessage(string message)
+        {
+            MessageBox.Show(message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        private void MM_cbxFirstTab_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var stt = Settings.Default;
+            if (SetFirstTab(MM_cbxFirstTab.Text))
+            {
+                stt.firstTabName = MM_cbxFirstTab.Text;
+                stt.Save();
+            }
+            else
+            {
+                ShowErrorMessage($"There is no tab which has name {MM_cbxFirstTab.Text}");
+            }
         }
     }
 }

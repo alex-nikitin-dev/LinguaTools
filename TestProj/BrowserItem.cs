@@ -44,6 +44,7 @@ namespace TestProj
             _prepareUrl = prepareUrl;
             _prepareJSCode = prepareJSCode;
             _browser.JavascriptObjectRepository.Settings.LegacyBindingEnabled = legacyBinding;
+            ColorTheme = ColorTheme.Light;
         }
         public BrowserItem(string url, 
             string browserName, 

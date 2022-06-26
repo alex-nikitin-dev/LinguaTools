@@ -62,5 +62,8 @@
     <Setting Name="Wiki_URL" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://en.wikipedia.org/wiki/</Value>
     </Setting>
+    <Setting Name="firstTabName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

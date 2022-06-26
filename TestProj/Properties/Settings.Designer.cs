@@ -262,5 +262,17 @@ namespace TestProj.Properties {
                 this["Wiki_URL"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string firstTabName {
+            get {
+                return ((string)(this["firstTabName"]));
+            }
+            set {
+                this["firstTabName"] = value;
+            }
+        }
     }
 }

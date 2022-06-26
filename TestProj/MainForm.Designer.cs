@@ -39,6 +39,9 @@
             this.showTheAppFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.MM_ShowTasks = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MM_FirstTab = new System.Windows.Forms.ToolStripMenuItem();
+            this.MM_cbxFirstTab = new System.Windows.Forms.ToolStripComboBox();
             this.mainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MM_NeedUrbanDictionary = new System.Windows.Forms.ToolStripMenuItem();
             this.loginToOALDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -118,6 +121,7 @@
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
+            this.viewToolStripMenuItem,
             this.mainToolStripMenuItem,
             this.historyToolStripMenuItem,
             this.styleToolStripMenuItem,
@@ -158,6 +162,8 @@
             // 
             // toolStripSeparator5
             // 
+            this.toolStripSeparator5.BackColor = System.Drawing.Color.Black;
+            this.toolStripSeparator5.ForeColor = System.Drawing.Color.Black;
             this.toolStripSeparator5.Name = "toolStripSeparator5";
             this.toolStripSeparator5.Size = new System.Drawing.Size(273, 6);
             // 
@@ -179,6 +185,28 @@
             this.MM_ShowTasks.Size = new System.Drawing.Size(276, 34);
             this.MM_ShowTasks.Text = "Show Tasks";
             this.MM_ShowTasks.Click += new System.EventHandler(this.MM_ShowTasks_Click);
+            // 
+            // viewToolStripMenuItem
+            // 
+            this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.MM_FirstTab,
+            this.MM_cbxFirstTab});
+            this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
+            this.viewToolStripMenuItem.Size = new System.Drawing.Size(65, 29);
+            this.viewToolStripMenuItem.Text = "View";
+            // 
+            // MM_FirstTab
+            // 
+            this.MM_FirstTab.Name = "MM_FirstTab";
+            this.MM_FirstTab.Size = new System.Drawing.Size(290, 34);
+            this.MM_FirstTab.Text = "The First Tab:";
+            // 
+            // MM_cbxFirstTab
+            // 
+            this.MM_cbxFirstTab.DropDownWidth = 200;
+            this.MM_cbxFirstTab.Name = "MM_cbxFirstTab";
+            this.MM_cbxFirstTab.Size = new System.Drawing.Size(200, 33);
+            this.MM_cbxFirstTab.SelectedIndexChanged += new System.EventHandler(this.MM_cbxFirstTab_SelectedIndexChanged);
             // 
             // mainToolStripMenuItem
             // 
@@ -446,7 +474,7 @@
             // dtBegin
             // 
             this.dtBegin.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.dtBegin.Location = new System.Drawing.Point(610, 9);
+            this.dtBegin.Location = new System.Drawing.Point(821, 5);
             this.dtBegin.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.dtBegin.Name = "dtBegin";
             this.dtBegin.Size = new System.Drawing.Size(298, 26);
@@ -456,7 +484,7 @@
             // dtEnd
             // 
             this.dtEnd.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.dtEnd.Location = new System.Drawing.Point(982, 9);
+            this.dtEnd.Location = new System.Drawing.Point(1162, 5);
             this.dtEnd.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.dtEnd.Name = "dtEnd";
             this.dtEnd.Size = new System.Drawing.Size(298, 26);
@@ -467,7 +495,7 @@
             // 
             this.lblFrom.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.lblFrom.AutoSize = true;
-            this.lblFrom.Location = new System.Drawing.Point(556, 17);
+            this.lblFrom.Location = new System.Drawing.Point(767, 9);
             this.lblFrom.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblFrom.Name = "lblFrom";
             this.lblFrom.Size = new System.Drawing.Size(46, 20);
@@ -479,7 +507,7 @@
             // 
             this.lblTo.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.lblTo.AutoSize = true;
-            this.lblTo.Location = new System.Drawing.Point(944, 18);
+            this.lblTo.Location = new System.Drawing.Point(1127, 7);
             this.lblTo.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblTo.Name = "lblTo";
             this.lblTo.Size = new System.Drawing.Size(27, 20);
@@ -490,7 +518,7 @@
             // btnByDateFilter
             // 
             this.btnByDateFilter.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.btnByDateFilter.Location = new System.Drawing.Point(1322, 6);
+            this.btnByDateFilter.Location = new System.Drawing.Point(1468, 0);
             this.btnByDateFilter.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnByDateFilter.Name = "btnByDateFilter";
             this.btnByDateFilter.Size = new System.Drawing.Size(112, 35);
@@ -696,6 +724,9 @@
         private System.Windows.Forms.ToolStripMenuItem setOALDCredentialsToolStripMenuItem;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.TableLayoutPanel controlPanel;
+        private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem MM_FirstTab;
+        private System.Windows.Forms.ToolStripComboBox MM_cbxFirstTab;
     }
 }
 
