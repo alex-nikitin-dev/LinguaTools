@@ -65,5 +65,8 @@
     <Setting Name="firstTabName" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="OALD_AcceptAllCookies_ID" Type="System.String" Scope="User">
+      <Value Profile="(Default)">onetrust-accept-btn-handler</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -85,6 +85,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.controlPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.btnClearFind = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -99,7 +100,7 @@
             this.txtToSearch.Location = new System.Drawing.Point(4, 30);
             this.txtToSearch.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.txtToSearch.Name = "txtToSearch";
-            this.txtToSearch.Size = new System.Drawing.Size(839, 35);
+            this.txtToSearch.Size = new System.Drawing.Size(621, 35);
             this.txtToSearch.TabIndex = 1;
             this.txtToSearch.TextChanged += new System.EventHandler(this.txtToSearch_TextChanged);
             this.txtToSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtBrowse_KeyDown);
@@ -371,14 +372,14 @@
             // darkToolStripMenuItem
             // 
             this.darkToolStripMenuItem.Name = "darkToolStripMenuItem";
-            this.darkToolStripMenuItem.Size = new System.Drawing.Size(153, 34);
+            this.darkToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.darkToolStripMenuItem.Text = "Dark";
             this.darkToolStripMenuItem.Click += new System.EventHandler(this.darkToolStripMenuItem_Click);
             // 
             // lightToolStripMenuItem
             // 
             this.lightToolStripMenuItem.Name = "lightToolStripMenuItem";
-            this.lightToolStripMenuItem.Size = new System.Drawing.Size(153, 34);
+            this.lightToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.lightToolStripMenuItem.Text = "Light";
             this.lightToolStripMenuItem.Click += new System.EventHandler(this.lightToolStripMenuItem_Click);
             // 
@@ -396,7 +397,7 @@
             this.MM_HotKeyEnabled.CheckOnClick = true;
             this.MM_HotKeyEnabled.CheckState = System.Windows.Forms.CheckState.Checked;
             this.MM_HotKeyEnabled.Name = "MM_HotKeyEnabled";
-            this.MM_HotKeyEnabled.Size = new System.Drawing.Size(245, 34);
+            this.MM_HotKeyEnabled.Size = new System.Drawing.Size(270, 34);
             this.MM_HotKeyEnabled.Text = "Hot Key Enabled";
             // 
             // MM_Help
@@ -412,21 +413,21 @@
             // MM_About
             // 
             this.MM_About.Name = "MM_About";
-            this.MM_About.Size = new System.Drawing.Size(189, 34);
+            this.MM_About.Size = new System.Drawing.Size(270, 34);
             this.MM_About.Text = "About";
             this.MM_About.Click += new System.EventHandler(this.MM_About_Click);
             // 
             // MM_ShortcutsHelp
             // 
             this.MM_ShortcutsHelp.Name = "MM_ShortcutsHelp";
-            this.MM_ShortcutsHelp.Size = new System.Drawing.Size(189, 34);
+            this.MM_ShortcutsHelp.Size = new System.Drawing.Size(270, 34);
             this.MM_ShortcutsHelp.Text = "Shortcuts";
             this.MM_ShortcutsHelp.Click += new System.EventHandler(this.MM_ShortcutsHelp_Click);
             // 
             // MM_Test
             // 
             this.MM_Test.Name = "MM_Test";
-            this.MM_Test.Size = new System.Drawing.Size(189, 34);
+            this.MM_Test.Size = new System.Drawing.Size(270, 34);
             this.MM_Test.Text = "Test";
             this.MM_Test.Click += new System.EventHandler(this.MM_Test_Click);
             // 
@@ -437,11 +438,11 @@
             this.cbxCategory.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cbxCategory.FormattingEnabled = true;
             this.cbxCategory.IntegralHeight = false;
-            this.cbxCategory.Location = new System.Drawing.Point(1425, 30);
+            this.cbxCategory.Location = new System.Drawing.Point(1287, 30);
             this.cbxCategory.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.cbxCategory.MaxDropDownItems = 20;
             this.cbxCategory.Name = "cbxCategory";
-            this.cbxCategory.Size = new System.Drawing.Size(277, 37);
+            this.cbxCategory.Size = new System.Drawing.Size(415, 37);
             this.cbxCategory.TabIndex = 5;
             this.cbxCategory.SelectedIndexChanged += new System.EventHandler(this.cbxCategory_SelectedIndexChanged);
             this.cbxCategory.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cbxCategory_KeyDown);
@@ -531,7 +532,7 @@
             // btnClearInput
             // 
             this.btnClearInput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClearInput.Location = new System.Drawing.Point(851, 30);
+            this.btnClearInput.Location = new System.Drawing.Point(633, 30);
             this.btnClearInput.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnClearInput.Name = "btnClearInput";
             this.btnClearInput.Size = new System.Drawing.Size(58, 35);
@@ -545,10 +546,10 @@
             this.txtFindText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtFindText.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtFindText.Location = new System.Drawing.Point(917, 30);
+            this.txtFindText.Location = new System.Drawing.Point(699, 30);
             this.txtFindText.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.txtFindText.Name = "txtFindText";
-            this.txtFindText.Size = new System.Drawing.Size(500, 35);
+            this.txtFindText.Size = new System.Drawing.Size(514, 35);
             this.txtFindText.TabIndex = 13;
             this.txtFindText.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtFindText_KeyDown);
             this.txtFindText.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtFindText_KeyUp);
@@ -570,7 +571,7 @@
             this.label2.AutoSize = true;
             this.label2.Dock = System.Windows.Forms.DockStyle.Left;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(917, 0);
+            this.label2.Location = new System.Drawing.Point(699, 0);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(56, 25);
@@ -581,7 +582,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(1425, 0);
+            this.label3.Location = new System.Drawing.Point(1287, 0);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(98, 25);
@@ -612,18 +613,20 @@
             // controlPanel
             // 
             this.controlPanel.AutoSize = true;
-            this.controlPanel.ColumnCount = 4;
-            this.controlPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 51.68493F));
+            this.controlPanel.ColumnCount = 5;
+            this.controlPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 54.66871F));
             this.controlPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.controlPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 31.01096F));
-            this.controlPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 17.30412F));
+            this.controlPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 45.3313F));
+            this.controlPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.controlPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 422F));
+            this.controlPanel.Controls.Add(this.btnClearFind, 3, 1);
             this.controlPanel.Controls.Add(this.label1, 0, 0);
             this.controlPanel.Controls.Add(this.txtToSearch, 0, 1);
             this.controlPanel.Controls.Add(this.label2, 2, 0);
-            this.controlPanel.Controls.Add(this.cbxCategory, 3, 1);
             this.controlPanel.Controls.Add(this.btnClearInput, 1, 1);
-            this.controlPanel.Controls.Add(this.label3, 3, 0);
             this.controlPanel.Controls.Add(this.txtFindText, 2, 1);
+            this.controlPanel.Controls.Add(this.cbxCategory, 4, 1);
+            this.controlPanel.Controls.Add(this.label3, 4, 0);
             this.controlPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.controlPanel.Location = new System.Drawing.Point(3, 3);
             this.controlPanel.Name = "controlPanel";
@@ -632,6 +635,18 @@
             this.controlPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.controlPanel.Size = new System.Drawing.Size(1706, 74);
             this.controlPanel.TabIndex = 3;
+            // 
+            // btnClearFind
+            // 
+            this.btnClearFind.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClearFind.Location = new System.Drawing.Point(1221, 30);
+            this.btnClearFind.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.btnClearFind.Name = "btnClearFind";
+            this.btnClearFind.Size = new System.Drawing.Size(58, 35);
+            this.btnClearFind.TabIndex = 18;
+            this.btnClearFind.Text = "Clear";
+            this.btnClearFind.UseVisualStyleBackColor = true;
+            this.btnClearFind.Click += new System.EventHandler(this.btnClearFind_Click);
             // 
             // MainForm
             // 
@@ -727,6 +742,7 @@
         private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem MM_FirstTab;
         private System.Windows.Forms.ToolStripComboBox MM_cbxFirstTab;
+        private System.Windows.Forms.Button btnClearFind;
     }
 }
 

@@ -23,8 +23,11 @@ namespace TestProj
             {
                 Locale = "en-US,en",
                 AcceptLanguageList = "en-US,en",
+                PersistSessionCookies = false,
+
                 
             };
+            
             Cef.Initialize(settingsBrowser);
             CefSharpSettings.WcfEnabled = true;
             StartPosition = FormStartPosition.CenterScreen;
@@ -63,8 +66,8 @@ namespace TestProj
             return text;
         }
 
-        
 
+        bool _firstGoBrowsers = true;
         void GoBrowsers(string text, bool saveHistory = true)
         {
             text = PrepareTextToProceed(text);
@@ -78,10 +81,26 @@ namespace TestProj
             {
                 unit.Go(text);
             }
+
             //if(MM_NeedUrbanDictionary.Checked) GoUrbanDictionary(text);
+            if (_firstGoBrowsers)
+            {
+                _firstGoBrowsers = false;
+                ActivateTabs();
+            }
         }
 
-        
+        private void ActivateTabs()
+        {
+            var selected = tabControl1.SelectedIndex;
+            for (int i = 0; i < tabControl1.TabPages.Count; i++)
+            {
+                tabControl1.SelectedTab = tabControl1.TabPages[i];
+            }
+
+            tabControl1.SelectedTab = tabControl1.TabPages[selected];
+        }
+
         private History _history;
         private int? _hotKeyId;
 
@@ -407,10 +426,35 @@ namespace TestProj
                 }
 
                 var highLightColors = GetHighLightColor(backColor, foreColor);
-                (parent as MenuStrip).Renderer = new MyRenderer(highLightColors.backColor/*,highLightColors.foreColor*/);
+                (parent as MenuStrip).Renderer = new MyRenderer(highLightColors.backColor, backColor/*,highLightColors.foreColor*/);
+            }
+        }
+        void SetMenuStripColorsRecursively(ToolStripItem parent, Color backColor, Color foreColor)
+        {
+            parent.BackColor = backColor;
+            parent.ForeColor = foreColor;
+
+
+            if (parent is ToolStripMenuItem)
+            {
+                var parentsDropDown = (parent as ToolStripMenuItem).DropDown;
+                (parentsDropDown as ToolStripDropDownMenu).ShowCheckMargin = true;
+                (parentsDropDown as ToolStripDropDownMenu).ShowImageMargin = false;
+                parentsDropDown.BackColor = backColor;
+                parentsDropDown.ForeColor = foreColor;
+                parentsDropDown.Invalidate(true);
+            }
+
+            if (parent is ToolStripDropDownItem)
+            {
+                foreach (ToolStripItem childItem in (parent as ToolStripDropDownItem).DropDownItems)
+                {
+                    SetMenuStripColorsRecursively(childItem, backColor, foreColor);
+                }
             }
         }
 
+       
         private (Color backColor, Color foreColor) GetHighLightColor(Color backColor, Color foreColor)
         {
             switch (_currentColorTheme)
@@ -423,15 +467,32 @@ namespace TestProj
                     throw new NotImplementedException();
             }
         }
+
+        public class MyProfessionalColorTable : ProfessionalColorTable
+        {
+
+            Color _backColor;
+            public MyProfessionalColorTable(Color backColor)
+                :base()
+            {
+                _backColor = backColor;
+            }
+
+            public override Color ImageMarginGradientBegin => _backColor;
+            public override Color ImageMarginGradientMiddle => _backColor;
+            public override Color ImageMarginGradientEnd => _backColor;
+        }
         private class MyRenderer : ToolStripProfessionalRenderer
         {
             private Color _backColorOfHighlightedItem;
             //private Color _foreColorOfHighlightedItem;
-            public MyRenderer(Color backColor/*,Color foreColor*/)
+            public MyRenderer(Color backColorOfHighlightedItem, Color backColor/*,Color foreColor*/)
+                :base(new MyProfessionalColorTable(backColor))
             {
-                _backColorOfHighlightedItem = backColor;
+                _backColorOfHighlightedItem = backColorOfHighlightedItem;
                 //_foreColorOfHighlightedItem = foreColor;
             }
+            
             protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e)
             {
                 Rectangle rc = new Rectangle(Point.Empty, e.Item.Size);
@@ -439,6 +500,8 @@ namespace TestProj
 
                 using (SolidBrush brush = new SolidBrush(backColor))
                     e.Graphics.FillRectangle(brush, rc);
+               
+               // base.OnRenderMenuItemBackground(e);
             }
 
             //protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
@@ -447,28 +510,7 @@ namespace TestProj
             //    base.OnRenderItemText(e);
             //}
         }
-        void SetMenuStripColorsRecursively(ToolStripItem parent, Color backColor, Color foreColor)
-        {
-            parent.BackColor = backColor;
-            parent.ForeColor = foreColor;
-            
-
-            if (parent is ToolStripMenuItem)
-            {
-                var parentsDropDown = (parent as ToolStripMenuItem).DropDown;
-                (parentsDropDown as ToolStripDropDownMenu).ShowImageMargin = false;
-                parentsDropDown.BackColor = backColor;
-                parentsDropDown.ForeColor = foreColor;
-            }
-
-            if (parent is ToolStripDropDownItem)
-            {
-                foreach (ToolStripItem childItem in (parent as ToolStripDropDownItem).DropDownItems)
-                {
-                    SetMenuStripColorsRecursively(childItem, backColor, foreColor);
-                }
-            }
-        }
+       
 
         string LoadCSSColorTheme(string path)
         {
@@ -1176,24 +1218,33 @@ namespace TestProj
         {
             SetLoginToOALDOnStart(((ToolStripMenuItem)sender).Checked);
         }
+
+        private void FindInDictionaries(string text)
+        {
+            foreach (var unit in _dictionaryTranslatorUnits)
+            {
+                if (text.Length <= 0)
+                {
+                    //this will clear all search result
+                    unit.Dictionary.Browser.StopFinding(true);
+                }
+                else
+                {
+                    unit.Dictionary.Browser.Find(txtFindText.Text, true, false, false);
+                }
+            }
+        }
+
         private void txtFindText_KeyUp(object sender, KeyEventArgs e)
         {
-            if (txtFindText.Text.Length <= 0)
-            {
-                //this will clear all search result
-               // _browsers[(int)BrowserNames.OALD].StopFinding(true);
-            }
-            else
-            {
-               // _browsers[(int)BrowserNames.OALD].Find(txtFindText.Text, true, false, false);
-            }
+            FindInDictionaries(txtFindText.Text);
         }
 
         private void txtFindText_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-               //_browsers[(int)BrowserNames.OALD].Find(txtFindText.Text, true, false, true);
+                FindInDictionaries(txtFindText.Text);
             }
         }
         private void ChooseBackupFolderDialog()
@@ -1263,6 +1314,12 @@ namespace TestProj
             {
                 ShowErrorMessage($"There is no tab which has name {MM_cbxFirstTab.Text}");
             }
+        }
+
+        private void btnClearFind_Click(object sender, EventArgs e)
+        {
+            txtFindText.Text = "";
+            FindInDictionaries("");
         }
     }
 }

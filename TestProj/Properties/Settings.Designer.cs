@@ -274,5 +274,17 @@ namespace TestProj.Properties {
                 this["firstTabName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("onetrust-accept-btn-handler")]
+        public string OALD_AcceptAllCookies_ID {
+            get {
+                return ((string)(this["OALD_AcceptAllCookies_ID"]));
+            }
+            set {
+                this["OALD_AcceptAllCookies_ID"] = value;
+            }
+        }
     }
 }

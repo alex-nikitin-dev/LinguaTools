@@ -59,5 +59,11 @@ namespace TestProj
             _dictionary.ReLoad();
             _translator.ReLoad();
         }
+
+        public void Show()
+        {
+            _dictionary.Browser.Show();
+            _translator.Browser.Show();
+        }
     }
 }

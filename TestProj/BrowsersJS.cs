@@ -34,6 +34,8 @@ namespace TestProj
             {{
                 element.remove();
             }}
+            
+            document.getElementById('{Settings.Default.OALD_AcceptAllCookies_ID}').click();
             "; }
         }
     }
