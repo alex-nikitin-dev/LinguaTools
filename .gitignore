@@ -17,3 +17,5 @@
 /.vs
 /.vs/LinguaHelper/v17
 /TestProj/credentials.json
+/UpgradeReport.sarif
+/upgrade-assistant.clef
