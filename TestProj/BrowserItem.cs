@@ -1,23 +1,20 @@
-﻿using CefSharp;
-using CefSharp.WinForms;
-using System.Threading;
-
+﻿using CefSharp.WinForms;
+using CefSharp;
 namespace TestProj
 {
     internal class BrowserItem
     {
         readonly ChromiumWebBrowser _browser;
-        string _url;
-        string _prepareJSCode;
-        string _prepareUrl;
-        string _mainFrameJSCode;
-        string _otherJSCode;
+        private readonly string _url;
+        readonly string _prepareUrl;
+
+        private IBrowserJS _browserJS;
+
         public string CSSDarkTheme { get; set; }
         public ColorTheme ColorTheme { get; set; }
 
 
-        string _browserName;
-        public string BrowserName => _browserName;
+        public string BrowserName { get; }
 
         public ChromiumWebBrowser Browser => _browser;
 
@@ -27,42 +24,42 @@ namespace TestProj
             string url, 
             string browserName,
             string cssDarkTheme,
-            string mainFrameJSCode,
-            string otherJSCode,
-            string prepareUrl, string prepareJSCode,
+           IBrowserJS browserJS,
+            string prepareUrl,
             bool legacyBinding = true)
         {
             _browser = browser;
             _url = url;
-            _browserName = browserName;
+            BrowserName = browserName;
             CSSDarkTheme = cssDarkTheme;
             _needPreparing = false;
             _browser.FrameLoadEnd += _browser_FrameLoadEnd;
             _browser.LoadingStateChanged += _browser_LoadingStateChanged;
-            _mainFrameJSCode = mainFrameJSCode;
-            _otherJSCode = otherJSCode;
+
             _prepareUrl = prepareUrl;
-            _prepareJSCode = prepareJSCode;
+            _browserJS = browserJS;
             _browser.JavascriptObjectRepository.Settings.LegacyBindingEnabled = legacyBinding;
             ColorTheme = ColorTheme.Light;
         }
         public BrowserItem(string url, 
             string browserName, 
             string cssDarkTheme,
-            string mainFrameJSCode = null,
-            string otherJSCode = null, 
-            string prepareUrl = null, 
-            string prepareJSCode = null)
+            IBrowserJS browserJS = null,
+            string prepareUrl = null)
             : this(new ChromiumWebBrowser(), 
                   url, 
                   browserName,
                   cssDarkTheme,
-                  mainFrameJSCode,  
-                  otherJSCode, 
-                  prepareUrl,
-                  prepareJSCode)
+                  browserJS,
+                  prepareUrl)
         {
             _browser.Dock = System.Windows.Forms.DockStyle.Fill;
+        }
+
+        public void ReloadJSCode(IBrowserJS browserJS)
+        {
+            if (browserJS != null)
+                _browserJS = browserJS;
         }
 
         public void Go(string text)
@@ -81,8 +78,9 @@ namespace TestProj
 
         private void DoPrepare()
         {
-            if (!string.IsNullOrEmpty(_prepareJSCode))
-                _browser.EvaluateScriptAsync(_prepareJSCode);
+            if (_browserJS != null && !string.IsNullOrEmpty(_browserJS.PrepareJSCode))
+                _browser.EvaluateScriptAsync(_browserJS.PrepareJSCode);
+            
         }
         private bool _needPreparing;
         private void _browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
@@ -103,13 +101,13 @@ namespace TestProj
         }
         private void InsertOtherJavaScript()
         {
-            if (!string.IsNullOrEmpty(_otherJSCode))
-                _browser.ExecuteScriptAsyncWhenPageLoaded(_otherJSCode);
+            if (_browserJS != null && !string.IsNullOrEmpty(_browserJS.OtherJSCode))
+                _browser.ExecuteScriptAsyncWhenPageLoaded(_browserJS.OtherJSCode);
         }
         private void InsertMainFrameJavaScript()
         {
-            if (!string.IsNullOrEmpty(_mainFrameJSCode))
-                _browser.ExecuteScriptAsyncWhenPageLoaded(_mainFrameJSCode);
+            if (_browserJS != null && !string.IsNullOrEmpty(_browserJS.MainFrameJSCode))
+                _browser.ExecuteScriptAsyncWhenPageLoaded(_browserJS.MainFrameJSCode);
         }
 
         private void _browser_LoadingStateChanged(object sender, LoadingStateChangedEventArgs e)

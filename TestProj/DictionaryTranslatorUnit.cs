@@ -41,7 +41,7 @@ namespace TestProj
 
             _boundObject = new BoundObject();
             _boundObject.BrowserTextSelected += _boundObject_BrowserTextSelected;
-            _dictionary.Browser.JavascriptObjectRepository.Register("b1", _boundObject, false);
+            _dictionary.Browser.JavascriptObjectRepository.Register("b1", _boundObject);
         }
         
         private void _boundObject_BrowserTextSelected(object sender, BrowserTextSelectedEventArgs e)

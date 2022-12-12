@@ -29,7 +29,7 @@ namespace TestProj
             };
             
             Cef.Initialize(settingsBrowser);
-            CefSharpSettings.WcfEnabled = true;
+            //CefSharpSettings.WcfEnabled = true;
             StartPosition = FormStartPosition.CenterScreen;
             WindowState = FormWindowState.Maximized;
         }
@@ -49,14 +49,14 @@ namespace TestProj
             return cbxCategory.Text;
         }
 
-        enum BrowserNames
-        {
-            OALD = 0,
-            GT_OALD,
-            Urban,
-            Cambridge,
-            GT_Cambridge
-        }
+        //enum BrowserNames
+        //{
+        //    OALD = 0,
+        //    GT_OALD,
+        //    Urban,
+        //    Cambridge,
+        //    GT_Cambridge
+        //}
 
         string PrepareTextToProceed(string text)
         {
@@ -77,7 +77,7 @@ namespace TestProj
             if(saveHistory)
                 _history.AddHistoryItem(text, GetCategory());
 
-            foreach (var unit in _dictionaryTranslatorUnits)
+            foreach (var unit in _dictionaryTranslatorUnits.Values)
             {
                 unit.Go(text);
             }
@@ -150,21 +150,35 @@ namespace TestProj
             HotKeyManager.HotKeyPressed += HotKeyManager_HotKeyPressed;
         }
 
+        private TableLayoutPanel CreateTableForUnit()
+        {
+            var table = new TableLayoutPanel() { ColumnCount = 2, RowCount = 1, Dock = DockStyle.Fill };
+            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70));
+            table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30));
+            return table;
+        }
+
+        private void AutoLayoutUnit(TableLayoutPanel panel, DictionaryTranslatorUnit unit)
+        {
+            panel.Controls.Add(unit.Dictionary.Browser, 0, 0);
+            panel.Controls.Add(unit.Translator.Browser, 1, 0);
+        }
+
         private void InitTabs()
         {
-            tabControl1.Font = new Font(tabControl1.Font.FontFamily, 12, FontStyle.Regular);
-            for (int i = 0; i < _dictionaryTranslatorUnits.Count; i++)
-            {
-                var table = new TableLayoutPanel() { ColumnCount = 2, RowCount = 1, Dock = DockStyle.Fill };
-                table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70));
-                table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30));
+#pragma warning disable CA1416
+#pragma warning disable CA1416
+            tabControl1.Font = new Font(family: tabControl1.Font.FontFamily, 12, FontStyle.Regular);
+#pragma warning restore CA1416
+#pragma warning restore CA1416
+            foreach (var unit in _dictionaryTranslatorUnits.Values)
+            { 
+                var table = CreateTableForUnit();
+                AutoLayoutUnit(table, unit);
 
-                table.Controls.Add(_dictionaryTranslatorUnits[i].Dictionary.Browser, 0, 0);
-                table.Controls.Add(_dictionaryTranslatorUnits[i].Translator.Browser, 1, 0);
-
-                var dictionaryName = _dictionaryTranslatorUnits[i].Dictionary.BrowserName;
+                var dictionaryName = unit.Dictionary.BrowserName;
                 tabControl1.TabPages.Add(dictionaryName, dictionaryName);
-                tabControl1.TabPages[dictionaryName].Controls.Add(table);
+                tabControl1.TabPages[dictionaryName]?.Controls.Add(table);
             }
             tabControl1.TabPages.Add("tabHistory", "History");
 
@@ -210,38 +224,51 @@ namespace TestProj
             return true;
         }
 
-        List<DictionaryTranslatorUnit> _dictionaryTranslatorUnits;
+        enum UnitName
+        {
+            Oald,
+            Cambridge,
+            Wiki
+        }
+
+        Dictionary<UnitName, DictionaryTranslatorUnit> _dictionaryTranslatorUnits;
 
         private void InitBrowsers()
         {
             var stt = Settings.Default;
             DictionaryTranslatorUnit.DefaultTranslatorUrl = stt.GT_URL;
             DictionaryTranslatorUnit.DefaultTranslatorName = stt.GT_Name;
-            _dictionaryTranslatorUnits = new List<DictionaryTranslatorUnit>();
+            _dictionaryTranslatorUnits = new ();
 
             var cssDarkColorTheme = LoadCSSColorTheme(stt.DarkCSSColorThemePath);
 
-            var oald = new BrowserItem(stt.OALD_URL, "OALD", cssDarkColorTheme, BrowsersJS.DictionaryOnSelectJS, BrowsersJS.OaldDeleteAdJS,stt.OALDPrepareURL, BrowsersJS.OaldPrepareJS);
-            var cambridge = new BrowserItem(stt.Cambridge_URL, "Cambridge en-rus", cssDarkColorTheme, BrowsersJS.DictionaryOnSelectJS, BrowsersJS.OaldDeleteAdJS);
-            var wiki = new BrowserItem(stt.Wiki_URL, "Wikipedia en", cssDarkColorTheme, BrowsersJS.DictionaryOnSelectJS);
+            var oaldJS = OaldJS.GetInstance();
+            var cambridgeJS = OaldJS.GetInstance(new BrowserJS(null,"",""));
+            var wikiJS = OaldJS.GetInstance(new BrowserJS(null,""));
 
-            _dictionaryTranslatorUnits.Add(new DictionaryTranslatorUnit(oald));
-            _dictionaryTranslatorUnits.Add(new DictionaryTranslatorUnit(cambridge));
-            _dictionaryTranslatorUnits.Add(new DictionaryTranslatorUnit(wiki));
+
+            var oald = new BrowserItem(stt.OALD_URL, "OALD", cssDarkColorTheme, oaldJS, stt.OALDPrepareURL);
+            var cambridge = new BrowserItem(stt.Cambridge_URL, "Cambridge en-rus", cssDarkColorTheme, cambridgeJS);
+            var wiki = new BrowserItem(stt.Wiki_URL, "Wikipedia en", cssDarkColorTheme, wikiJS);
+
+            _dictionaryTranslatorUnits.Add(UnitName.Oald ,new DictionaryTranslatorUnit(oald));
+            _dictionaryTranslatorUnits.Add(UnitName.Cambridge ,new DictionaryTranslatorUnit(cambridge));
+            _dictionaryTranslatorUnits.Add(UnitName.Wiki , new DictionaryTranslatorUnit(wiki));
         }
 
-       
+        //private void OALD_Browser_KeyDown(object sender, KeyEventArgs e)
+        //{
+        //    if (e.KeyData == (Keys.Control | Keys.Shift | Keys.C))
+        //    {
+        //        ClearTxtSearchAndFocus();
+        //    }
+        //}
 
-        private void OALD_Browser_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyData == (Keys.Control | Keys.Shift | Keys.C))
-            {
-                ClearTxtSearchAndFocus();
-            }
-        }
-
+/*
         private delegate void ClearTxtSearchAndFocusDelegate();
+*/
 
+/*
         private void ClearTxtSearchAndFocus()
         {
             if(InvokeRequired)
@@ -253,6 +280,7 @@ namespace TestProj
             txtToSearch.Clear();
             txtToSearch.Focus();
         }
+*/
 
        
 
@@ -401,7 +429,7 @@ namespace TestProj
 
         void ReloadAllBrowsers()
         {
-            foreach (var unit in _dictionaryTranslatorUnits)
+            foreach (var unit in _dictionaryTranslatorUnits.Values)
             {
                 unit.ReLoad();
             }
@@ -438,8 +466,8 @@ namespace TestProj
             if (parent is ToolStripMenuItem)
             {
                 var parentsDropDown = (parent as ToolStripMenuItem).DropDown;
-                (parentsDropDown as ToolStripDropDownMenu).ShowCheckMargin = true;
-                (parentsDropDown as ToolStripDropDownMenu).ShowImageMargin = false;
+                ((parentsDropDown as ToolStripDropDownMenu)!).ShowCheckMargin = true;
+                ((parentsDropDown as ToolStripDropDownMenu)!).ShowImageMargin = false;
                 parentsDropDown.BackColor = backColor;
                 parentsDropDown.ForeColor = foreColor;
                 parentsDropDown.Invalidate(true);
@@ -473,7 +501,6 @@ namespace TestProj
 
             Color _backColor;
             public MyProfessionalColorTable(Color backColor)
-                :base()
             {
                 _backColor = backColor;
             }
@@ -497,11 +524,12 @@ namespace TestProj
             {
                 Rectangle rc = new Rectangle(Point.Empty, e.Item.Size);
                 Color backColor = e.Item.Selected ? _backColorOfHighlightedItem : e.Item.BackColor;
-
-                using (SolidBrush brush = new SolidBrush(backColor))
-                    e.Graphics.FillRectangle(brush, rc);
+#pragma warning disable CA1416
+                using SolidBrush brush = new(backColor);
+                e.Graphics.FillRectangle(brush, rc);
+#pragma warning restore CA1416
                
-               // base.OnRenderMenuItemBackground(e);
+                // base.OnRenderMenuItemBackground(e);
             }
 
             //protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
@@ -540,7 +568,7 @@ namespace TestProj
 
         private void SetColotThemeForAllUnits()
         {
-            foreach (var unit in _dictionaryTranslatorUnits)
+            foreach (var unit in _dictionaryTranslatorUnits.Values)
             {
                 unit.ColorTheme = _currentColorTheme;
             }
@@ -651,29 +679,33 @@ namespace TestProj
 
         private ListView _lstHistory;
         private void InitHistoryListView()
-        { 
+        {
             InitSorterListView();
 
             _lstHistory = new ListView()
             {
-                View = View.Details, 
-                Dock = DockStyle.Fill, 
+                View = View.Details,
+                Dock = DockStyle.Fill,
+#pragma warning disable CA1416
                 Font = new Font(Font.FontFamily, 12, FontStyle.Regular),
+#pragma warning restore CA1416
                 FullRowSelect = true,
             };
-            
-            tabControl1.TabPages["tabHistory"].Controls.Add(_lstHistory);
+
+            tabControl1.TabPages["tabHistory"]?.Controls.Add(_lstHistory);
             _lstHistory.Columns.Add("phrase", "phrase");
             _lstHistory.Columns.Add("category", "category");
             _lstHistory.Columns.Add("date", "date");
-            
-            var menuItems = new List<MenuItem>
+
+            var menuItems = new List<ToolStripMenuItem>
             {
-                new MenuItem("Update", UpdateHistoryListView),
-                new MenuItem("Delete", DeleteHistoryItem)
+                new("Update",null, UpdateHistoryListView),
+                new("Delete", null, DeleteHistoryItem)
             };
 
-            _lstHistory.ContextMenu = new ContextMenu(menuItems.ToArray());
+            _lstHistory.ContextMenuStrip = new ContextMenuStrip();
+            // ReSharper disable once CoVariantArrayConversion
+            _lstHistory.ContextMenuStrip?.Items.AddRange(menuItems.ToArray());
             _lstHistory.MouseDoubleClick += LstHistoryOnMouseDoubleClick;
             _lstHistory.ColumnClick += _lstHistory_ColumnClick;
         }
@@ -853,10 +885,10 @@ namespace TestProj
 
         private void LoginToOALD()
         {
-            //if(InvokeRequired)
-            _dictionaryTranslatorUnits[0].Dictionary.Prepare();
+            _dictionaryTranslatorUnits[UnitName.Oald].Dictionary.Prepare();
         }
 
+/*
         private void Urban_LoadingStateChanged(object sender, LoadingStateChangedEventArgs e)
         {
             if (e.IsLoading)
@@ -869,6 +901,7 @@ namespace TestProj
                 //SetBrowserColorsCSS(browser, _curCSSTheme);
             }
         }
+*/
         
 
         delegate void HotKeyPressedDelegate(object sender, HotKeyEventArgs e);
@@ -886,7 +919,14 @@ namespace TestProj
             if ((e.Modifiers & KeyModifiers.Control) == KeyModifiers.Control &&
                (e.Modifiers & KeyModifiers.Shift) == KeyModifiers.Shift &&
                (e.Key & Keys.X) == Keys.X)
+            {
                 GoBrowsers(Clipboard.GetText());
+
+                var vd = new VirtualDesktopManager();
+                //Process.GetCurrentProcess();
+                vd.GetWindowDesktopId(Handle);
+            }
+                
         }
 
         private async Task SaveHistoryBackup()
@@ -938,7 +978,7 @@ namespace TestProj
                 if (!File.Exists(stt.TaskFilePath))
                     return;
 
-                File.Copy(stt.TaskFilePath, Path.Combine(dir, Path.GetFileName(stt.TaskFilePath)), true);
+                File.Copy(stt.TaskFilePath, Path.Combine(dir, Path.GetFileName(stt.TaskFilePath) ?? throw new InvalidOperationException()), true);
             });
         }
 
@@ -1015,7 +1055,7 @@ namespace TestProj
             {
                 if (tabControl1.TabPages.ContainsKey("Urban"))
                 {
-                    tabControl1.TabPages.Remove(tabControl1.TabPages["Urban"]);
+                    tabControl1.TabPages.Remove(tabControl1.TabPages["Urban"]!);
                 }
             }
         }
@@ -1221,7 +1261,7 @@ namespace TestProj
 
         private void FindInDictionaries(string text)
         {
-            foreach (var unit in _dictionaryTranslatorUnits)
+            foreach (var unit in _dictionaryTranslatorUnits.Values)
             {
                 if (text.Length <= 0)
                 {
@@ -1260,9 +1300,9 @@ namespace TestProj
             }
             else
             {
-                dlg.InitialDirectory = Path.GetDirectoryName(stt.HistoryBackupPath);
-                dlg.FileName = Path.GetFileName(stt.HistoryBackupPath);
-                var ext = Path.GetExtension(stt.HistoryBackupPath);
+                dlg.InitialDirectory = Path.GetDirectoryName(stt.HistoryBackupPath) ?? throw new InvalidOperationException();
+                dlg.FileName = Path.GetFileName(stt.HistoryBackupPath) ?? throw new InvalidOperationException();
+                var ext = Path.GetExtension(stt.HistoryBackupPath) ?? throw new InvalidOperationException();
                 dlg.Filter = $@"(*{ext})|*{ext}";
             }
 
@@ -1296,6 +1336,12 @@ namespace TestProj
             stt.OALDUser = dialog.Credentials.UserName;
             stt.OALDPass = dialog.Credentials.Password;
             stt.Save();
+            ReloadOaldJS();
+        }
+
+        private void ReloadOaldJS()
+        {
+            _dictionaryTranslatorUnits[UnitName.Oald].Dictionary.ReloadJSCode(OaldJS.GetInstance());
         }
 
         private void ShowErrorMessage(string message)
