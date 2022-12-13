@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using CefSharp;
 using CefSharp.WinForms;
 using TestProj.Properties;
+//using static System.Net.Mime.MediaTypeNames;
 
 namespace TestProj
 {
@@ -23,9 +24,7 @@ namespace TestProj
             {
                 Locale = "en-US,en",
                 AcceptLanguageList = "en-US,en",
-                PersistSessionCookies = false,
-
-                
+                PersistSessionCookies = false
             };
             
             Cef.Initialize(settingsBrowser);
@@ -102,7 +101,8 @@ namespace TestProj
         }
 
         private History _history;
-        private int? _hotKeyId;
+        private int? _hotKeyGo;
+        private int? _hotKeyReturn;
 
         private Color _foreColor;
         private Color _backColor;
@@ -112,6 +112,7 @@ namespace TestProj
             Text = Application.ProductName;
             _foreColor = ForeColor;
             _backColor = BackColor;
+            _handle = Handle;
 
             LoadSettings();
             InitHotKeys();
@@ -146,7 +147,8 @@ namespace TestProj
 
         private void InitHotKeys()
         {
-            _hotKeyId = HotKeyManager.RegisterHotKey(Keys.X, KeyModifiers.Control | KeyModifiers.Shift);
+            _hotKeyGo = HotKeyManager.RegisterHotKey(Keys.X, KeyModifiers.Control | KeyModifiers.Shift);
+            _hotKeyReturn = HotKeyManager.RegisterHotKey(Keys.Q, KeyModifiers.Control | KeyModifiers.Shift);
             HotKeyManager.HotKeyPressed += HotKeyManager_HotKeyPressed;
         }
 
@@ -559,14 +561,14 @@ namespace TestProj
                     break;
             }
 
-            SetColotThemeForAllUnits();
+            SetColorThemeForAllUnits();
             ReloadAllBrowsers();
 
             Settings.Default.DarkTheme = theme == ColorTheme.Dark;
             Settings.Default.Save();
         }
 
-        private void SetColotThemeForAllUnits()
+        private void SetColorThemeForAllUnits()
         {
             foreach (var unit in _dictionaryTranslatorUnits.Values)
             {
@@ -906,6 +908,9 @@ namespace TestProj
 
         delegate void HotKeyPressedDelegate(object sender, HotKeyEventArgs e);
 
+        private DesktopHelper.Desktop _previousDesktop;
+        private nint _handle;
+
         void HotKeyManager_HotKeyPressed(object sender, HotKeyEventArgs e)
         {
             if (InvokeRequired)
@@ -920,13 +925,36 @@ namespace TestProj
                (e.Modifiers & KeyModifiers.Shift) == KeyModifiers.Shift &&
                (e.Key & Keys.X) == Keys.X)
             {
+                ShowCurrentDesktop();
                 GoBrowsers(Clipboard.GetText());
-
-                var vd = new VirtualDesktopManager();
-                //Process.GetCurrentProcess();
-                vd.GetWindowDesktopId(Handle);
             }
-                
+            else if ((e.Modifiers & KeyModifiers.Control) == KeyModifiers.Control &&
+                (e.Modifiers & KeyModifiers.Shift) == KeyModifiers.Shift &&
+                (e.Key & Keys.Q) == Keys.Q)
+            {
+                ReturnToPreviousDesktop();
+            }
+        }
+
+        private void ShowCurrentDesktop()
+        {
+            var thisDesktop = DesktopHelper.Desktop.FromWindow(Handle);
+            _previousDesktop = DesktopHelper.Desktop.Current;
+            if (!thisDesktop.IsVisible)
+            {
+                thisDesktop.MakeVisible();
+            }
+        }
+
+        private void ReturnToPreviousDesktop()
+        {
+            if (_previousDesktop == null) return;
+            _previousDesktop.MakeVisible();
+        }
+
+        private void returnToPreviousDesktopToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+           ReturnToPreviousDesktop();
         }
 
         private async Task SaveHistoryBackup()
@@ -936,24 +964,12 @@ namespace TestProj
                 await _history.SaveHistoryToFile(stt.HistoryBackupPath, true);
         }
 
-        private async Task SaveHistory(bool showDialog)
+        private async Task SaveHistory(bool saveMainFile, bool SaveACopy, bool saveBackup)
         {
-            var wannaSave = true;
-
-            if (showDialog)
-                wannaSave = MessageBox.Show(@"Do you want to save data before exit?", Application.ProductName,
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes;
-
-            if (wannaSave)
-            {
-                await _history.SaveHistoryToFile();
-            }
-            else
-            {
-                await _history.SaveHistoryToFileAsACopy();
-            }
-
-            await SaveHistoryBackup();
+            
+            if (saveMainFile) await _history.SaveHistoryToFile();
+            if(SaveACopy) await _history.SaveHistoryToFileAsACopy();
+            if(saveBackup) await SaveHistoryBackup();
         }
 
 /*
@@ -982,24 +998,55 @@ namespace TestProj
             });
         }
 
-        bool _readyToClosing;
-
         private async void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            e.Cancel = !_readyToClosing;
+            var isUserClosing = e.CloseReason == CloseReason.UserClosing;
+            var isHistoryChanged = _history.HistoryHasBeenChanged;
 
-            if (!_readyToClosing)
+            if (isUserClosing && isHistoryChanged)
             {
-                if (_history.HistoryHasBeenChanged)
-                    await SaveHistory(e.CloseReason == CloseReason.UserClosing);
+                var dialogResult = MessageBox.Show(@"Do you want to save data before exit?", Application.ProductName,
+                    MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation);
 
-                await SaveTasksBackup();
+                switch (dialogResult)
+                {
+                    case DialogResult.Yes:
+                        await SaveHistory(true, false, true);
+                        break;
+                    case DialogResult.No:
+                        await SaveHistory(false, true, false);
+                        break;
+                    case DialogResult.Cancel:
+                        e.Cancel = true; 
+                        return;
+                }
+            }
+            if (isUserClosing && !isHistoryChanged)
+            {
+                var dialogResult = MessageBox.Show(@"Do you want to close the app?", Application.ProductName,
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                switch (dialogResult)
+                {
+                    case DialogResult.Cancel:
+                        e.Cancel = true; 
+                        return;
+                }
+            }
+            else if(!isUserClosing && isHistoryChanged)
+            {
+                await SaveHistory(false, true, true);
+            }
 
-                if (_hotKeyId != null)
-                    HotKeyManager.UnregisterHotKey(_hotKeyId.Value);
+            await SaveTasksBackup();
+            UnregisterHotKeys();
+        }
 
-                _readyToClosing = true;
-                Close();
+        private void UnregisterHotKeys()
+        {
+            if (_hotKeyGo != null && _hotKeyReturn != null)
+            {
+                HotKeyManager.UnregisterHotKey(_hotKeyGo.Value);
+                HotKeyManager.UnregisterHotKey(_hotKeyReturn.Value);
             }
         }
 
@@ -1101,14 +1148,19 @@ namespace TestProj
             MM_showCurrentCategory.Enabled = !MM_showChronologically.Checked;
         }
 
+        private void StartProcess(string path)
+        {
+            Process.Start(new ProcessStartInfo { UseShellExecute = true, FileName = path });
+        }
+
         private void showDatainiToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Process.Start(Settings.Default.DataPath);
+            StartProcess(Settings.Default.DataPath);
         }
 
         private void showTheAppFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Process.Start(Application.StartupPath);
+            StartProcess(Application.StartupPath);
         }
 
         private void SetDateTimeFilter(DateTime begin, DateTime end)
@@ -1195,7 +1247,7 @@ namespace TestProj
 
         private void MM_ShowTasks_Click(object sender, EventArgs e)
         {
-            Process.Start(Settings.Default.TaskFilePath);
+            StartProcess(Settings.Default.TaskFilePath);
         }
 
         private void txtToSearch_TextChanged(object sender, EventArgs e)
@@ -1213,6 +1265,7 @@ namespace TestProj
         private void btnClearInput_Click(object sender, EventArgs e)
         {
             txtToSearch.Clear();
+            txtFindText.Focus();
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
@@ -1224,7 +1277,8 @@ namespace TestProj
             if (keyData == (Keys.Control | Keys.Shift | Keys.C))
             {
                     txtToSearch.Clear();
-                    return true;
+                    txtToSearch.Focus();
+                return true;
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
@@ -1234,6 +1288,7 @@ namespace TestProj
             if (e.KeyData == (Keys.Control | Keys.Shift | Keys.C))
             {
                 txtToSearch.Clear();
+                txtToSearch.Focus();
             }
         }
 
@@ -1259,19 +1314,31 @@ namespace TestProj
             SetLoginToOALDOnStart(((ToolStripMenuItem)sender).Checked);
         }
 
-        private void FindInDictionaries(string text)
+        private void StopFinding()
         {
             foreach (var unit in _dictionaryTranslatorUnits.Values)
             {
-                if (text.Length <= 0)
-                {
-                    //this will clear all search result
-                    unit.Dictionary.Browser.StopFinding(true);
-                }
-                else
-                {
-                    unit.Dictionary.Browser.Find(txtFindText.Text, true, false, false);
-                }
+                unit.Dictionary.Browser.StopFinding(true);
+            }
+        }
+
+        private void StartFinding(string text)
+        {
+            foreach (var unit in _dictionaryTranslatorUnits.Values)
+            {
+                unit.Dictionary.Browser.Find(txtFindText.Text, true, false, false);
+            }
+        }
+        private void FindInDictionaries(string text)
+        {
+            if (text.Length <= 0)
+            {
+                //this will clear all search result
+                StopFinding();
+            }
+            else
+            {
+                StartFinding(text);
             }
         }
 
@@ -1282,8 +1349,9 @@ namespace TestProj
 
         private void txtFindText_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter)
+            if ((e.KeyCode & Keys.Enter) == Keys.Enter)
             {
+                StopFinding();
                 FindInDictionaries(txtFindText.Text);
             }
         }
@@ -1365,7 +1433,10 @@ namespace TestProj
         private void btnClearFind_Click(object sender, EventArgs e)
         {
             txtFindText.Text = "";
+            txtFindText.Focus();
             FindInDictionaries("");
         }
+
+        
     }
 }

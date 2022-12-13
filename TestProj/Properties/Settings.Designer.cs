@@ -193,8 +193,7 @@ namespace TestProj.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://translate.google.am/?hl=en#view=home&amp;op=translate&amp;sl=en&amp;tl=ru" +
-            "&amp;text=")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://translate.google.am/?hl=en#view=home&op=translate&sl=en&tl=ru&text=")]
         public string GT_URL {
             get {
                 return ((string)(this["GT_URL"]));

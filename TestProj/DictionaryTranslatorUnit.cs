@@ -4,8 +4,8 @@ namespace TestProj
 {
     internal class DictionaryTranslatorUnit
     {
-        BrowserItem _dictionary;
-        BrowserItem _translator;
+        readonly BrowserItem _dictionary;
+        readonly BrowserItem _translator;
 
         public BrowserItem Dictionary => _dictionary;
         public BrowserItem Translator => _translator;
@@ -18,10 +18,7 @@ namespace TestProj
         private ColorTheme _colorTheme;
         public ColorTheme ColorTheme
         {
-            get
-            {
-                return _colorTheme;
-            }
+            get => _colorTheme;
             set
             {
                 _colorTheme = value;

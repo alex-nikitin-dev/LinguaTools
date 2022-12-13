@@ -34,9 +34,11 @@
     <ApplicationIcon>Notebook.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationManifest>app1.manifest</ApplicationManifest>
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
     <StartupObject>TestProj.Program</StartupObject>
+    <Copyright>Oleksii Nikitin</Copyright>
+    <UseWPF>True</UseWPF>
   </PropertyGroup>
   <ItemGroup>
     <None Update="credentials.json">
@@ -66,13 +68,27 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CefSharp.Common.NETCore" Version="107.1.120" />
+    <PackageReference Include="CefSharp.OffScreen.NETCore" Version="107.1.120" />
     <PackageReference Include="CefSharp.WinForms.NETCore" Version="107.1.120" />
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="107.1.120" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.355802">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DesktopHelper\DesktopHelper.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="VirtualDesktop">
+      <HintPath>..\..\VirtualDesktop\src\VirtualDesktop.WinForms\bin\Debug\net6.0-windows10.0.19041.0\VirtualDesktop.dll</HintPath>
+    </Reference>
+    <Reference Include="VirtualDesktop.WinForms">
+      <HintPath>..\..\VirtualDesktop\src\VirtualDesktop.WinForms\bin\Debug\net6.0-windows10.0.19041.0\VirtualDesktop.WinForms.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Settings.Designer.cs">

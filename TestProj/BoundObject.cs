@@ -9,8 +9,7 @@ namespace TestProj
 
         protected virtual void OnBrowserTextSelected(BrowserTextSelectedEventArgs e)
         {
-            var handler = BrowserTextSelected;
-            handler?.Invoke(this, e);
+            BrowserTextSelected?.Invoke(this, e);
         }
         // ReSharper disable once InconsistentNaming
         // ReSharper disable once IdentifierTypo
