@@ -19,3 +19,5 @@
 /TestProj/credentials.json
 /UpgradeReport.sarif
 /upgrade-assistant.clef
+/DesktopHelper/bin
+/DesktopHelper/obj
