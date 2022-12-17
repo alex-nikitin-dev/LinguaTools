@@ -4,13 +4,15 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CefSharp;
 using CefSharp.WinForms;
+using Microsoft.VisualBasic;
 using TestProj.Properties;
-//using static System.Net.Mime.MediaTypeNames;
+
 
 namespace TestProj
 {
@@ -24,10 +26,11 @@ namespace TestProj
             {
                 Locale = "en-US,en",
                 AcceptLanguageList = "en-US,en",
-                PersistSessionCookies = false
+                PersistSessionCookies = false,
             };
             
             Cef.Initialize(settingsBrowser);
+            
             //CefSharpSettings.WcfEnabled = true;
             StartPosition = FormStartPosition.CenterScreen;
             WindowState = FormWindowState.Maximized;
@@ -47,15 +50,6 @@ namespace TestProj
                 return "general";
             return cbxCategory.Text;
         }
-
-        //enum BrowserNames
-        //{
-        //    OALD = 0,
-        //    GT_OALD,
-        //    Urban,
-        //    Cambridge,
-        //    GT_Cambridge
-        //}
 
         string PrepareTextToProceed(string text)
         {
@@ -113,6 +107,7 @@ namespace TestProj
             _foreColor = ForeColor;
             _backColor = BackColor;
             _handle = Handle;
+            _colorThemes = new();
 
             LoadSettings();
             InitHotKeys();
@@ -130,6 +125,8 @@ namespace TestProj
             //else
             //    GoOALD("");
 
+            GoBrowsers("test");
+
             SetThemeFromSettings();
         }
 
@@ -137,10 +134,19 @@ namespace TestProj
         {
             var stt = Settings.Default;
             MM_LoginToOALDOnStart.Checked = stt.OALDLoginOnStart;
+
+            _colorThemes.Clear();
+            _colorThemes.Add(ColorTheme.Dark, new(ColorTheme.Dark, stt.DarkForeground, stt.DarkBackground));
+            _colorThemes.Add(ColorTheme.Light, new(ColorTheme.Light, _foreColor, _backColor));
+
+            _currentColorTheme = stt.DarkTheme ? ColorTheme.Dark : ColorTheme.Light;
         }
 
+        Dictionary<ColorTheme, ColorThemeProvider> _colorThemes;
+       
+
         private void SetThemeFromSettings()
-        {
+        { 
             if (Settings.Default.DarkTheme)
                 SetColorTheme(ColorTheme.Dark);
         }
@@ -168,11 +174,7 @@ namespace TestProj
 
         private void InitTabs()
         {
-#pragma warning disable CA1416
-#pragma warning disable CA1416
             tabControl1.Font = new Font(family: tabControl1.Font.FontFamily, 12, FontStyle.Regular);
-#pragma warning restore CA1416
-#pragma warning restore CA1416
             foreach (var unit in _dictionaryTranslatorUnits.Values)
             { 
                 var table = CreateTableForUnit();
@@ -185,6 +187,13 @@ namespace TestProj
             tabControl1.TabPages.Add("tabHistory", "History");
 
             ShowUrban(MM_NeedUrbanDictionary.Checked);
+        }
+
+        private void Page_Paint(object sender, PaintEventArgs e)
+        {
+            SolidBrush fillBrush = new SolidBrush(Color.Black);
+
+            e.Graphics.FillRectangle(fillBrush, e.ClipRectangle);
         }
 
         private void FirstTabSelectionInit()
@@ -230,7 +239,8 @@ namespace TestProj
         {
             Oald,
             Cambridge,
-            Wiki
+            Wiki,
+            Google
         }
 
         Dictionary<UnitName, DictionaryTranslatorUnit> _dictionaryTranslatorUnits;
@@ -242,20 +252,41 @@ namespace TestProj
             DictionaryTranslatorUnit.DefaultTranslatorName = stt.GT_Name;
             _dictionaryTranslatorUnits = new ();
 
-            var cssDarkColorTheme = LoadCSSColorTheme(stt.DarkCSSColorThemePath);
+            var cssDarkColorTheme = File.ReadAllText(stt.DarkCSSColorThemePath);
+            var cssDarkGTranslator = File.ReadAllText(stt.DarkCSSGTranslator);
 
-            var oaldJS = OaldJS.GetInstance();
-            var cambridgeJS = OaldJS.GetInstance(new BrowserJS(null,"",""));
-            var wikiJS = OaldJS.GetInstance(new BrowserJS(null,""));
+            var oald = new BrowserItem(stt.OALD_URL,
+                                       "OALD",
+                                       cssDarkColorTheme,
+                                       _currentColorTheme,
+                                       //_colorThemes,
+                                       OaldJS.GetInstance(),
+                                       stt.OALDPrepareURL);
+            var cambridge = new BrowserItem(stt.Cambridge_URL,
+                                            "Cambridge en-rus",
+                                            cssDarkColorTheme,
+                                            _currentColorTheme,
+                                            //_colorThemes,
+                                            CambridgeJS.GetInstance());
+            var wiki = new BrowserItem(stt.Wiki_URL,
+                                       "Wikipedia en",
+                                       cssDarkColorTheme,
+                                       _currentColorTheme,
+                                       //_colorThemes,
+                                       GenericJS.GetInstance());
+            var google = new BrowserItem(stt.GoogleSearchURL,
+                                         "Google",
+                                         null/*cssDarkColorTheme*/,
+                                         _currentColorTheme,
+                                         //_colorThemes,
+                                         GoogleJS.GetInstance(),
+                                         null,
+                                         stt.GoogleSearchRequestParams);
 
-
-            var oald = new BrowserItem(stt.OALD_URL, "OALD", cssDarkColorTheme, oaldJS, stt.OALDPrepareURL);
-            var cambridge = new BrowserItem(stt.Cambridge_URL, "Cambridge en-rus", cssDarkColorTheme, cambridgeJS);
-            var wiki = new BrowserItem(stt.Wiki_URL, "Wikipedia en", cssDarkColorTheme, wikiJS);
-
-            _dictionaryTranslatorUnits.Add(UnitName.Oald ,new DictionaryTranslatorUnit(oald));
-            _dictionaryTranslatorUnits.Add(UnitName.Cambridge ,new DictionaryTranslatorUnit(cambridge));
-            _dictionaryTranslatorUnits.Add(UnitName.Wiki , new DictionaryTranslatorUnit(wiki));
+            _dictionaryTranslatorUnits.Add(UnitName.Oald ,new DictionaryTranslatorUnit(oald, cssDarkGTranslator));
+            _dictionaryTranslatorUnits.Add(UnitName.Cambridge ,new DictionaryTranslatorUnit(cambridge, cssDarkGTranslator));
+            _dictionaryTranslatorUnits.Add(UnitName.Wiki , new DictionaryTranslatorUnit(wiki, cssDarkGTranslator));
+            _dictionaryTranslatorUnits.Add(UnitName.Google, new DictionaryTranslatorUnit(google, cssDarkGTranslator));
         }
 
         //private void OALD_Browser_KeyDown(object sender, KeyEventArgs e)
@@ -540,26 +571,16 @@ namespace TestProj
             //    base.OnRenderItemText(e);
             //}
         }
-       
 
-        string LoadCSSColorTheme(string path)
-        {
-            return File.ReadAllText(path);
-        }
+        
 
         void SetColorTheme(ColorTheme theme)
         {
             _currentColorTheme = theme;
-
-            switch (theme)
-            {
-                case ColorTheme.Dark:
-                    SetColorsRecursively(this, ColorTranslator.FromHtml("#282828"), ColorTranslator.FromHtml("#dadada"));
-                    break;
-                case ColorTheme.Light:
-                    SetColorsRecursively(this, _backColor, _foreColor);
-                    break;
-            }
+            SetColorsRecursively(this, _colorThemes[theme].Background, _colorThemes[theme].Foreground);
+            UseImmersiveDarkMode(Handle, theme == ColorTheme.Dark);
+            tabControl1.DisplayStyle = theme == ColorTheme.Dark ? TabStyle.Dark : TabStyle.Default;
+          
 
             SetColorThemeForAllUnits();
             ReloadAllBrowsers();
@@ -1265,7 +1286,7 @@ namespace TestProj
         private void btnClearInput_Click(object sender, EventArgs e)
         {
             txtToSearch.Clear();
-            txtFindText.Focus();
+            txtToSearch.Focus();
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
@@ -1437,6 +1458,33 @@ namespace TestProj
             FindInDictionaries("");
         }
 
-        
+        [DllImport("dwmapi.dll")]
+        private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr,
+    ref int attrValue, int attrSize);
+
+        private const int DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1 = 19;
+        private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
+
+        internal static bool UseImmersiveDarkMode(IntPtr handle, bool enabled)
+        {
+            if (IsWindows10OrGreater(17763))
+            {
+                var attribute = DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1;
+                if (IsWindows10OrGreater(18985))
+                {
+                    attribute = DWMWA_USE_IMMERSIVE_DARK_MODE;
+                }
+
+                int useImmersiveDarkMode = enabled ? 1 : 0;
+                return DwmSetWindowAttribute(handle, attribute, ref useImmersiveDarkMode, sizeof(int)) == 0;
+            }
+
+            return false;
+        }
+
+        private static bool IsWindows10OrGreater(int build = -1)
+        {
+            return Environment.OSVersion.Version.Major >= 10 && Environment.OSVersion.Version.Build >= build;
+        }
     }
 }

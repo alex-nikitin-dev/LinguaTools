@@ -31,16 +31,26 @@ namespace TestProj
             _translator.ColorTheme = _colorTheme;
         }
 
-        public DictionaryTranslatorUnit(BrowserItem dictionary, BrowserItem translator = null)
+        private DictionaryTranslatorUnit(BrowserItem dictionary, BrowserItem translator = null)
         {
             _dictionary = dictionary;
-            _translator = translator ?? new BrowserItem(DefaultTranslatorUrl, DefaultTranslatorName, dictionary.CSSDarkTheme);
+            _translator = translator ?? new BrowserItem(DefaultTranslatorUrl,
+                DefaultTranslatorName, 
+                _dictionary.CSSDarkTheme,
+                _dictionary.ColorTheme
+                /*dictionary.ColorThemes*/);
 
             _boundObject = new BoundObject();
             _boundObject.BrowserTextSelected += _boundObject_BrowserTextSelected;
             _dictionary.Browser.JavascriptObjectRepository.Register("b1", _boundObject);
         }
-        
+
+        public DictionaryTranslatorUnit(BrowserItem dictionary, string cssDarkTranslator)
+            :this(dictionary)
+        {
+            _translator.CSSDarkTheme = cssDarkTranslator;
+        }
+
         private void _boundObject_BrowserTextSelected(object sender, BrowserTextSelectedEventArgs e)
         {
             _translator.Go(e.Text);

@@ -68,5 +68,23 @@
     <Setting Name="OALD_AcceptAllCookies_ID" Type="System.String" Scope="User">
       <Value Profile="(Default)">onetrust-accept-btn-handler</Value>
     </Setting>
+    <Setting Name="GoogleSearchURL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://www.google.com/search?q=</Value>
+    </Setting>
+    <Setting Name="GoogleSearchRequestParams" Type="System.String" Scope="User">
+      <Value Profile="(Default)">+meaning</Value>
+    </Setting>
+    <Setting Name="DarkCSSGTranslator" Type="System.String" Scope="User">
+      <Value Profile="(Default)">css\dark.mode.google.translator.css</Value>
+    </Setting>
+    <Setting Name="GoogleThemeClassName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">dluk7e</Value>
+    </Setting>
+    <Setting Name="DarkBackground" Type="System.String" Scope="User">
+      <Value Profile="(Default)">#282828</Value>
+    </Setting>
+    <Setting Name="DarkForeground" Type="System.String" Scope="User">
+      <Value Profile="(Default)">#dadada</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

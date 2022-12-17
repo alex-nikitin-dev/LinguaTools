@@ -5,7 +5,7 @@ namespace TestProj
     internal static class OaldJS
     {
         //OaldPrepareJS
-        private static string PrepareJSCode =>
+        public static string PrepareJSCode =>
             $@"function setItem(itemId,itemValue){{
             document.getElementById(itemId).value = itemValue;
             }}
@@ -15,17 +15,8 @@ namespace TestProj
             document.getElementById('{Settings.Default.OALDSubmitID}').click();
             ";
 
-        //DictionaryOnSelectJS
-        private static string MainFrameJSCode =>
-            $@"
-              document.body.onmouseup = function()
-              {{
-                    b1.onselect(document.getSelection().toString());
-              }};
-            ";
-
         //OaldDeleteAdJS
-        private static string OtherJSCode =>
+        public static string OtherJSCode =>
             $@"
             polls = document.querySelectorAll('[id ^= ""ad_""]');
             Array.prototype.forEach.call(polls, callback);
@@ -38,16 +29,11 @@ namespace TestProj
             document.getElementById('{Settings.Default.OALD_AcceptAllCookies_ID}').click();
             ";
 
-        public static IBrowserJS GetInstance(IBrowserJS browserJS)
-        {
-            return new BrowserJS(browserJS.PrepareJSCode == null ? null: PrepareJSCode,
-                browserJS.MainFrameJSCode == null ? null : MainFrameJSCode,
-                browserJS.OtherJSCode == null ? null : OtherJSCode);
-        }
         public static IBrowserJS GetInstance()
         {
             return new BrowserJS(PrepareJSCode,
-                MainFrameJSCode,
+                null,
+                GenericJS.MainFrameJSCode,
                 OtherJSCode);
         }
     }

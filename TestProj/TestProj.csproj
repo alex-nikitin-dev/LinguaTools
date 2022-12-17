@@ -41,8 +41,11 @@
     <UseWPF>True</UseWPF>
   </PropertyGroup>
   <ItemGroup>
-    <None Update="credentials.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Remove="credentials.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="CSS\dark.mode.google.translator.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="CSS\dark.mode.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -68,10 +71,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CefSharp.Common.NETCore" Version="107.1.120" />
-    <PackageReference Include="CefSharp.OffScreen.NETCore" Version="107.1.120" />
-    <PackageReference Include="CefSharp.WinForms.NETCore" Version="107.1.120" />
-    <PackageReference Include="CefSharp.Wpf.NETCore" Version="107.1.120" />
+    <PackageReference Include="CefSharp.Common.NETCore" Version="108.4.130" />
+    <PackageReference Include="CefSharp.OffScreen.NETCore" Version="108.4.130" />
+    <PackageReference Include="CefSharp.WinForms.NETCore" Version="108.4.130" />
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="108.4.130" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.355802">
@@ -80,6 +83,7 @@
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CustomTabControl\CustomTabControl.csproj" />
     <ProjectReference Include="..\DesktopHelper\DesktopHelper.csproj" />
   </ItemGroup>
   <ItemGroup>

@@ -286,5 +286,77 @@ namespace TestProj.Properties {
                 this["OALD_AcceptAllCookies_ID"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://www.google.com/search?q=")]
+        public string GoogleSearchURL {
+            get {
+                return ((string)(this["GoogleSearchURL"]));
+            }
+            set {
+                this["GoogleSearchURL"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("+meaning")]
+        public string GoogleSearchRequestParams {
+            get {
+                return ((string)(this["GoogleSearchRequestParams"]));
+            }
+            set {
+                this["GoogleSearchRequestParams"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("css\\dark.mode.google.translator.css")]
+        public string DarkCSSGTranslator {
+            get {
+                return ((string)(this["DarkCSSGTranslator"]));
+            }
+            set {
+                this["DarkCSSGTranslator"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("dluk7e")]
+        public string GoogleThemeClassName {
+            get {
+                return ((string)(this["GoogleThemeClassName"]));
+            }
+            set {
+                this["GoogleThemeClassName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#282828")]
+        public string DarkBackground {
+            get {
+                return ((string)(this["DarkBackground"]));
+            }
+            set {
+                this["DarkBackground"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#dadada")]
+        public string DarkForeground {
+            get {
+                return ((string)(this["DarkForeground"]));
+            }
+            set {
+                this["DarkForeground"] = value;
+            }
+        }
     }
 }

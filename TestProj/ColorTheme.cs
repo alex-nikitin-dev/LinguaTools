@@ -1,8 +1,8 @@
 ﻿namespace TestProj
 {
-    enum ColorTheme
+    public enum ColorTheme
     {
-        Dark,
-        Light
+        Light,
+        Dark
     }
 }

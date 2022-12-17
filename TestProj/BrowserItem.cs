@@ -1,18 +1,38 @@
 ﻿using CefSharp.WinForms;
 using CefSharp;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+
 namespace TestProj
 {
     internal class BrowserItem
     {
         readonly ChromiumWebBrowser _browser;
         private readonly string _url;
+        private readonly string _requestParams;
         readonly string _prepareUrl;
 
         private IBrowserJS _browserJS;
 
         public string CSSDarkTheme { get; set; }
-        public ColorTheme ColorTheme { get; set; }
 
+        private ColorTheme _colorTheme;
+        public ColorTheme ColorTheme
+        {
+            get => _colorTheme;
+            set
+            {
+                _colorTheme = value;
+                _needSetColorTheme = true;
+                //if (_browser.BrowserSettings != null)
+                //{ 
+                //    _browser.BrowserSettings.BackgroundColor = ColorThemes[value].BackgroundArgb;
+                //}
+            }
+        }
+
+        //public Dictionary<ColorTheme, ColorThemeProvider> ColorThemes { get; private set; }
 
         public string BrowserName { get; }
 
@@ -21,14 +41,18 @@ namespace TestProj
         public string Url => _url;
 
         private BrowserItem(ChromiumWebBrowser browser, 
-            string url, 
+            string url,
             string browserName,
             string cssDarkTheme,
+            ColorTheme theme,
+            //Dictionary<ColorTheme, ColorThemeProvider> colorThemes,
            IBrowserJS browserJS,
             string prepareUrl,
+            string requestParams = null,
             bool legacyBinding = true)
         {
             _browser = browser;
+            //ColorThemes = colorThemes;
             _url = url;
             BrowserName = browserName;
             CSSDarkTheme = cssDarkTheme;
@@ -37,21 +61,31 @@ namespace TestProj
             _browser.LoadingStateChanged += _browser_LoadingStateChanged;
 
             _prepareUrl = prepareUrl;
+            _requestParams = requestParams;
             _browserJS = browserJS;
             _browser.JavascriptObjectRepository.Settings.LegacyBindingEnabled = legacyBinding;
-            ColorTheme = ColorTheme.Light;
+            ColorTheme = theme;
+            
+            
+            _needSetColorTheme = true;
         }
         public BrowserItem(string url, 
             string browserName, 
             string cssDarkTheme,
+            ColorTheme theme,
+            //Dictionary<ColorTheme, ColorThemeProvider> colorThemes,
             IBrowserJS browserJS = null,
-            string prepareUrl = null)
+            string prepareUrl = null,
+            string requestParams = null)
             : this(new ChromiumWebBrowser(), 
                   url, 
                   browserName,
                   cssDarkTheme,
+                  theme,
+                  //colorThemes,
                   browserJS,
-                  prepareUrl)
+                  prepareUrl,
+                  requestParams)
         {
             _browser.Dock = System.Windows.Forms.DockStyle.Fill;
         }
@@ -64,7 +98,7 @@ namespace TestProj
 
         public void Go(string text)
         {
-            _browser.Load($"{_url}{text}");
+            _browser.Load($"{_url}{text}{_requestParams}");
         }
 
         public void Prepare()
@@ -83,6 +117,7 @@ namespace TestProj
             
         }
         private bool _needPreparing;
+        private bool _needSetColorTheme;
         private void _browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
         {
             if (e.Frame.IsValid == false)
@@ -94,10 +129,22 @@ namespace TestProj
                 DoPrepare();
             }
 
+            if(_needSetColorTheme && e.Frame.IsMain)
+            {
+                _needSetColorTheme = false;
+                InsertColorThemeJS();
+            }
+
             if (e.Frame.IsMain)
                 InsertMainFrameJavaScript();
 
             InsertOtherJavaScript();
+        }
+
+        private void InsertColorThemeJS()
+        {
+            if (_browserJS != null && _browserJS.ColorThemeJSCode != null && _browserJS.ColorThemeJSCode.Length >= 2)
+                _browser.ExecuteScriptAsyncWhenPageLoaded(_browserJS.ColorThemeJSCode[(int)ColorTheme]);
         }
         private void InsertOtherJavaScript()
         {

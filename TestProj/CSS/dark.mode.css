@@ -1,7 +1,7 @@
 html, html * {
-  color: #eeeeee !important;
-  border-color: #555555 !important;
-  background-color: #292929 !important;
+    color: #eeeeee !important;
+    /*border-color: #555555 !important;*/
+    background-color: #292929 !important;
 }
 
 html, body, html::before, body::before {
@@ -21,4 +21,19 @@ a {background-color: rgba(255, 255, 255, 0.01) !important}
 
 #lightbox-nav {
     opacity: 0.0;
+}
+
+::-webkit-scrollbar {
+    width: 15px;
+    height: 3px;
+}
+
+::-webkit-scrollbar-track-piece {
+    background-color: #525252;
+}
+
+::-webkit-scrollbar-thumb {
+    height: 50px;
+    background-color: dimgray;
+    border-radius: 3px;
 }
