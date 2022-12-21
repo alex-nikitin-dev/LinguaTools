@@ -86,5 +86,8 @@
     <Setting Name="DarkForeground" Type="System.String" Scope="User">
       <Value Profile="(Default)">#dadada</Value>
     </Setting>
+    <Setting Name="ForceLoadFromBrowse" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

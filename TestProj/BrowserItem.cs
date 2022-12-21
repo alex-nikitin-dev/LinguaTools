@@ -3,6 +3,9 @@ using CefSharp;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Threading.Tasks;
+using CefSharp.DevTools.IndexedDB;
+using System.Windows.Forms;
 
 namespace TestProj
 {
@@ -25,14 +28,8 @@ namespace TestProj
             {
                 _colorTheme = value;
                 _needSetColorTheme = true;
-                //if (_browser.BrowserSettings != null)
-                //{ 
-                //    _browser.BrowserSettings.BackgroundColor = ColorThemes[value].BackgroundArgb;
-                //}
             }
         }
-
-        //public Dictionary<ColorTheme, ColorThemeProvider> ColorThemes { get; private set; }
 
         public string BrowserName { get; }
 
@@ -45,21 +42,19 @@ namespace TestProj
             string browserName,
             string cssDarkTheme,
             ColorTheme theme,
-            //Dictionary<ColorTheme, ColorThemeProvider> colorThemes,
            IBrowserJS browserJS,
             string prepareUrl,
             string requestParams = null,
             bool legacyBinding = true)
         {
             _browser = browser;
-            //ColorThemes = colorThemes;
+            _gotoAfterPreparing = null;
             _url = url;
             BrowserName = browserName;
             CSSDarkTheme = cssDarkTheme;
             _needPreparing = false;
             _browser.FrameLoadEnd += _browser_FrameLoadEnd;
             _browser.LoadingStateChanged += _browser_LoadingStateChanged;
-
             _prepareUrl = prepareUrl;
             _requestParams = requestParams;
             _browserJS = browserJS;
@@ -69,11 +64,11 @@ namespace TestProj
             
             _needSetColorTheme = true;
         }
+
         public BrowserItem(string url, 
             string browserName, 
             string cssDarkTheme,
             ColorTheme theme,
-            //Dictionary<ColorTheme, ColorThemeProvider> colorThemes,
             IBrowserJS browserJS = null,
             string prepareUrl = null,
             string requestParams = null)
@@ -82,7 +77,6 @@ namespace TestProj
                   browserName,
                   cssDarkTheme,
                   theme,
-                  //colorThemes,
                   browserJS,
                   prepareUrl,
                   requestParams)
@@ -96,26 +90,56 @@ namespace TestProj
                 _browserJS = browserJS;
         }
 
-        public void Go(string text)
+        private bool IsLoadAllowed()
         {
-            _browser.Load($"{_url}{text}{_requestParams}");
+            return !_needPreparing && !_browser.IsLoading;
         }
 
-        public void Prepare()
+        private void ResetLoadSettings()
         {
-            if (string.IsNullOrEmpty(_prepareUrl))
-                return;
+            _gotoAfterPreparing = null;
+        }
+
+        public void Go(string text, bool force = false)
+        {
+            if (force || IsLoadAllowed())
+            {
+                ResetLoadSettings();
+                _browser.Load($"{_url}{text}{_requestParams}");
+            }
+        }
+
+        private string _gotoAfterPreparing;
+
+        public void Prepare(string gotoAfterPreparing = null)
+        {
+            if (string.IsNullOrEmpty(_prepareUrl)) return;
 
             _needPreparing = true;
+            _gotoAfterPreparing = gotoAfterPreparing;
             _browser.Load(_prepareUrl);
         }
 
-        private void DoPrepare()
+        private bool DoPrepare()
         {
             if (_browserJS != null && !string.IsNullOrEmpty(_browserJS.PrepareJSCode))
+            {
                 _browser.EvaluateScriptAsync(_browserJS.PrepareJSCode);
-            
+                return true;
+            }
+
+            return false;
         }
+
+        private void GotoAfterPreparing()
+        {
+            if (_gotoAfterPreparing == null)
+                return;
+            Go(_gotoAfterPreparing, true);
+        }
+
+        private bool IsAutoRedirectNeeded => !string.IsNullOrEmpty(_gotoAfterPreparing);
+
         private bool _needPreparing;
         private bool _needSetColorTheme;
         private void _browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
@@ -126,10 +150,14 @@ namespace TestProj
             if (_needPreparing && e.Frame.IsMain)
             {
                 _needPreparing = false;
-                DoPrepare();
+                if (!DoPrepare() && IsAutoRedirectNeeded) GotoAfterPreparing();
+            }
+            else if (IsAutoRedirectNeeded && e.Frame.IsMain)
+            {
+                GotoAfterPreparing();
             }
 
-            if(_needSetColorTheme && e.Frame.IsMain)
+            if (_needSetColorTheme && e.Frame.IsMain)
             {
                 _needSetColorTheme = false;
                 InsertColorThemeJS();
@@ -169,13 +197,6 @@ namespace TestProj
         }
         private void SetBrowserColorsCSS(string css)
         {
-            //SynchronizationContext.Current.Send(new SendOrPostCallback(
-            //delegate (object state)
-            //{
-
-            //}
-            //), null);
-
             _browser.ExecuteScriptAsync($@"
                     var style1 = document.createElement('style');
                     style1.innerText = `{css}`;

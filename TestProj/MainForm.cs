@@ -9,8 +9,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CefSharp;
+using CefSharp.DevTools.IndexedDB;
 using CefSharp.WinForms;
-using Microsoft.VisualBasic;
+using DesktopHelper;
 using TestProj.Properties;
 
 
@@ -31,7 +32,6 @@ namespace TestProj
             
             Cef.Initialize(settingsBrowser);
             
-            //CefSharpSettings.WcfEnabled = true;
             StartPosition = FormStartPosition.CenterScreen;
             WindowState = FormWindowState.Maximized;
         }
@@ -40,7 +40,7 @@ namespace TestProj
         {
             if (e.KeyCode == Keys.Enter)
             {
-                GoBrowsers(txtToSearch.Text);
+                GoBrowsers(txtToSearch.Text, MM_ForceLoadFromBrowseField.Checked);
             }
         }
 
@@ -61,7 +61,7 @@ namespace TestProj
 
 
         bool _firstGoBrowsers = true;
-        void GoBrowsers(string text, bool saveHistory = true)
+        void GoBrowsers(string text, bool saveHistory = true, bool force = false)
         {
             text = PrepareTextToProceed(text);
             if (string.IsNullOrEmpty(text)) return;
@@ -71,8 +71,8 @@ namespace TestProj
                 _history.AddHistoryItem(text, GetCategory());
 
             foreach (var unit in _dictionaryTranslatorUnits.Values)
-            {
-                unit.Go(text);
+            { 
+                unit.Go(text, force);
             }
 
             //if(MM_NeedUrbanDictionary.Checked) GoUrbanDictionary(text);
@@ -106,34 +106,83 @@ namespace TestProj
             Text = Application.ProductName;
             _foreColor = ForeColor;
             _backColor = BackColor;
-            _handle = Handle;
             _colorThemes = new();
 
             LoadSettings();
             InitHotKeys();
             InitBrowsers();
             InitTabs();
-            FirstTabSelectionInit();
+            InitMainMenuItems();
+            InitFirstTabSelection();
             InitHistory();
             SetDateTimeFilterNow();
             FillCategoriesComboBox();
             InitHistoryListView();
             FillHistoryListView();
-            //GoGoogleTranslate("");
+
             if (MM_LoginToOALDOnStart.Checked)
-                LoginToOALD();
-            //else
-            //    GoOALD("");
-
+                LoginToOALD("test");
             GoBrowsers("test");
-
             SetThemeFromSettings();
+        }
+
+        private void AddReturnDesktopItem(string text, object tag, bool @checked = false)
+        {
+            var item = new ToolStripMenuItem
+            {
+                Text = text,
+                Tag = tag,
+                CheckOnClick = true,
+                Checked = @checked
+            };
+            item.Click += MM_ReturnDesktopItem_Click;
+            MM_ReturnDesktop.DropDownItems.Add(item);
+        }
+
+        private void MM_ReturnDesktopItem_Click(object sender, EventArgs e)
+        {
+            var item = ((ToolStripMenuItem)sender);
+            if (item.Tag == null)
+            {
+                _previousDesktopAuto = true;
+                SetPreviousDesktopMenuText();
+            }
+            else
+            {
+                _previousDesktopAuto = false;
+                SetPreviousDesktop((Desktop)item.Tag);
+            }
+
+            
+            MM_ReturnDesktopCheckItems(item);
+        }
+
+        private void MM_ReturnDesktopCheckItems(ToolStripMenuItem checkedItem)
+        {
+            foreach (ToolStripMenuItem item in MM_ReturnDesktop.DropDownItems)
+            { 
+                item.Checked = item == checkedItem;
+            }
+        }
+
+        private void InitMainMenuItems()
+        { 
+            MM_ReturnDesktop.DropDownItems.Clear();
+            AddReturnDesktopItem("Auto", null,true);
+
+            for (int i = 0; i < Desktop.Count; i++)
+            {
+                AddReturnDesktopItem(Desktop.DesktopNameFromIndex(i), Desktop.FromIndex(i));
+            }
+
+            SetPreviousDesktopMenuText();
         }
 
         private void LoadSettings()
         {
             var stt = Settings.Default;
             MM_LoginToOALDOnStart.Checked = stt.OALDLoginOnStart;
+            MM_ForceLoadFromBrowseField.Checked = stt.ForceLoadFromBrowse;
 
             _colorThemes.Clear();
             _colorThemes.Add(ColorTheme.Dark, new(ColorTheme.Dark, stt.DarkForeground, stt.DarkBackground));
@@ -191,12 +240,10 @@ namespace TestProj
 
         private void Page_Paint(object sender, PaintEventArgs e)
         {
-            SolidBrush fillBrush = new SolidBrush(Color.Black);
-
-            e.Graphics.FillRectangle(fillBrush, e.ClipRectangle);
+            e.Graphics.FillRectangle(new SolidBrush(Color.Black), e.ClipRectangle);
         }
 
-        private void FirstTabSelectionInit()
+        private void InitFirstTabSelection()
         {
             FillFirstTabComboBox();
             FirstTabComboboxSelectFromSettings();
@@ -259,26 +306,22 @@ namespace TestProj
                                        "OALD",
                                        cssDarkColorTheme,
                                        _currentColorTheme,
-                                       //_colorThemes,
                                        OaldJS.GetInstance(),
                                        stt.OALDPrepareURL);
             var cambridge = new BrowserItem(stt.Cambridge_URL,
                                             "Cambridge en-rus",
                                             cssDarkColorTheme,
                                             _currentColorTheme,
-                                            //_colorThemes,
                                             CambridgeJS.GetInstance());
             var wiki = new BrowserItem(stt.Wiki_URL,
                                        "Wikipedia en",
                                        cssDarkColorTheme,
                                        _currentColorTheme,
-                                       //_colorThemes,
                                        GenericJS.GetInstance());
             var google = new BrowserItem(stt.GoogleSearchURL,
                                          "Google",
                                          null/*cssDarkColorTheme*/,
                                          _currentColorTheme,
-                                         //_colorThemes,
                                          GoogleJS.GetInstance(),
                                          null,
                                          stt.GoogleSearchRequestParams);
@@ -288,34 +331,6 @@ namespace TestProj
             _dictionaryTranslatorUnits.Add(UnitName.Wiki , new DictionaryTranslatorUnit(wiki, cssDarkGTranslator));
             _dictionaryTranslatorUnits.Add(UnitName.Google, new DictionaryTranslatorUnit(google, cssDarkGTranslator));
         }
-
-        //private void OALD_Browser_KeyDown(object sender, KeyEventArgs e)
-        //{
-        //    if (e.KeyData == (Keys.Control | Keys.Shift | Keys.C))
-        //    {
-        //        ClearTxtSearchAndFocus();
-        //    }
-        //}
-
-/*
-        private delegate void ClearTxtSearchAndFocusDelegate();
-*/
-
-/*
-        private void ClearTxtSearchAndFocus()
-        {
-            if(InvokeRequired)
-            {
-                Invoke(new ClearTxtSearchAndFocusDelegate(ClearTxtSearchAndFocus));
-                return;
-            }
-
-            txtToSearch.Clear();
-            txtToSearch.Focus();
-        }
-*/
-
-       
 
         private void InitHistory()
         {
@@ -472,7 +487,6 @@ namespace TestProj
         {
             parent.BackColor = backColor;
             parent.ForeColor = foreColor;
-            //if (!parent.HasChildren) return;
 
             foreach (Control child in parent.Controls)
             {
@@ -487,7 +501,7 @@ namespace TestProj
                 }
 
                 var highLightColors = GetHighLightColor(backColor, foreColor);
-                (parent as MenuStrip).Renderer = new MyRenderer(highLightColors.backColor, backColor/*,highLightColors.foreColor*/);
+                (parent as MenuStrip).Renderer = new MyRenderer(highLightColors.backColor, backColor);
             }
         }
         void SetMenuStripColorsRecursively(ToolStripItem parent, Color backColor, Color foreColor)
@@ -557,11 +571,8 @@ namespace TestProj
             {
                 Rectangle rc = new Rectangle(Point.Empty, e.Item.Size);
                 Color backColor = e.Item.Selected ? _backColorOfHighlightedItem : e.Item.BackColor;
-#pragma warning disable CA1416
                 using SolidBrush brush = new(backColor);
                 e.Graphics.FillRectangle(brush, rc);
-#pragma warning restore CA1416
-               
                 // base.OnRenderMenuItemBackground(e);
             }
 
@@ -571,8 +582,6 @@ namespace TestProj
             //    base.OnRenderItemText(e);
             //}
         }
-
-        
 
         void SetColorTheme(ColorTheme theme)
         {
@@ -597,101 +606,6 @@ namespace TestProj
             }
         }
 
-        //void SetBrowserColorsForAllElements(ChromiumWebBrowser browser, string backColor,string foreColor)
-        //{
-        //    browser.ExecuteScriptAsyncWhenPageLoaded($@"function SetBackgroundForAll(backColor, foreColor){{
-        //        var elements = document.querySelectorAll('*');
-        //        for (var i = 0; i < elements.length; i++) {{
-        //        if(elements[i] instanceof HTMLImageElement) continue;
-        //        //if(elements[i] instanceof HTMLFrameSetElement) continue;
-        //        if(elements[i].id == 'lightbox-nav') continue;
-        //        elements[i].style.backgroundColor=backColor;
-        //        elements[i].style.color = foreColor;
-        //        }}
-        //    }}
-        //    SetBackgroundForAll('{backColor}','{foreColor}');
-        //    ");
-        //}
-
-        //[DllImport("User32.dll", CharSet = CharSet.Auto)]
-        //public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
-
-        //[DllImport("User32.dll")]
-        //private static extern IntPtr GetWindowDC(IntPtr hWnd);
-
-        //protected override void WndProc(ref Message m)
-        //{
-        //    base.WndProc(ref m);
-        //    const int WM_NCPAINT = 0x85;
-        //    if (m.Msg == WM_NCPAINT)
-        //    {
-        //        IntPtr hdc = GetWindowDC(m.HWnd);
-        //        if ((int)hdc != 0)
-        //        {
-        //            Graphics g = Graphics.FromHdc(hdc);
-        //            g.FillRectangle(Brushes.Green, new Rectangle(0, 0, 4800, 23));
-        //            g.Flush();
-        //            ReleaseDC(m.HWnd, hdc);
-        //        }
-        //    }
-        //}
-
-        //delegate void SetBrowserColorsWithDocumentHeadStyleDelegate(ChromiumWebBrowser browser, string backColor, string foreColor);
-        //void SetBrowserColorsWithDocumentHeadStyle(ChromiumWebBrowser browser, string backColor, string foreColor)
-        //{
-        //    if(InvokeRequired)
-        //    {
-        //        Invoke(new SetBrowserColorsWithDocumentHeadStyleDelegate(SetBrowserColorsWithDocumentHeadStyle), browser, backColor, foreColor);
-        //        return;
-        //    }
-
-        //    browser.ExecuteScriptAsync($@"
-        //    var style1 = document.createElement('style');
-        //    style1.innerText = `
-        //        html, html * {{
-        //        color: #eeeeee !important;
-        //        border-color: #555555 !important;
-        //        background-color: #292929 !important;
-        //        }}
-
-        //        html, body, html::before, body::before {{
-        //        background-image: none !important;
-        //        }}
-
-        //        img, video {{z-index: 1}}
-        //        cite, cite * {{color: #029833 !important}}
-        //        video {{background-color: transparent !important}}
-        //        input, textarea {{background-color: #333333 !important}}
-        //        input, select, button {{background-image: none !important}}
-        //        a {{background-color: rgba(255, 255, 255, 0.01) !important}}
-
-        //        :before {{color: #eeeeee !important}}
-        //        :link, :link * {{color: #8db2e5 !important}}
-        //        :visited, :visited * {{color: rgb(211, 138, 138) !important}}
-        //      `;
-        //    document.head.appendChild(style1);
-        //    ");
-
-
-
-
-        //    //MessageBox.Show(" SetBrowserColorsWithDocumentHeadStyle");
-
-
-        //    //var style1 = document.createElement('style');
-        //    //style1.innerHTML = `html * {
-        //    //    {
-        //    //    color: { foreColor}
-        //    //        !important;
-        //    //        background - color: { backColor}
-        //    //        !important
-        //    //     }
-        //    //}
-        //    //  `;
-        //    //document.head.appendChild(style1);
-        //    //// document.body.classList.toggle(style1);
-        //}
-
         private void InitSorterListView()
         {
             _lvwColumnSorter = new ListViewColumnSorter {DateTimeFormat = _dateTimeFormat};
@@ -709,9 +623,7 @@ namespace TestProj
             {
                 View = View.Details,
                 Dock = DockStyle.Fill,
-#pragma warning disable CA1416
                 Font = new Font(Font.FontFamily, 12, FontStyle.Regular),
-#pragma warning restore CA1416
                 FullRowSelect = true,
             };
 
@@ -906,31 +818,15 @@ namespace TestProj
             cbxCategory.Sorted = true;
         }
 
-        private void LoginToOALD()
+        private void LoginToOALD(string gotoAfterLoading = null)
         {
-            _dictionaryTranslatorUnits[UnitName.Oald].Dictionary.Prepare();
+            _dictionaryTranslatorUnits[UnitName.Oald].Dictionary.Prepare(gotoAfterLoading);
         }
-
-/*
-        private void Urban_LoadingStateChanged(object sender, LoadingStateChangedEventArgs e)
-        {
-            if (e.IsLoading)
-                return;
-
-            var browser = (ChromiumWebBrowser)sender;
-
-            if (_currentColorTheme == ColorTheme.Dark && MM_NeedUrbanDictionary.Checked)
-            {
-                //SetBrowserColorsCSS(browser, _curCSSTheme);
-            }
-        }
-*/
         
 
         delegate void HotKeyPressedDelegate(object sender, HotKeyEventArgs e);
 
-        private DesktopHelper.Desktop _previousDesktop;
-        private nint _handle;
+        private Desktop _previousDesktop;
 
         void HotKeyManager_HotKeyPressed(object sender, HotKeyEventArgs e)
         {
@@ -946,31 +842,72 @@ namespace TestProj
                (e.Modifiers & KeyModifiers.Shift) == KeyModifiers.Shift &&
                (e.Key & Keys.X) == Keys.X)
             {
-                ShowCurrentDesktop();
+                ShowThisAppDesktop();
                 GoBrowsers(Clipboard.GetText());
             }
             else if ((e.Modifiers & KeyModifiers.Control) == KeyModifiers.Control &&
                 (e.Modifiers & KeyModifiers.Shift) == KeyModifiers.Shift &&
                 (e.Key & Keys.Q) == Keys.Q)
             {
+                SwitchDesktops();
+            }
+        }
+
+        private void SwitchDesktops()
+        {
+            var thisAppDesktop = Desktop.FromWindow(Handle);
+            if (thisAppDesktop.IsVisible)
+            {
                 ReturnToPreviousDesktop();
             }
-        }
-
-        private void ShowCurrentDesktop()
-        {
-            var thisDesktop = DesktopHelper.Desktop.FromWindow(Handle);
-            _previousDesktop = DesktopHelper.Desktop.Current;
-            if (!thisDesktop.IsVisible)
+            else
             {
-                thisDesktop.MakeVisible();
+                ShowThisAppDesktop();
             }
         }
 
+        private void SearchTextBoxFocus()
+        {
+            txtToSearch.SelectAll();
+            txtToSearch.Focus();
+        }
+
+        void SavePreviousDesktop()
+        {
+            if (_previousDesktopAuto)
+                SetPreviousDesktop (Desktop.Current);
+        }
+
+        private void ShowThisAppDesktop()
+        {
+            var thisAppDesktop = Desktop.FromWindow(Handle);
+            if (!thisAppDesktop.IsVisible)
+            {
+                SavePreviousDesktop();
+                thisAppDesktop.MakeVisible();
+            }
+
+            SearchTextBoxFocus();
+        }
+
+        private void SetPreviousDesktop(Desktop desktop)
+        {
+            _previousDesktop = desktop;
+            SetPreviousDesktopMenuText();
+        }
+        private void SetPreviousDesktopMenuText()
+        {
+            var name = _previousDesktop != null? Desktop.DesktopNameFromDesktop(_previousDesktop): "None";
+            var desktopTag = _previousDesktop == null ? " desktop" : "";
+
+            MM_ReturnDesktop.Text = $"Previous{desktopTag}: {(_previousDesktopAuto ? "(Auto) " : "")} {name}";
+        }
         private void ReturnToPreviousDesktop()
         {
-            if (_previousDesktop == null) return;
-            _previousDesktop.MakeVisible();
+            if (_previousDesktop == null)
+                return;//DesktopHelper.Desktop.FromIndex(0).MakeVisible();
+            if (!_previousDesktop.IsVisible)
+                _previousDesktop.MakeVisible();
         }
 
         private void returnToPreviousDesktopToolStripMenuItem_Click(object sender, EventArgs e)
@@ -992,15 +929,6 @@ namespace TestProj
             if(SaveACopy) await _history.SaveHistoryToFileAsACopy();
             if(saveBackup) await SaveHistoryBackup();
         }
-
-/*
-        private string GetFileNameWithTimeStamp(string path)
-        {
-            var fileNameWithoutExt = Path.GetFileNameWithoutExtension(path);
-            var fileExt = Path.GetExtension(path);
-            return $"{fileNameWithoutExt}_{_history.GetTimeStampNowForFile()}_{fileExt}";
-        }
-*/
 
         private async Task SaveTasksBackup()
         {
@@ -1116,7 +1044,6 @@ namespace TestProj
                 if (!tabControl1.TabPages.ContainsKey("Urban"))
                 {
                     tabControl1.TabPages.Add("Urban", "Urban");
-                   // tabControl1.TabPages["Urban"].Controls.Add(_browsers[(int)BrowserNames.Urban]);
                 }
             }
             else
@@ -1285,9 +1212,15 @@ namespace TestProj
 
         private void btnClearInput_Click(object sender, EventArgs e)
         {
+            SearchClearAndFocus();
+        }
+
+        private void SearchClearAndFocus()
+        {
             txtToSearch.Clear();
             txtToSearch.Focus();
         }
+
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
@@ -1297,8 +1230,12 @@ namespace TestProj
         {
             if (keyData == (Keys.Control | Keys.Shift | Keys.C))
             {
-                    txtToSearch.Clear();
-                    txtToSearch.Focus();
+                SearchClearAndFocus();
+                return true;
+            }
+            else if (keyData == (Keys.Control | Keys.Shift | Keys.F))
+            {
+                FindClearAndFocus();
                 return true;
             }
 
@@ -1306,21 +1243,16 @@ namespace TestProj
         }
         private void MainForm_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
-            if (e.KeyData == (Keys.Control | Keys.Shift | Keys.C))
-            {
-                txtToSearch.Clear();
-                txtToSearch.Focus();
-            }
+            //if (e.KeyData == (Keys.Control | Keys.Shift | Keys.C))
+            //{
+            //    txtToSearch.Clear();
+            //    txtToSearch.Focus();
+            //}
         }
 
         private void MM_ShortcutsHelp_Click(object sender, EventArgs e)
         {
             new ShortcutsForm().ShowDialog();
-        }
-
-        private void MM_Test_Click(object sender, EventArgs e)
-        {
-           // MessageBox.Show(_boundObject.Text);
         }
 
         void SetLoginToOALDOnStart(bool predicate)
@@ -1451,11 +1383,16 @@ namespace TestProj
             }
         }
 
-        private void btnClearFind_Click(object sender, EventArgs e)
+        private void FindClearAndFocus()
         {
             txtFindText.Text = "";
             txtFindText.Focus();
             FindInDictionaries("");
+        }
+
+        private void btnClearFind_Click(object sender, EventArgs e)
+        {
+            FindClearAndFocus();
         }
 
         [DllImport("dwmapi.dll")]
@@ -1486,5 +1423,20 @@ namespace TestProj
         {
             return Environment.OSVersion.Version.Major >= 10 && Environment.OSVersion.Version.Build >= build;
         }
+
+
+        void SetForceLoadFromBrowseField(bool predicate)
+        {
+            var stt = Settings.Default;
+            stt.ForceLoadFromBrowse = predicate;
+            stt.Save();
+        }
+        private void MM_ForceLoadFromBrowseField_Click(object sender, EventArgs e)
+        {
+            SetForceLoadFromBrowseField(((ToolStripMenuItem)sender).Checked);
+        }
+
+        bool _previousDesktopAuto = true;
+       
     }
 }

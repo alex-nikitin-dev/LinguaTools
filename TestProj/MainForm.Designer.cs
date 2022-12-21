@@ -46,6 +46,7 @@
             this.loginToOALDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MM_LoginToOALDOnStart = new System.Windows.Forms.ToolStripMenuItem();
             this.setOALDCredentialsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MM_ForceLoadFromBrowseField = new System.Windows.Forms.ToolStripMenuItem();
             this.historyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MM_save = new System.Windows.Forms.ToolStripMenuItem();
             this.MM_saveAsCopy = new System.Windows.Forms.ToolStripMenuItem();
@@ -65,11 +66,11 @@
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MM_HotKeyEnabled = new System.Windows.Forms.ToolStripMenuItem();
             this.windowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.returnToPreviousDesktopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MM_ReturnDesktop = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.MM_Help = new System.Windows.Forms.ToolStripMenuItem();
             this.MM_About = new System.Windows.Forms.ToolStripMenuItem();
             this.MM_ShortcutsHelp = new System.Windows.Forms.ToolStripMenuItem();
-            this.MM_Test = new System.Windows.Forms.ToolStripMenuItem();
             this.cbxCategory = new System.Windows.Forms.ComboBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.mainProgress = new System.Windows.Forms.ToolStripProgressBar();
@@ -207,7 +208,8 @@
             this.MM_NeedUrbanDictionary,
             this.loginToOALDToolStripMenuItem,
             this.MM_LoginToOALDOnStart,
-            this.setOALDCredentialsToolStripMenuItem});
+            this.setOALDCredentialsToolStripMenuItem,
+            this.MM_ForceLoadFromBrowseField});
             this.mainToolStripMenuItem.Name = "mainToolStripMenuItem";
             this.mainToolStripMenuItem.Size = new System.Drawing.Size(91, 29);
             this.mainToolStripMenuItem.Text = "Browser";
@@ -216,14 +218,14 @@
             // 
             this.MM_NeedUrbanDictionary.CheckOnClick = true;
             this.MM_NeedUrbanDictionary.Name = "MM_NeedUrbanDictionary";
-            this.MM_NeedUrbanDictionary.Size = new System.Drawing.Size(299, 34);
+            this.MM_NeedUrbanDictionary.Size = new System.Drawing.Size(352, 34);
             this.MM_NeedUrbanDictionary.Text = "Need Urban Dictionary";
             this.MM_NeedUrbanDictionary.Click += new System.EventHandler(this.MM_NeedUrbanDictionary_Click);
             // 
             // loginToOALDToolStripMenuItem
             // 
             this.loginToOALDToolStripMenuItem.Name = "loginToOALDToolStripMenuItem";
-            this.loginToOALDToolStripMenuItem.Size = new System.Drawing.Size(299, 34);
+            this.loginToOALDToolStripMenuItem.Size = new System.Drawing.Size(352, 34);
             this.loginToOALDToolStripMenuItem.Text = "Login to OALD";
             this.loginToOALDToolStripMenuItem.Click += new System.EventHandler(this.loginToOALDToolStripMenuItem_Click);
             // 
@@ -231,16 +233,23 @@
             // 
             this.MM_LoginToOALDOnStart.CheckOnClick = true;
             this.MM_LoginToOALDOnStart.Name = "MM_LoginToOALDOnStart";
-            this.MM_LoginToOALDOnStart.Size = new System.Drawing.Size(299, 34);
+            this.MM_LoginToOALDOnStart.Size = new System.Drawing.Size(352, 34);
             this.MM_LoginToOALDOnStart.Text = "Login to OALD on Start";
             this.MM_LoginToOALDOnStart.Click += new System.EventHandler(this.MM_LoginToOALDOnStart_Click);
             // 
             // setOALDCredentialsToolStripMenuItem
             // 
             this.setOALDCredentialsToolStripMenuItem.Name = "setOALDCredentialsToolStripMenuItem";
-            this.setOALDCredentialsToolStripMenuItem.Size = new System.Drawing.Size(299, 34);
+            this.setOALDCredentialsToolStripMenuItem.Size = new System.Drawing.Size(352, 34);
             this.setOALDCredentialsToolStripMenuItem.Text = "Set OALD Credentials";
             this.setOALDCredentialsToolStripMenuItem.Click += new System.EventHandler(this.setOALDCredentialsToolStripMenuItem_Click);
+            // 
+            // MM_ForceLoadFromBrowseField
+            // 
+            this.MM_ForceLoadFromBrowseField.Name = "MM_ForceLoadFromBrowseField";
+            this.MM_ForceLoadFromBrowseField.Size = new System.Drawing.Size(352, 34);
+            this.MM_ForceLoadFromBrowseField.Text = "Force Load From Browse Field";
+            this.MM_ForceLoadFromBrowseField.Click += new System.EventHandler(this.MM_ForceLoadFromBrowseField_Click);
             // 
             // historyToolStripMenuItem
             // 
@@ -395,24 +404,29 @@
             // windowToolStripMenuItem
             // 
             this.windowToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.returnToPreviousDesktopToolStripMenuItem});
+            this.MM_ReturnDesktop,
+            this.toolStripMenuItem1});
             this.windowToolStripMenuItem.Name = "windowToolStripMenuItem";
             this.windowToolStripMenuItem.Size = new System.Drawing.Size(94, 29);
             this.windowToolStripMenuItem.Text = "Window";
             // 
-            // returnToPreviousDesktopToolStripMenuItem
+            // MM_ReturnDesktop
             // 
-            this.returnToPreviousDesktopToolStripMenuItem.Name = "returnToPreviousDesktopToolStripMenuItem";
-            this.returnToPreviousDesktopToolStripMenuItem.Size = new System.Drawing.Size(332, 34);
-            this.returnToPreviousDesktopToolStripMenuItem.Text = "Return To Previous Desktop";
-            this.returnToPreviousDesktopToolStripMenuItem.Click += new System.EventHandler(this.returnToPreviousDesktopToolStripMenuItem_Click);
+            this.MM_ReturnDesktop.Name = "MM_ReturnDesktop";
+            this.MM_ReturnDesktop.Size = new System.Drawing.Size(332, 34);
+            this.MM_ReturnDesktop.Text = "Return To Previous Desktop";
+            this.MM_ReturnDesktop.Click += new System.EventHandler(this.returnToPreviousDesktopToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(332, 34);
             // 
             // MM_Help
             // 
             this.MM_Help.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.MM_About,
-            this.MM_ShortcutsHelp,
-            this.MM_Test});
+            this.MM_ShortcutsHelp});
             this.MM_Help.Name = "MM_Help";
             this.MM_Help.Size = new System.Drawing.Size(65, 29);
             this.MM_Help.Text = "Help";
@@ -431,13 +445,6 @@
             this.MM_ShortcutsHelp.Text = "Shortcuts";
             this.MM_ShortcutsHelp.Click += new System.EventHandler(this.MM_ShortcutsHelp_Click);
             // 
-            // MM_Test
-            // 
-            this.MM_Test.Name = "MM_Test";
-            this.MM_Test.Size = new System.Drawing.Size(189, 34);
-            this.MM_Test.Text = "Test";
-            this.MM_Test.Click += new System.EventHandler(this.MM_Test_Click);
-            // 
             // cbxCategory
             // 
             this.cbxCategory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -451,6 +458,7 @@
             this.cbxCategory.Name = "cbxCategory";
             this.cbxCategory.Size = new System.Drawing.Size(464, 37);
             this.cbxCategory.TabIndex = 5;
+            this.cbxCategory.TabStop = false;
             this.cbxCategory.SelectedIndexChanged += new System.EventHandler(this.cbxCategory_SelectedIndexChanged);
             this.cbxCategory.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cbxCategory_KeyDown);
             // 
@@ -487,6 +495,7 @@
             this.dtBegin.Name = "dtBegin";
             this.dtBegin.Size = new System.Drawing.Size(331, 31);
             this.dtBegin.TabIndex = 7;
+            this.dtBegin.TabStop = false;
             this.dtBegin.Visible = false;
             // 
             // dtEnd
@@ -497,6 +506,7 @@
             this.dtEnd.Name = "dtEnd";
             this.dtEnd.Size = new System.Drawing.Size(331, 31);
             this.dtEnd.TabIndex = 8;
+            this.dtEnd.TabStop = false;
             this.dtEnd.Visible = false;
             // 
             // lblFrom
@@ -531,6 +541,7 @@
             this.btnByDateFilter.Name = "btnByDateFilter";
             this.btnByDateFilter.Size = new System.Drawing.Size(124, 44);
             this.btnByDateFilter.TabIndex = 11;
+            this.btnByDateFilter.TabStop = false;
             this.btnByDateFilter.Text = "Show";
             this.btnByDateFilter.UseVisualStyleBackColor = true;
             this.btnByDateFilter.Visible = false;
@@ -544,6 +555,7 @@
             this.btnClearInput.Name = "btnClearInput";
             this.btnClearInput.Size = new System.Drawing.Size(64, 37);
             this.btnClearInput.TabIndex = 12;
+            this.btnClearInput.TabStop = false;
             this.btnClearInput.Text = "Clear";
             this.btnClearInput.UseVisualStyleBackColor = true;
             this.btnClearInput.Click += new System.EventHandler(this.btnClearInput_Click);
@@ -557,7 +569,7 @@
             this.txtFindText.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.txtFindText.Name = "txtFindText";
             this.txtFindText.Size = new System.Drawing.Size(572, 35);
-            this.txtFindText.TabIndex = 13;
+            this.txtFindText.TabIndex = 2;
             this.txtFindText.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtFindText_KeyDown);
             this.txtFindText.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtFindText_KeyUp);
             // 
@@ -653,6 +665,7 @@
             this.btnClearFind.Name = "btnClearFind";
             this.btnClearFind.Size = new System.Drawing.Size(64, 35);
             this.btnClearFind.TabIndex = 18;
+            this.btnClearFind.TabStop = false;
             this.btnClearFind.Text = "Clear";
             this.btnClearFind.UseVisualStyleBackColor = true;
             this.btnClearFind.Click += new System.EventHandler(this.btnClearFind_Click);
@@ -759,7 +772,6 @@
         private System.Windows.Forms.ToolStripStatusLabel stHistoryCountShown;
         private System.Windows.Forms.Button btnClearInput;
         private System.Windows.Forms.ToolStripMenuItem MM_ShortcutsHelp;
-        private System.Windows.Forms.ToolStripMenuItem MM_Test;
         private System.Windows.Forms.ToolStripMenuItem MM_LoginToOALDOnStart;
         private System.Windows.Forms.TextBox txtFindText;
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
@@ -777,8 +789,10 @@
         private System.Windows.Forms.ToolStripComboBox MM_cbxFirstTab;
         private System.Windows.Forms.Button btnClearFind;
         private System.Windows.Forms.ToolStripMenuItem windowToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem returnToPreviousDesktopToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem MM_ReturnDesktop;
         private System.Windows.Forms.CustomTabControl tabControl1;
+        private System.Windows.Forms.ToolStripMenuItem MM_ForceLoadFromBrowseField;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
     }
 }
 

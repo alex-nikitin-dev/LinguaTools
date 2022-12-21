@@ -1,4 +1,5 @@
 ﻿using CefSharp;
+using System.Windows.Forms;
 
 namespace TestProj
 {
@@ -43,7 +44,27 @@ namespace TestProj
             _boundObject = new BoundObject();
             _boundObject.BrowserTextSelected += _boundObject_BrowserTextSelected;
             _dictionary.Browser.JavascriptObjectRepository.Register("b1", _boundObject);
+
+            _dictionary.Browser.KeyboardHandler = new KeyboardHandler();
+            _translator.Browser.KeyboardHandler = new KeyboardHandler();
         }
+
+        //public delegate void PreviewKeyDownDelegate(object sender, KeyPressEventArgs e);
+        //public event PreviewKeyDownDelegate PreviewKeyDown;
+        //protected virtual void OnPreviewKeyDown(object sender, KeyPressEventArgs e)
+        //{
+        //    PreviewKeyDown?.Invoke(sender, e);
+        //}
+
+        //private void Translator_PreviewKeyDown(object sender, KeyPressEventArgs e)
+        //{
+        //    OnPreviewKeyDown(sender, e);
+        //}
+
+        //private void Dictionary_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        //{
+        //    OnPreviewKeyDown(sender, e);
+        //}
 
         public DictionaryTranslatorUnit(BrowserItem dictionary, string cssDarkTranslator)
             :this(dictionary)
@@ -55,10 +76,10 @@ namespace TestProj
         {
             _translator.Go(e.Text);
         }
-        public void Go(string text)
+        public void Go(string text, bool force = false)
         {
-            _dictionary.Go(text);
-            _translator.Go(text);
+            _dictionary.Go(text, force);
+            _translator.Go(text, force);
         }
 
         public void ReLoad()
