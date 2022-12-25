@@ -23,17 +23,7 @@ namespace TestProj
         {
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
             InitializeComponent();
-            var settingsBrowser = new CefSettings
-            {
-                Locale = "en-US,en",
-                AcceptLanguageList = "en-US,en",
-                PersistSessionCookies = false,
-            };
             
-            Cef.Initialize(settingsBrowser);
-            
-            StartPosition = FormStartPosition.CenterScreen;
-            WindowState = FormWindowState.Maximized;
         }
 
         private void txtBrowse_KeyDown(object sender, KeyEventArgs e)
@@ -101,8 +91,25 @@ namespace TestProj
         private Color _foreColor;
         private Color _backColor;
 
+        private void CefInit()
+        {
+            var settingsBrowser = new CefSettings
+            {
+                Locale = "en-US,en",
+                AcceptLanguageList = "en-US,en",
+                PersistSessionCookies = false,
+            };
+            settingsBrowser.CefCommandLineArgs.Remove("mute-audio");
+            settingsBrowser.CefCommandLineArgs.Add("enable-media-stream", "1");
+            Cef.Initialize(settingsBrowser);
+        }
+
         private void MainForm_Load(object sender, EventArgs e)
         {
+            CefInit();
+            StartPosition = FormStartPosition.CenterScreen;
+            WindowState = FormWindowState.Maximized;
+
             Text = Application.ProductName;
             _foreColor = ForeColor;
             _backColor = BackColor;
@@ -125,6 +132,8 @@ namespace TestProj
             GoBrowsers("test");
             SetThemeFromSettings();
         }
+
+       
 
         private void AddReturnDesktopItem(string text, object tag, bool @checked = false)
         {
@@ -308,6 +317,8 @@ namespace TestProj
                                        _currentColorTheme,
                                        OaldJS.GetInstance(),
                                        stt.OALDPrepareURL);
+            oald.FinishAllTasks += Oald_FinishAllTasks;
+
             var cambridge = new BrowserItem(stt.Cambridge_URL,
                                             "Cambridge en-rus",
                                             cssDarkColorTheme,
@@ -330,6 +341,24 @@ namespace TestProj
             _dictionaryTranslatorUnits.Add(UnitName.Cambridge ,new DictionaryTranslatorUnit(cambridge, cssDarkGTranslator));
             _dictionaryTranslatorUnits.Add(UnitName.Wiki , new DictionaryTranslatorUnit(wiki, cssDarkGTranslator));
             _dictionaryTranslatorUnits.Add(UnitName.Google, new DictionaryTranslatorUnit(google, cssDarkGTranslator));
+        }
+
+        private delegate void Oald_FinishAllTasksDelegate(BrowserItem sender);
+        private void Oald_FinishAllTasks(BrowserItem sender)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Oald_FinishAllTasksDelegate(Oald_FinishAllTasks), sender);
+                return;
+            }
+
+            OaldAutoSound();
+        }
+
+        private void OaldAutoSound()
+        {
+            var name = Settings.Default.OALD_AudioButton_ID;
+            _dictionaryTranslatorUnits[UnitName.Oald].Dictionary.ClickOnElementByClassName(@$".{name.Replace(' ', '.')}");
         }
 
         private void InitHistory()
@@ -1437,6 +1466,10 @@ namespace TestProj
         }
 
         bool _previousDesktopAuto = true;
-       
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            _dictionaryTranslatorUnits[UnitName.Oald].Dictionary.ClickOnElementByClassName(".sound.audio_play_button.pron-us.icon-audio");
+        }
     }
 }

@@ -370,5 +370,17 @@ namespace TestProj.Properties {
                 this["ForceLoadFromBrowse"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("sound audio_play_button pron-us icon-audio")]
+        public string OALD_AudioButton_ID {
+            get {
+                return ((string)(this["OALD_AudioButton_ID"]));
+            }
+            set {
+                this["OALD_AudioButton_ID"] = value;
+            }
+        }
     }
 }

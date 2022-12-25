@@ -89,5 +89,8 @@
     <Setting Name="ForceLoadFromBrowse" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="OALD_AudioButton_ID" Type="System.String" Scope="User">
+      <Value Profile="(Default)">sound audio_play_button pron-us icon-audio</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

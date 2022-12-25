@@ -1,4 +1,6 @@
-﻿namespace TestProj
+﻿using Windows.Media.AppBroadcasting;
+
+namespace TestProj
 {
     internal interface IBrowserJS
     {
@@ -6,5 +8,6 @@
         string[] ColorThemeJSCode { get; set; }
         string MainFrameJSCode { get; set; }
         string OtherJSCode { get; set; }
+        string ForAsyncEvalJSCode { get; set; }
     }
 }

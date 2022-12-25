@@ -421,6 +421,8 @@
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(332, 34);
+            this.toolStripMenuItem1.Text = "test";
+            this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
             // MM_Help
             // 
@@ -434,14 +436,14 @@
             // MM_About
             // 
             this.MM_About.Name = "MM_About";
-            this.MM_About.Size = new System.Drawing.Size(189, 34);
+            this.MM_About.Size = new System.Drawing.Size(270, 34);
             this.MM_About.Text = "About";
             this.MM_About.Click += new System.EventHandler(this.MM_About_Click);
             // 
             // MM_ShortcutsHelp
             // 
             this.MM_ShortcutsHelp.Name = "MM_ShortcutsHelp";
-            this.MM_ShortcutsHelp.Size = new System.Drawing.Size(189, 34);
+            this.MM_ShortcutsHelp.Size = new System.Drawing.Size(270, 34);
             this.MM_ShortcutsHelp.Text = "Shortcuts";
             this.MM_ShortcutsHelp.Click += new System.EventHandler(this.MM_ShortcutsHelp_Click);
             // 

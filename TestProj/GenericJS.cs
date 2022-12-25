@@ -7,7 +7,7 @@
             $@"
               document.body.onmouseup = function()
               {{
-                    b1.onselect(document.getSelection().toString());
+                    b1.onselect(document.getSelection().toString());    
               }};
             ";
 

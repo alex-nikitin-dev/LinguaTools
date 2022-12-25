@@ -11,8 +11,7 @@ namespace TestProj
         {
             BrowserTextSelected?.Invoke(this, e);
         }
-        // ReSharper disable once InconsistentNaming
-        // ReSharper disable once IdentifierTypo
+       
         public void onselect(string msg)
         {
             if (!string.IsNullOrEmpty(msg))

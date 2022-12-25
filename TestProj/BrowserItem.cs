@@ -1,11 +1,11 @@
 ﻿using CefSharp.WinForms;
 using CefSharp;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Threading.Tasks;
-using CefSharp.DevTools.IndexedDB;
 using System.Windows.Forms;
+using ABI.Windows.Foundation;
+using System.Threading;
+using CefSharp.Web;
+using System;
+using System.Threading.Tasks;
 
 namespace TestProj
 {
@@ -15,6 +15,7 @@ namespace TestProj
         private readonly string _url;
         private readonly string _requestParams;
         readonly string _prepareUrl;
+        public bool IsClickVergin { get; private set; }
 
         private IBrowserJS _browserJS;
 
@@ -48,6 +49,7 @@ namespace TestProj
             bool legacyBinding = true)
         {
             _browser = browser;
+            IsClickVergin = true;
             _gotoAfterPreparing = null;
             _url = url;
             BrowserName = browserName;
@@ -81,7 +83,14 @@ namespace TestProj
                   prepareUrl,
                   requestParams)
         {
-            _browser.Dock = System.Windows.Forms.DockStyle.Fill;
+            _browser.Dock = DockStyle.Fill;
+        }
+
+        public delegate void FinishAllTasksDelegate(BrowserItem sender);
+        public event FinishAllTasksDelegate FinishAllTasks;
+        private void OnFinishAllTasks(BrowserItem sender)
+        {
+            FinishAllTasks?.Invoke(sender);
         }
 
         public void ReloadJSCode(IBrowserJS browserJS)
@@ -100,11 +109,13 @@ namespace TestProj
             _gotoAfterPreparing = null;
         }
 
+        private bool _outsideLoadCommand = false;
         public void Go(string text, bool force = false)
         {
             if (force || IsLoadAllowed())
             {
                 ResetLoadSettings();
+                _outsideLoadCommand = true;
                 _browser.Load($"{_url}{text}{_requestParams}");
             }
         }
@@ -117,6 +128,7 @@ namespace TestProj
 
             _needPreparing = true;
             _gotoAfterPreparing = gotoAfterPreparing;
+            _outsideLoadCommand = true;
             _browser.Load(_prepareUrl);
         }
 
@@ -131,30 +143,30 @@ namespace TestProj
             return false;
         }
 
-        private void GotoAfterPreparing()
-        {
-            if (_gotoAfterPreparing == null)
-                return;
-            Go(_gotoAfterPreparing, true);
-        }
-
         private bool IsAutoRedirectNeeded => !string.IsNullOrEmpty(_gotoAfterPreparing);
 
         private bool _needPreparing;
         private bool _needSetColorTheme;
         private void _browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
         {
+            var autoRedirecting = false;
+
             if (e.Frame.IsValid == false)
                 return;
 
             if (_needPreparing && e.Frame.IsMain)
             {
                 _needPreparing = false;
-                if (!DoPrepare() && IsAutoRedirectNeeded) GotoAfterPreparing();
+                if (!DoPrepare() && IsAutoRedirectNeeded)
+                {
+                    Go(_gotoAfterPreparing, true);
+                    autoRedirecting = true;
+                }
             }
             else if (IsAutoRedirectNeeded && e.Frame.IsMain)
             {
-                GotoAfterPreparing();
+                Go(_gotoAfterPreparing, true);
+                autoRedirecting= true;
             }
 
             if (_needSetColorTheme && e.Frame.IsMain)
@@ -164,9 +176,28 @@ namespace TestProj
             }
 
             if (e.Frame.IsMain)
+            {
                 InsertMainFrameJavaScript();
+                DoAsyncJSCode();
+            }
 
             InsertOtherJavaScript();
+
+            if(_outsideLoadCommand && e.Frame.IsMain && !IsAutoRedirectNeeded && !_needPreparing)
+            {
+                OnFinishAllTasks(this);
+            }
+
+            if (e.Frame.IsMain && !autoRedirecting)
+                _outsideLoadCommand = false;
+        }
+
+        public void DoAsyncJSCode()
+        {
+            if (_browserJS != null && !string.IsNullOrEmpty(_browserJS.ForAsyncEvalJSCode))
+            {
+                _browser.EvaluateScriptAsync(_browserJS.ForAsyncEvalJSCode);
+            }
         }
 
         private void InsertColorThemeJS()
@@ -208,6 +239,49 @@ namespace TestProj
         {
             if (_browser.IsBrowserInitialized)
                 _browser.Reload();
+        }
+
+        private async Task<(double x, double y)?> GetElementPositionByClassName(string elementClassName)
+        {
+            var jsReponse = await _browser.EvaluateScriptAsync(
+            @$"(function () {{
+            var element = document.querySelector('{elementClassName}');
+            element.focus();
+            var elementRect = element.getBoundingClientRect();
+            return elementRect.left + `#` + elementRect.top;
+            }})();"
+            );
+            string jsonString = null;
+            if (jsReponse.Success && jsReponse.Result != null)
+            {
+                jsonString = (string)jsReponse.Result;
+                var result = jsonString.Split('#');
+                if (result.Length == 2) 
+                {
+                    return (double.Parse(result[0]), double.Parse(result[1]));
+                }
+            }
+
+            return null;
+        }
+
+        public async void ClickOnElementByClassName(string elementClassName)
+        {
+            var responce = await GetElementPositionByClassName(elementClassName);
+            if (responce != null)
+            {
+                var x = (int)Math.Round(responce.Value.x) + 1;
+                var y = (int)Math.Round(responce.Value.y) + 1;
+
+                var host = _browser.GetBrowser().GetHost();
+                host.SendMouseMoveEvent(x, y, false, CefEventFlags.None);
+                Thread.Sleep(100);
+                host.SendMouseClickEvent(x, y, MouseButtonType.Left, false, 0, CefEventFlags.LeftMouseButton);
+                Thread.Sleep(10);
+                host.SendMouseClickEvent(x, y, MouseButtonType.Left, true, 0, CefEventFlags.LeftMouseButton);
+
+                IsClickVergin = false;
+            }
         }
     }
 }

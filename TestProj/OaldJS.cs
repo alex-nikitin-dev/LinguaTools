@@ -29,12 +29,18 @@ namespace TestProj
             document.getElementById('{Settings.Default.OALD_AcceptAllCookies_ID}').click();
             ";
 
+        public static string ForAsyncEvalJSCode =>
+            @$"
+            document.querySelector('.sound.audio_play_button.pron-us.icon-audio').click();
+            ";
+
         public static IBrowserJS GetInstance()
         {
             return new BrowserJS(PrepareJSCode,
                 null,
                 GenericJS.MainFrameJSCode,
-                OtherJSCode);
+                OtherJSCode,
+                ForAsyncEvalJSCode);
         }
     }
 }
