@@ -47,6 +47,7 @@
             this.MM_LoginToOALDOnStart = new System.Windows.Forms.ToolStripMenuItem();
             this.setOALDCredentialsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MM_ForceLoadFromBrowseField = new System.Windows.Forms.ToolStripMenuItem();
+            this.MM_SpeakOnBrowsingOALD = new System.Windows.Forms.ToolStripMenuItem();
             this.historyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MM_save = new System.Windows.Forms.ToolStripMenuItem();
             this.MM_saveAsCopy = new System.Windows.Forms.ToolStripMenuItem();
@@ -209,7 +210,8 @@
             this.loginToOALDToolStripMenuItem,
             this.MM_LoginToOALDOnStart,
             this.setOALDCredentialsToolStripMenuItem,
-            this.MM_ForceLoadFromBrowseField});
+            this.MM_ForceLoadFromBrowseField,
+            this.MM_SpeakOnBrowsingOALD});
             this.mainToolStripMenuItem.Name = "mainToolStripMenuItem";
             this.mainToolStripMenuItem.Size = new System.Drawing.Size(91, 29);
             this.mainToolStripMenuItem.Text = "Browser";
@@ -250,6 +252,16 @@
             this.MM_ForceLoadFromBrowseField.Size = new System.Drawing.Size(352, 34);
             this.MM_ForceLoadFromBrowseField.Text = "Force Load From Browse Field";
             this.MM_ForceLoadFromBrowseField.Click += new System.EventHandler(this.MM_ForceLoadFromBrowseField_Click);
+            // 
+            // MM_SpeakOnBrowsingOALD
+            // 
+            this.MM_SpeakOnBrowsingOALD.Checked = true;
+            this.MM_SpeakOnBrowsingOALD.CheckOnClick = true;
+            this.MM_SpeakOnBrowsingOALD.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.MM_SpeakOnBrowsingOALD.Name = "MM_SpeakOnBrowsingOALD";
+            this.MM_SpeakOnBrowsingOALD.Size = new System.Drawing.Size(352, 34);
+            this.MM_SpeakOnBrowsingOALD.Text = "Speak On Browsing (OALD)";
+            this.MM_SpeakOnBrowsingOALD.Click += new System.EventHandler(this.MM_SpeakOnBrowsingOALD_Click);
             // 
             // historyToolStripMenuItem
             // 
@@ -436,14 +448,14 @@
             // MM_About
             // 
             this.MM_About.Name = "MM_About";
-            this.MM_About.Size = new System.Drawing.Size(270, 34);
+            this.MM_About.Size = new System.Drawing.Size(189, 34);
             this.MM_About.Text = "About";
             this.MM_About.Click += new System.EventHandler(this.MM_About_Click);
             // 
             // MM_ShortcutsHelp
             // 
             this.MM_ShortcutsHelp.Name = "MM_ShortcutsHelp";
-            this.MM_ShortcutsHelp.Size = new System.Drawing.Size(270, 34);
+            this.MM_ShortcutsHelp.Size = new System.Drawing.Size(189, 34);
             this.MM_ShortcutsHelp.Text = "Shortcuts";
             this.MM_ShortcutsHelp.Click += new System.EventHandler(this.MM_ShortcutsHelp_Click);
             // 
@@ -795,6 +807,7 @@
         private System.Windows.Forms.CustomTabControl tabControl1;
         private System.Windows.Forms.ToolStripMenuItem MM_ForceLoadFromBrowseField;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem MM_SpeakOnBrowsingOALD;
     }
 }
 

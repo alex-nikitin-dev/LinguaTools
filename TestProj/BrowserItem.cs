@@ -251,10 +251,9 @@ namespace TestProj
             return elementRect.left + `#` + elementRect.top;
             }})();"
             );
-            string jsonString = null;
             if (jsReponse.Success && jsReponse.Result != null)
             {
-                jsonString = (string)jsReponse.Result;
+                var jsonString = (string)jsReponse.Result;
                 var result = jsonString.Split('#');
                 if (result.Length == 2) 
                 {

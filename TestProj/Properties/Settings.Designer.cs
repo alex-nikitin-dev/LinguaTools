@@ -382,5 +382,17 @@ namespace TestProj.Properties {
                 this["OALD_AudioButton_ID"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SpeakOnBrowsingOALD {
+            get {
+                return ((bool)(this["SpeakOnBrowsingOALD"]));
+            }
+            set {
+                this["SpeakOnBrowsingOALD"] = value;
+            }
+        }
     }
 }

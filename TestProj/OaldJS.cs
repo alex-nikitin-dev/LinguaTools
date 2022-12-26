@@ -1,4 +1,5 @@
 ﻿using TestProj.Properties;
+using Windows.Media.Capture;
 
 namespace TestProj
 {
@@ -29,13 +30,18 @@ namespace TestProj
             document.getElementById('{Settings.Default.OALD_AcceptAllCookies_ID}').click();
             ";
 
+        private static string SpeakOnBrowsing =>
+             @$"
+            document.querySelector('.sound.audio_play_button.pron-us.icon-audio').click();
+            ";
         public static string ForAsyncEvalJSCode =>
             @$"
-            document.querySelector('.sound.audio_play_button.pron-us.icon-audio').click();
+            {(Settings.Default.SpeakOnBrowsingOALD ? SpeakOnBrowsing:"")}
             ";
 
         public static IBrowserJS GetInstance()
         {
+            
             return new BrowserJS(PrepareJSCode,
                 null,
                 GenericJS.MainFrameJSCode,

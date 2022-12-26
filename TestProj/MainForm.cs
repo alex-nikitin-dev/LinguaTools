@@ -9,7 +9,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CefSharp;
-using CefSharp.DevTools.IndexedDB;
 using CefSharp.WinForms;
 using DesktopHelper;
 using TestProj.Properties;
@@ -51,7 +50,8 @@ namespace TestProj
 
 
         bool _firstGoBrowsers = true;
-        void GoBrowsers(string text, bool saveHistory = true, bool force = false)
+        bool _silentOALD = false;
+        void GoBrowsers(string text, bool saveHistory = true, bool force = false, bool silentOALD = false)
         {
             text = PrepareTextToProceed(text);
             if (string.IsNullOrEmpty(text)) return;
@@ -59,6 +59,8 @@ namespace TestProj
             txtToSearch.Text = text;
             if(saveHistory)
                 _history.AddHistoryItem(text, GetCategory());
+
+            _silentOALD = silentOALD;
 
             foreach (var unit in _dictionaryTranslatorUnits.Values)
             { 
@@ -78,10 +80,12 @@ namespace TestProj
             var selected = tabControl1.SelectedIndex;
             for (int i = 0; i < tabControl1.TabPages.Count; i++)
             {
-                tabControl1.SelectedTab = tabControl1.TabPages[i];
+                //tabControl1.SelectedTab = tabControl1.TabPages[i];
+                tabControl1.SelectedIndex= i;
             }
 
-            tabControl1.SelectedTab = tabControl1.TabPages[selected];
+            //tabControl1.SelectedTab = tabControl1.TabPages[selected];
+            tabControl1.SelectedIndex = selected;
         }
 
         private History _history;
@@ -129,11 +133,10 @@ namespace TestProj
 
             if (MM_LoginToOALDOnStart.Checked)
                 LoginToOALD("test");
-            GoBrowsers("test");
+            
+            GoBrowsers("test", false, false, true);
             SetThemeFromSettings();
         }
-
-       
 
         private void AddReturnDesktopItem(string text, object tag, bool @checked = false)
         {
@@ -192,6 +195,7 @@ namespace TestProj
             var stt = Settings.Default;
             MM_LoginToOALDOnStart.Checked = stt.OALDLoginOnStart;
             MM_ForceLoadFromBrowseField.Checked = stt.ForceLoadFromBrowse;
+            MM_SpeakOnBrowsingOALD.Checked = stt.SpeakOnBrowsingOALD;
 
             _colorThemes.Clear();
             _colorThemes.Add(ColorTheme.Dark, new(ColorTheme.Dark, stt.DarkForeground, stt.DarkBackground));
@@ -337,26 +341,27 @@ namespace TestProj
                                          null,
                                          stt.GoogleSearchRequestParams);
 
-            _dictionaryTranslatorUnits.Add(UnitName.Oald ,new DictionaryTranslatorUnit(oald, cssDarkGTranslator));
-            _dictionaryTranslatorUnits.Add(UnitName.Cambridge ,new DictionaryTranslatorUnit(cambridge, cssDarkGTranslator));
-            _dictionaryTranslatorUnits.Add(UnitName.Wiki , new DictionaryTranslatorUnit(wiki, cssDarkGTranslator));
-            _dictionaryTranslatorUnits.Add(UnitName.Google, new DictionaryTranslatorUnit(google, cssDarkGTranslator));
+            _dictionaryTranslatorUnits.Add(UnitName.Oald ,new (oald, cssDarkGTranslator));
+            _dictionaryTranslatorUnits.Add(UnitName.Cambridge ,new (cambridge, cssDarkGTranslator));
+            _dictionaryTranslatorUnits.Add(UnitName.Wiki , new (wiki, cssDarkGTranslator));
+            _dictionaryTranslatorUnits.Add(UnitName.Google, new (google, cssDarkGTranslator));
         }
 
-        private delegate void Oald_FinishAllTasksDelegate(BrowserItem sender);
         private void Oald_FinishAllTasks(BrowserItem sender)
         {
-            if (InvokeRequired)
-            {
-                Invoke(new Oald_FinishAllTasksDelegate(Oald_FinishAllTasks), sender);
-                return;
-            }
-
             OaldAutoSound();
         }
 
+        private delegate void OaldAutoSoundDelegate();
+
         private void OaldAutoSound()
         {
+            if (InvokeRequired) {
+                Invoke(new OaldAutoSoundDelegate(OaldAutoSound));
+                return;
+            }
+            if (!MM_SpeakOnBrowsingOALD.Checked || _silentOALD) return;
+
             var name = Settings.Default.OALD_AudioButton_ID;
             _dictionaryTranslatorUnits[UnitName.Oald].Dictionary.ClickOnElementByClassName(@$".{name.Replace(' ', '.')}");
         }
@@ -430,7 +435,6 @@ namespace TestProj
                 Invoke(new AddHistoryItemToListViewDelegate(AddItemAndGroupToHistoryListView),historyItem,isCategoryNew);
                 return;
             }
-
 
             AddCategoryIfNeed(isCategoryNew, historyItem.Category);
             AddItemToHistoryListView(historyItem);
@@ -1470,6 +1474,18 @@ namespace TestProj
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
             _dictionaryTranslatorUnits[UnitName.Oald].Dictionary.ClickOnElementByClassName(".sound.audio_play_button.pron-us.icon-audio");
+        }
+        void SetSpeakOnBrowsingOALD(bool predicate)
+        {
+            var stt = Settings.Default;
+            stt.SpeakOnBrowsingOALD = predicate;
+            stt.Save();
+
+            ReloadOaldJS();
+        }
+        private void MM_SpeakOnBrowsingOALD_Click(object sender, EventArgs e)
+        {
+            SetSpeakOnBrowsingOALD(((ToolStripMenuItem)sender).Checked);
         }
     }
 }
