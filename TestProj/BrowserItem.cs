@@ -32,6 +32,7 @@ namespace TestProj
             }
         }
 
+        //TODO: should't be string
         public string BrowserName { get; }
 
         public ChromiumWebBrowser Browser => _browser;

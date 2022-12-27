@@ -90,7 +90,8 @@ namespace TestProj
 
         private History _history;
         private int? _hotKeyGo;
-        private int? _hotKeyReturn;
+        private int? _hotKeySwitch;
+        private int? _hotKeyShow;
 
         private Color _foreColor;
         private Color _backColor;
@@ -165,7 +166,6 @@ namespace TestProj
                 SetPreviousDesktop((Desktop)item.Tag);
             }
 
-            
             MM_ReturnDesktopCheckItems(item);
         }
 
@@ -216,7 +216,8 @@ namespace TestProj
         private void InitHotKeys()
         {
             _hotKeyGo = HotKeyManager.RegisterHotKey(Keys.X, KeyModifiers.Control | KeyModifiers.Shift);
-            _hotKeyReturn = HotKeyManager.RegisterHotKey(Keys.Q, KeyModifiers.Control | KeyModifiers.Shift);
+            _hotKeySwitch = HotKeyManager.RegisterHotKey(Keys.Q, KeyModifiers.Control | KeyModifiers.Shift);
+            _hotKeyShow = HotKeyManager.RegisterHotKey(Keys.Q, KeyModifiers.Control | KeyModifiers.Alt);
             HotKeyManager.HotKeyPressed += HotKeyManager_HotKeyPressed;
         }
 
@@ -503,9 +504,6 @@ namespace TestProj
             AddCategoryCombobox(e.Category);
         }
 
-       
-        
-
         ColorTheme _currentColorTheme = ColorTheme.Light;
 
         void ReloadAllBrowsers()
@@ -562,7 +560,6 @@ namespace TestProj
             }
         }
 
-       
         private (Color backColor, Color foreColor) GetHighLightColor(Color backColor, Color foreColor)
         {
             switch (_currentColorTheme)
@@ -679,7 +676,6 @@ namespace TestProj
         }
 
         private ListViewColumnSorter _lvwColumnSorter;
-       
         private void _lstHistory_ColumnClick(object sender, ColumnClickEventArgs e)
         {
             // Determine if clicked column is already the column that is being sorted.
@@ -884,16 +880,18 @@ namespace TestProj
             {
                 SwitchDesktops();
             }
+            else if ((e.Modifiers & KeyModifiers.Control) == KeyModifiers.Control &&
+                (e.Modifiers & KeyModifiers.Alt) == KeyModifiers.Alt &&
+                (e.Key & Keys.Q) == Keys.Q)
+            {
+                ShowThisAppDesktop();
+            }
         }
 
         private void SwitchDesktops()
         {
             var thisAppDesktop = Desktop.FromWindow(Handle);
-            if (thisAppDesktop.IsVisible)
-            {
-                ReturnToPreviousDesktop();
-            }
-            else
+            if (!thisAppDesktop.IsVisible || !ReturnToPreviousDesktop())
             {
                 ShowThisAppDesktop();
             }
@@ -920,7 +918,14 @@ namespace TestProj
                 thisAppDesktop.MakeVisible();
             }
 
+            WindowOnTop();
             SearchTextBoxFocus();
+        }
+
+        private void WindowOnTop()
+        {
+            TopMost= true;
+            TopMost= false;
         }
 
         private void SetPreviousDesktop(Desktop desktop)
@@ -935,12 +940,13 @@ namespace TestProj
 
             MM_ReturnDesktop.Text = $"Previous{desktopTag}: {(_previousDesktopAuto ? "(Auto) " : "")} {name}";
         }
-        private void ReturnToPreviousDesktop()
+        private bool ReturnToPreviousDesktop()
         {
             if (_previousDesktop == null)
-                return;//DesktopHelper.Desktop.FromIndex(0).MakeVisible();
+                return false;
             if (!_previousDesktop.IsVisible)
                 _previousDesktop.MakeVisible();
+            return true;
         }
 
         private void returnToPreviousDesktopToolStripMenuItem_Click(object sender, EventArgs e)
@@ -957,9 +963,8 @@ namespace TestProj
 
         private async Task SaveHistory(bool saveMainFile, bool SaveACopy, bool saveBackup)
         {
-            
-            if (saveMainFile) await _history.SaveHistoryToFile();
-            if(SaveACopy) await _history.SaveHistoryToFileAsACopy();
+            if(saveMainFile) await _history.SaveHistoryToFile();
+            if(SaveACopy)  await _history.SaveHistoryToFileAsACopy();
             if(saveBackup) await SaveHistoryBackup();
         }
 
@@ -1025,11 +1030,12 @@ namespace TestProj
 
         private void UnregisterHotKeys()
         {
-            if (_hotKeyGo != null && _hotKeyReturn != null)
-            {
+            if (_hotKeyGo != null)
                 HotKeyManager.UnregisterHotKey(_hotKeyGo.Value);
-                HotKeyManager.UnregisterHotKey(_hotKeyReturn.Value);
-            }
+            if (_hotKeySwitch != null)
+                HotKeyManager.UnregisterHotKey(_hotKeySwitch.Value);
+            if (_hotKeyShow != null)
+                HotKeyManager.UnregisterHotKey(_hotKeyShow.Value);
         }
 
         private void loginToOALDToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1429,8 +1435,7 @@ namespace TestProj
         }
 
         [DllImport("dwmapi.dll")]
-        private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr,
-    ref int attrValue, int attrSize);
+        private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
 
         private const int DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1 = 19;
         private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
