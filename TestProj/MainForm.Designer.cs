@@ -410,7 +410,7 @@
             this.MM_HotKeyEnabled.CheckOnClick = true;
             this.MM_HotKeyEnabled.CheckState = System.Windows.Forms.CheckState.Checked;
             this.MM_HotKeyEnabled.Name = "MM_HotKeyEnabled";
-            this.MM_HotKeyEnabled.Size = new System.Drawing.Size(245, 34);
+            this.MM_HotKeyEnabled.Size = new System.Drawing.Size(270, 34);
             this.MM_HotKeyEnabled.Text = "Hot Key Enabled";
             // 
             // windowToolStripMenuItem
@@ -434,6 +434,7 @@
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(332, 34);
             this.toolStripMenuItem1.Text = "test";
+            this.toolStripMenuItem1.Visible = false;
             this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
             // MM_Help

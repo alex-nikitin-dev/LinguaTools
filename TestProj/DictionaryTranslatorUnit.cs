@@ -1,4 +1,5 @@
 ﻿using CefSharp;
+using CefSharp.JavascriptBinding;
 using System.Windows.Forms;
 
 namespace TestProj
@@ -43,28 +44,25 @@ namespace TestProj
 
             _boundObject = new BoundObject();
             _boundObject.BrowserTextSelected += _boundObject_BrowserTextSelected;
-            _dictionary.Browser.JavascriptObjectRepository.Register("b1", _boundObject);
+            //_dictionary.Browser.JavascriptObjectRepository.Register("dictionaryOperator1", _boundObject);
+            //_dictionary.Browser.LoadingStateChanged += (s, a) =>
+            //{
+            //    if (a.IsLoading) return;
+            //    _dictionary.Browser.ExecuteScriptAsync("CefSharp.BindObjectAsync('dictionaryOperator1');");
+            //};
+
+            _dictionary.Browser.JavascriptObjectRepository.ResolveObject += (sender, e) =>
+            {
+                var repo = e.ObjectRepository;
+                if (e.ObjectName == "dictionaryOperator1")
+                {
+                    repo.Register("dictionaryOperator1", _boundObject, new BindingOptions());
+                }
+            };
 
             _dictionary.Browser.KeyboardHandler = new KeyboardHandler();
             _translator.Browser.KeyboardHandler = new KeyboardHandler();
         }
-
-        //public delegate void PreviewKeyDownDelegate(object sender, KeyPressEventArgs e);
-        //public event PreviewKeyDownDelegate PreviewKeyDown;
-        //protected virtual void OnPreviewKeyDown(object sender, KeyPressEventArgs e)
-        //{
-        //    PreviewKeyDown?.Invoke(sender, e);
-        //}
-
-        //private void Translator_PreviewKeyDown(object sender, KeyPressEventArgs e)
-        //{
-        //    OnPreviewKeyDown(sender, e);
-        //}
-
-        //private void Dictionary_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
-        //{
-        //    OnPreviewKeyDown(sender, e);
-        //}
 
         public DictionaryTranslatorUnit(BrowserItem dictionary, string cssDarkTranslator)
             :this(dictionary)

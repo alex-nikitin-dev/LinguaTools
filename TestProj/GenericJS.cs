@@ -5,11 +5,25 @@
         //DictionaryOnSelectJS
         public static string MainFrameJSCode =>
             $@"
-              document.body.onmouseup = function()
-              {{
-                    b1.onselect(document.getSelection().toString());    
-              }};
+            (async function()
+	        {{
+		        await CefSharp.BindObjectAsync(""dictionaryOperator1"");
+		        document.body.onmouseup = function()
+                {{
+                    dictionaryOperator1.onselect(document.getSelection().toString());
+                }};
+	        }})();
             ";
+
+        //public static string MainFrameJSCode =>
+        //   $@"
+        //      CefSharp.BindObjectAsync('dictionaryOperator1');
+        //      document.body.onmouseup = function()
+        //      {{
+        //            dictionaryOperator1.onselect(document.getSelection().toString());
+        //            //alert(document.getSelection().toString());
+        //      }};
+        //    ";
 
         public static IBrowserJS GetInstance()
         {

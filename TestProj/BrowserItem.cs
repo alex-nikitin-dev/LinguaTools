@@ -46,7 +46,7 @@ namespace TestProj
            IBrowserJS browserJS,
             string prepareUrl,
             string requestParams = null,
-            bool legacyBinding = true)
+            bool legacyBinding = false)
         {
             _browser = browser;
             IsClickVergin = true;
@@ -188,6 +188,11 @@ namespace TestProj
                 OnFinishAllTasks(this);
             }
 
+            if(BrowserName == "Google")
+            {
+                bool b = false;
+            }
+
             if (e.Frame.IsMain && !autoRedirecting)
                 _outsideLoadCommand = false;
         }
@@ -202,18 +207,19 @@ namespace TestProj
 
         private void InsertColorThemeJS()
         {
+            //TODO: this solution is wrong. Need to replace with somthing like a dictionary with keys ColorTheme
             if (_browserJS != null && _browserJS.ColorThemeJSCode != null && _browserJS.ColorThemeJSCode.Length >= 2)
-                _browser.ExecuteScriptAsyncWhenPageLoaded(_browserJS.ColorThemeJSCode[(int)ColorTheme]);
+                _browser.ExecuteScriptAsync(_browserJS.ColorThemeJSCode[(int)ColorTheme]);
         }
         private void InsertOtherJavaScript()
         {
             if (_browserJS != null && !string.IsNullOrEmpty(_browserJS.OtherJSCode))
-                _browser.ExecuteScriptAsyncWhenPageLoaded(_browserJS.OtherJSCode);
+                _browser.ExecuteScriptAsync(_browserJS.OtherJSCode);
         }
         private void InsertMainFrameJavaScript()
         {
             if (_browserJS != null && !string.IsNullOrEmpty(_browserJS.MainFrameJSCode))
-                _browser.ExecuteScriptAsyncWhenPageLoaded(_browserJS.MainFrameJSCode);
+                _browser.ExecuteScriptAsync(_browserJS.MainFrameJSCode);
         }
 
         private void _browser_LoadingStateChanged(object sender, LoadingStateChangedEventArgs e)
@@ -228,6 +234,8 @@ namespace TestProj
         }
         private void SetBrowserColorsCSS(string css)
         {
+            if (css == null) return;
+
             _browser.ExecuteScriptAsync($@"
                     var style1 = document.createElement('style');
                     style1.innerText = `{css}`;
