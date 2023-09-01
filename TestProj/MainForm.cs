@@ -5,14 +5,14 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CefSharp;
 using CefSharp.WinForms;
-using DesktopHelper;
 using TestProj.Properties;
-
+using WindowsDesktop;
 
 namespace TestProj
 {
@@ -106,9 +106,10 @@ namespace TestProj
             };
             settingsBrowser.CefCommandLineArgs.Remove("mute-audio");
             settingsBrowser.CefCommandLineArgs.Add("enable-media-stream", "1");
+            settingsBrowser.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.5672.93 Safari/537.36 CefSharp Browser/" + Cef.CefSharpVersion;
             Cef.Initialize(settingsBrowser);
         }
-
+        [SupportedOSPlatform("windows")]    
         private void MainForm_Load(object sender, EventArgs e)
         {
             CefInit();
@@ -138,7 +139,7 @@ namespace TestProj
             GoBrowsers("test", false, false, true);
             SetThemeFromSettings();
         }
-
+        [SupportedOSPlatform("windows")]    
         private void AddReturnDesktopItem(string text, object tag, bool @checked = false)
         {
             var item = new ToolStripMenuItem
@@ -151,7 +152,7 @@ namespace TestProj
             item.Click += MM_ReturnDesktopItem_Click;
             MM_ReturnDesktop.DropDownItems.Add(item);
         }
-
+        [SupportedOSPlatform("Windows")]
         private void MM_ReturnDesktopItem_Click(object sender, EventArgs e)
         {
             var item = ((ToolStripMenuItem)sender);
@@ -163,7 +164,7 @@ namespace TestProj
             else
             {
                 _previousDesktopAuto = false;
-                SetPreviousDesktop((Desktop)item.Tag);
+                SetPreviousDesktop((VirtualDesktop)item.Tag);
             }
 
             MM_ReturnDesktopCheckItems(item);
@@ -176,15 +177,15 @@ namespace TestProj
                 item.Checked = item == checkedItem;
             }
         }
-
+        [SupportedOSPlatform("Windows")]
         private void InitMainMenuItems()
         { 
             MM_ReturnDesktop.DropDownItems.Clear();
             AddReturnDesktopItem("Auto", null,true);
-
-            for (int i = 0; i < Desktop.Count; i++)
+            var desktops = VirtualDesktop.GetDesktops();
+            for (int i = 0; i < desktops.Length; i++)
             {
-                AddReturnDesktopItem(Desktop.DesktopNameFromIndex(i), Desktop.FromIndex(i));
+                AddReturnDesktopItem(desktops[i].Name, desktops[i]);
             }
 
             SetPreviousDesktopMenuText();
@@ -855,7 +856,7 @@ namespace TestProj
 
         delegate void HotKeyPressedDelegate(object sender, HotKeyEventArgs e);
 
-        private Desktop _previousDesktop;
+        private VirtualDesktop _previousDesktop;
 
         void HotKeyManager_HotKeyPressed(object sender, HotKeyEventArgs e)
         {
@@ -888,10 +889,19 @@ namespace TestProj
             }
         }
 
+        [SupportedOSPlatform("windows")]
         private void SwitchDesktops()
         {
-            var thisAppDesktop = Desktop.FromWindow(Handle);
-            if (!thisAppDesktop.IsVisible || !ReturnToPreviousDesktop())
+            //var thisAppDesktop = Desktop.FromWindow(Handle);
+            //MessageBox.Show(Desktop.DesktopNameFromDesktop(thisAppDesktop));
+            //if (!thisAppDesktop.IsVisible || !ReturnToPreviousDesktop())
+            //{
+            //    ShowThisAppDesktop();
+            //}
+
+            //var thisAppDesktop = VirtualDesktop.FromHwnd(Handle);
+            
+            if (!VirtualDesktop.IsCurrentVirtualDesktop(Handle)  || !ReturnToPreviousDesktop())
             {
                 ShowThisAppDesktop();
             }
@@ -902,20 +912,27 @@ namespace TestProj
             txtToSearch.SelectAll();
             txtToSearch.Focus();
         }
-
+        [SupportedOSPlatform ("windows")]
         void SavePreviousDesktop()
         {
             if (_previousDesktopAuto)
-                SetPreviousDesktop (Desktop.Current);
+                SetPreviousDesktop (VirtualDesktop.Current);
         }
 
+        [SupportedOSPlatform ("windows")]
         private void ShowThisAppDesktop()
         {
-            var thisAppDesktop = Desktop.FromWindow(Handle);
-            if (!thisAppDesktop.IsVisible)
+            //var thisAppDesktop = Desktop.FromWindow(Handle);
+            //if (!thisAppDesktop.IsVisible)
+            //{
+            //    SavePreviousDesktop();
+            //    thisAppDesktop.MakeVisible();
+            //}
+
+            if(!VirtualDesktop.IsCurrentVirtualDesktop(Handle))
             {
                 SavePreviousDesktop();
-                thisAppDesktop.MakeVisible();
+                VirtualDesktop.FromHwnd(Handle).Switch();
             }
 
             WindowOnTop();
@@ -924,28 +941,40 @@ namespace TestProj
 
         private void WindowOnTop()
         {
-            TopMost= true;
-            TopMost= false;
+            Show();
+            this.Restore();
+            BringToFront();
+            Activate();
         }
-
-        private void SetPreviousDesktop(Desktop desktop)
+        [SupportedOSPlatform("Windows")]
+        private void SetPreviousDesktop(VirtualDesktop desktop)
         {
+            //_previousDesktop = desktop;
+            //SetPreviousDesktopMenuText();
+
             _previousDesktop = desktop;
             SetPreviousDesktopMenuText();
         }
+
+        [SupportedOSPlatform("Windows")]
         private void SetPreviousDesktopMenuText()
         {
-            var name = _previousDesktop != null? Desktop.DesktopNameFromDesktop(_previousDesktop): "None";
+            //var name = _previousDesktop != null? Desktop.DesktopNameFromDesktop(_previousDesktop): "None";
+            //var desktopTag = _previousDesktop == null ? " desktop" : "";
+
+            //MM_ReturnDesktop.Text = $"Previous{desktopTag}: {(_previousDesktopAuto ? "(Auto) " : "")} {name}";
+
+            var name = _previousDesktop != null ? _previousDesktop.Name : "None";
             var desktopTag = _previousDesktop == null ? " desktop" : "";
 
             MM_ReturnDesktop.Text = $"Previous{desktopTag}: {(_previousDesktopAuto ? "(Auto) " : "")} {name}";
         }
+
+        [SupportedOSPlatform("Windows")]
         private bool ReturnToPreviousDesktop()
         {
-            if (_previousDesktop == null)
-                return false;
-            if (!_previousDesktop.IsVisible)
-                _previousDesktop.MakeVisible();
+            if (_previousDesktop == null) return false;
+            _previousDesktop.Switch();
             return true;
         }
 

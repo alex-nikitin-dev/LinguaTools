@@ -12,7 +12,7 @@ namespace TestProj.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.4.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.5.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -193,7 +193,7 @@ namespace TestProj.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://translate.google.am/?hl=en#view=home&op=translate&sl=en&tl=ru&text=")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://translate.google.am/?sl=en&tl=ru&hl=en&text=")]
         public string GT_URL {
             get {
                 return ((string)(this["GT_URL"]));

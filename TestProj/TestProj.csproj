@@ -20,7 +20,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <OutputPath>bin\x86\Debug\</OutputPath>
@@ -35,7 +35,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app1.manifest</ApplicationManifest>
-    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion>10.0.22000.0</SupportedOSPlatformVersion>
     <StartupObject>TestProj.Program</StartupObject>
     <Copyright>Oleksii Nikitin</Copyright>
     <UseWPF>True</UseWPF>
@@ -71,20 +71,20 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CefSharp.Common.NETCore" Version="108.4.130" />
-    <PackageReference Include="CefSharp.OffScreen.NETCore" Version="108.4.130" />
-    <PackageReference Include="CefSharp.WinForms.NETCore" Version="108.4.130" />
-    <PackageReference Include="CefSharp.Wpf.NETCore" Version="108.4.130" />
+    <PackageReference Include="CefSharp.Common.NETCore" Version="116.0.150" />
+    <PackageReference Include="CefSharp.OffScreen.NETCore" Version="116.0.150" />
+    <PackageReference Include="CefSharp.WinForms.NETCore" Version="116.0.150" />
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="116.0.150" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Slions.VirtualDesktop" Version="6.1.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.355802">
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CustomTabControl\CustomTabControl.csproj" />
-    <ProjectReference Include="..\DesktopHelper\DesktopHelper.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="VirtualDesktop">
@@ -100,5 +100,14 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="116.0.15" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="116.0.15" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="116.0.15" />
   </ItemGroup>
 </Project>
