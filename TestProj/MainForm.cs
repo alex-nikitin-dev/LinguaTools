@@ -185,7 +185,8 @@ namespace TestProj
             var desktops = VirtualDesktop.GetDesktops();
             for (int i = 0; i < desktops.Length; i++)
             {
-                AddReturnDesktopItem(desktops[i].Name, desktops[i]);
+                var name = desktops[i].Name;
+                AddReturnDesktopItem(string.IsNullOrEmpty(name) ? $"Desktop {i+1}" : name, desktops[i]);
             }
 
             SetPreviousDesktopMenuText();
