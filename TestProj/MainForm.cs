@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using CefSharp;
 using CefSharp.WinForms;
-using TestProj.Properties;
+using LinguaHelper.Properties;
 using WindowsDesktop;
 
 namespace TestProj

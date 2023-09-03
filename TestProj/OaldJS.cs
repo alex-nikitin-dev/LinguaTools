@@ -1,4 +1,4 @@
-﻿using TestProj.Properties;
+﻿using LinguaHelper.Properties;
 using Windows.Media.Capture;
 
 namespace TestProj

@@ -1,4 +1,4 @@
-﻿using TestProj.Properties;
+﻿using LinguaHelper.Properties;
 
 namespace TestProj
 {
