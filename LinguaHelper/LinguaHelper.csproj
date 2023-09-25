@@ -71,17 +71,17 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CefSharp.Common.NETCore" Version="116.0.150" />
-    <PackageReference Include="CefSharp.OffScreen.NETCore" Version="116.0.150" />
-    <PackageReference Include="CefSharp.WinForms.NETCore" Version="116.0.150" />
-    <PackageReference Include="CefSharp.Wpf.NETCore" Version="116.0.150" />
+    <PackageReference Include="CefSharp.Common.NETCore" Version="116.0.230" />
+    <PackageReference Include="CefSharp.OffScreen.NETCore" Version="116.0.230" />
+    <PackageReference Include="CefSharp.WinForms.NETCore" Version="116.0.230" />
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="116.0.230" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Slions.VirtualDesktop" Version="6.1.0" />
+    <PackageReference Include="Slions.VirtualDesktop" Version="6.2.1" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.4" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.5" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CustomTabControl\CustomTabControl.csproj" />
@@ -89,9 +89,6 @@
   <ItemGroup>
     <Reference Include="VirtualDesktop">
       <HintPath>..\..\VirtualDesktop\src\VirtualDesktop.WinForms\bin\Debug\net6.0-windows10.0.19041.0\VirtualDesktop.dll</HintPath>
-    </Reference>
-    <Reference Include="VirtualDesktop.WinForms">
-      <HintPath>..\..\VirtualDesktop\src\VirtualDesktop.WinForms\bin\Debug\net6.0-windows10.0.19041.0\VirtualDesktop.WinForms.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -102,12 +99,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="116.0.15" />
+    <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="116.0.23" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="116.0.15" />
+    <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="116.0.23" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="116.0.15" />
+    <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="116.0.23" />
   </ItemGroup>
 </Project>
