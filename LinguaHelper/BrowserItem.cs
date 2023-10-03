@@ -1,11 +1,9 @@
-﻿using CefSharp.WinForms;
-using CefSharp;
-using System.Windows.Forms;
-using ABI.Windows.Foundation;
-using System.Threading;
-using CefSharp.Web;
+﻿using CefSharp;
+using CefSharp.WinForms;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace TestProj
 {
@@ -39,7 +37,7 @@ namespace TestProj
 
         public string Url => _url;
 
-        private BrowserItem(ChromiumWebBrowser browser, 
+        private BrowserItem(ChromiumWebBrowser browser,
             string url,
             string browserName,
             string cssDarkTheme,
@@ -63,20 +61,20 @@ namespace TestProj
             _browserJS = browserJS;
             _browser.JavascriptObjectRepository.Settings.LegacyBindingEnabled = legacyBinding;
             ColorTheme = theme;
-            
-            
+
+
             _needSetColorTheme = true;
         }
 
-        public BrowserItem(string url, 
-            string browserName, 
+        public BrowserItem(string url,
+            string browserName,
             string cssDarkTheme,
             ColorTheme theme,
             IBrowserJS browserJS = null,
             string prepareUrl = null,
             string requestParams = null)
-            : this(new ChromiumWebBrowser(), 
-                  url, 
+            : this(new ChromiumWebBrowser(),
+                  url,
                   browserName,
                   cssDarkTheme,
                   theme,
@@ -167,7 +165,7 @@ namespace TestProj
             else if (IsAutoRedirectNeeded && e.Frame.IsMain)
             {
                 Go(_gotoAfterPreparing, true);
-                autoRedirecting= true;
+                autoRedirecting = true;
             }
 
             if (_needSetColorTheme && e.Frame.IsMain)
@@ -184,12 +182,12 @@ namespace TestProj
 
             InsertOtherJavaScript();
 
-            if(_outsideLoadCommand && e.Frame.IsMain && !IsAutoRedirectNeeded && !_needPreparing)
+            if (_outsideLoadCommand && e.Frame.IsMain && !IsAutoRedirectNeeded && !_needPreparing)
             {
                 OnFinishAllTasks(this);
             }
 
-            if(BrowserName == "Google")
+            if (BrowserName == "Google")
             {
                 bool b = false;
             }
@@ -264,7 +262,7 @@ namespace TestProj
             {
                 var jsonString = (string)jsReponse.Result;
                 var result = jsonString.Split('#');
-                if (result.Length == 2) 
+                if (result.Length == 2)
                 {
                     return (double.Parse(result[0]), double.Parse(result[1]));
                 }

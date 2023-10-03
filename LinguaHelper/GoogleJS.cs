@@ -14,7 +14,7 @@ namespace TestProj
         public static IBrowserJS GetInstance()
         {
             return new BrowserJS(null,
-                new string[] { LightThemeJSCode,DarkThemeJSCode },
+                new string[] { LightThemeJSCode, DarkThemeJSCode },
                 GenericJS.MainFrameJSCode,
                 null);
         }

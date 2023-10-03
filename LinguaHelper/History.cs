@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TestProj
 {
-    class History:IEnumerable<HistoryDataItem>
+    class History : IEnumerable<HistoryDataItem>
     {
         private readonly List<HistoryDataItem> _historyData;
         private readonly string _filePath;
@@ -63,11 +63,11 @@ namespace TestProj
         }
         public bool IsHistoryContainsCategory(string category)
         {
-           // return _historyData.Exists(x => string.Compare(x.Category, category, StringComparison.Ordinal) == 0);
-           return Categories.Exists(x => string.Compare(x, category, StringComparison.Ordinal) == 0);
+            // return _historyData.Exists(x => string.Compare(x.Category, category, StringComparison.Ordinal) == 0);
+            return Categories.Exists(x => string.Compare(x, category, StringComparison.Ordinal) == 0);
         }
 
-        public (bool isExist,HistoryDataItem item) IsThereItem(string phrase, string category)
+        public (bool isExist, HistoryDataItem item) IsThereItem(string phrase, string category)
         {
             foreach (var dataItem in _historyData)
             {
@@ -106,8 +106,8 @@ namespace TestProj
 
         public void AddHistoryItem(string text, string category)
         {
-            var isCategoryNew =  !IsHistoryContainsCategory(category);
-            var thereItem =   IsThereItem(text, category);
+            var isCategoryNew = !IsHistoryContainsCategory(category);
+            var thereItem = IsThereItem(text, category);
 
             if (thereItem.isExist)
             {
@@ -141,7 +141,7 @@ namespace TestProj
                 using (var file = File.AppendText(path))
                 {
                     foreach (var data in _historyData)
-                    { 
+                    {
                         file.WriteLine($@"{data.Phrase};;{data.Category};;{GetDataTimeFormatted(data.Date)}");
                     }
                 }

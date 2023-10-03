@@ -1,6 +1,4 @@
 ﻿using CefSharp;
-using CefSharp.JavascriptBinding;
-using System.Windows.Forms;
 
 namespace TestProj
 {
@@ -37,7 +35,7 @@ namespace TestProj
         {
             _dictionary = dictionary;
             _translator = translator ?? new BrowserItem(DefaultTranslatorUrl,
-                DefaultTranslatorName, 
+                DefaultTranslatorName,
                 _dictionary.CSSDarkTheme,
                 _dictionary.ColorTheme
                 /*dictionary.ColorThemes*/);
@@ -65,7 +63,7 @@ namespace TestProj
         }
 
         public DictionaryTranslatorUnit(BrowserItem dictionary, string cssDarkTranslator)
-            :this(dictionary)
+            : this(dictionary)
         {
             _translator.CSSDarkTheme = cssDarkTranslator;
         }

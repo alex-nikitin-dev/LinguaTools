@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFramework>net7.0-windows10.0.22621.0</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -18,7 +19,7 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <UseWindowsForms>true</UseWindowsForms>
+    <UseWindowsForms>True</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
@@ -35,10 +36,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app1.manifest</ApplicationManifest>
-    <SupportedOSPlatformVersion>10.0.22000.0</SupportedOSPlatformVersion>
     <StartupObject>TestProj.Program</StartupObject>
     <Copyright>Oleksii Nikitin</Copyright>
-    <UseWPF>True</UseWPF>
+    <UseWPF>False</UseWPF>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="credentials.json" />
@@ -76,7 +76,7 @@
     <PackageReference Include="CefSharp.WinForms.NETCore" Version="116.0.230" />
     <PackageReference Include="CefSharp.Wpf.NETCore" Version="116.0.230" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Slions.VirtualDesktop" Version="6.2.1" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.3.7" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
       <PrivateAssets>all</PrivateAssets>
@@ -85,11 +85,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CustomTabControl\CustomTabControl.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="VirtualDesktop">
-      <HintPath>..\..\VirtualDesktop\src\VirtualDesktop.WinForms\bin\Debug\net6.0-windows10.0.19041.0\VirtualDesktop.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Settings.Designer.cs">

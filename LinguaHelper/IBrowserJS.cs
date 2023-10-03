@@ -1,6 +1,4 @@
-﻿using Windows.Media.AppBroadcasting;
-
-namespace TestProj
+﻿namespace TestProj
 {
     internal interface IBrowserJS
     {

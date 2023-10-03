@@ -1,4 +1,8 @@
-﻿using System;
+﻿using CefSharp;
+using CefSharp.WinForms;
+using LinguaHelper;
+using LinguaHelper.Properties;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -9,10 +13,6 @@ using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using CefSharp;
-using CefSharp.WinForms;
-using LinguaHelper.Properties;
-using WindowsDesktop;
 
 namespace TestProj
 {
@@ -22,7 +22,7 @@ namespace TestProj
         {
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
             InitializeComponent();
-            
+
         }
 
         private void txtBrowse_KeyDown(object sender, KeyEventArgs e)
@@ -42,9 +42,9 @@ namespace TestProj
 
         string PrepareTextToProceed(string text)
         {
-            text = text.Trim(',', '.', '!', ':', ';','-','"','\'',' ','\n');
+            text = text.Trim(',', '.', '!', ':', ';', '-', '"', '\'', ' ', '\n');
             text = text.Replace(Environment.NewLine, " ");
-            text = new Regex("[ ]{2,}", RegexOptions.None).Replace( text, " ");
+            text = new Regex("[ ]{2,}", RegexOptions.None).Replace(text, " ");
             return text;
         }
 
@@ -57,13 +57,13 @@ namespace TestProj
             if (string.IsNullOrEmpty(text)) return;
 
             txtToSearch.Text = text;
-            if(saveHistory)
+            if (saveHistory)
                 _history.AddHistoryItem(text, GetCategory());
 
             _silentOALD = silentOALD;
 
             foreach (var unit in _dictionaryTranslatorUnits.Values)
-            { 
+            {
                 unit.Go(text, force);
             }
 
@@ -81,7 +81,7 @@ namespace TestProj
             for (int i = 0; i < tabControl1.TabPages.Count; i++)
             {
                 //tabControl1.SelectedTab = tabControl1.TabPages[i];
-                tabControl1.SelectedIndex= i;
+                tabControl1.SelectedIndex = i;
             }
 
             //tabControl1.SelectedTab = tabControl1.TabPages[selected];
@@ -109,10 +109,11 @@ namespace TestProj
             settingsBrowser.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.5672.93 Safari/537.36 CefSharp Browser/" + Cef.CefSharpVersion;
             Cef.Initialize(settingsBrowser);
         }
-        [SupportedOSPlatform("windows")]    
+        [SupportedOSPlatform("windows")]
         private void MainForm_Load(object sender, EventArgs e)
         {
             CefInit();
+            VirtualDesktopPSInit();
             StartPosition = FormStartPosition.CenterScreen;
             WindowState = FormWindowState.Maximized;
 
@@ -135,11 +136,20 @@ namespace TestProj
 
             if (MM_LoginToOALDOnStart.Checked)
                 LoginToOALD("test");
-            
+
             GoBrowsers("test", false, false, true);
             SetThemeFromSettings();
         }
-        [SupportedOSPlatform("windows")]    
+
+        VirtualDesktopCollection _desktops = null;
+      
+        private void VirtualDesktopPSInit()
+        {
+            _desktops = new();
+            _previousDesktop = null;
+        }
+
+        [SupportedOSPlatform("windows")]
         private void AddReturnDesktopItem(string text, object tag, bool @checked = false)
         {
             var item = new ToolStripMenuItem
@@ -164,7 +174,7 @@ namespace TestProj
             else
             {
                 _previousDesktopAuto = false;
-                SetPreviousDesktop((VirtualDesktop)item.Tag);
+               // SetPreviousDesktop((VirtualDesktop)item.Tag);
             }
 
             MM_ReturnDesktopCheckItems(item);
@@ -173,22 +183,24 @@ namespace TestProj
         private void MM_ReturnDesktopCheckItems(ToolStripMenuItem checkedItem)
         {
             foreach (ToolStripMenuItem item in MM_ReturnDesktop.DropDownItems)
-            { 
+            {
                 item.Checked = item == checkedItem;
             }
         }
+
+       
+
         [SupportedOSPlatform("Windows")]
         private void InitMainMenuItems()
-        { 
+        {
             MM_ReturnDesktop.DropDownItems.Clear();
-            AddReturnDesktopItem("Auto", null,true);
-            var desktops = VirtualDesktop.GetDesktops();
-            for (int i = 0; i < desktops.Length; i++)
-            {
-                var name = desktops[i].Name;
-                AddReturnDesktopItem(string.IsNullOrEmpty(name) ? $"Desktop {i+1}" : name, desktops[i]);
-            }
+            AddReturnDesktopItem("Auto", null, true);
 
+            foreach (var desktop in _desktops)
+            {
+                var name = desktop.Name;
+                AddReturnDesktopItem(string.IsNullOrEmpty(name) ? $"Desktop {desktop.Index + 1}" : name, desktop);
+            }
             SetPreviousDesktopMenuText();
         }
 
@@ -207,10 +219,10 @@ namespace TestProj
         }
 
         Dictionary<ColorTheme, ColorThemeProvider> _colorThemes;
-       
+
 
         private void SetThemeFromSettings()
-        { 
+        {
             if (Settings.Default.DarkTheme)
                 SetColorTheme(ColorTheme.Dark);
         }
@@ -241,7 +253,7 @@ namespace TestProj
         {
             tabControl1.Font = new Font(family: tabControl1.Font.FontFamily, 12, FontStyle.Regular);
             foreach (var unit in _dictionaryTranslatorUnits.Values)
-            { 
+            {
                 var table = CreateTableForUnit();
                 AutoLayoutUnit(table, unit);
 
@@ -290,7 +302,7 @@ namespace TestProj
 
         private bool SetFirstTab(string name)
         {
-            if(!tabControl1.TabPages.ContainsKey(name))
+            if (!tabControl1.TabPages.ContainsKey(name))
                 return false;
 
             tabControl1.SelectTab(name);
@@ -313,7 +325,7 @@ namespace TestProj
             var stt = Settings.Default;
             DictionaryTranslatorUnit.DefaultTranslatorUrl = stt.GT_URL;
             DictionaryTranslatorUnit.DefaultTranslatorName = stt.GT_Name;
-            _dictionaryTranslatorUnits = new ();
+            _dictionaryTranslatorUnits = new();
 
             var cssDarkColorTheme = File.ReadAllText(stt.DarkCSSColorThemePath);
             var cssDarkGTranslator = File.ReadAllText(stt.DarkCSSGTranslator);
@@ -344,10 +356,10 @@ namespace TestProj
                                          null,
                                          stt.GoogleSearchRequestParams);
 
-            _dictionaryTranslatorUnits.Add(UnitName.Oald ,new (oald, cssDarkGTranslator));
-            _dictionaryTranslatorUnits.Add(UnitName.Cambridge ,new (cambridge, cssDarkGTranslator));
-            _dictionaryTranslatorUnits.Add(UnitName.Wiki , new (wiki, cssDarkGTranslator));
-            _dictionaryTranslatorUnits.Add(UnitName.Google, new (google, cssDarkGTranslator));
+            _dictionaryTranslatorUnits.Add(UnitName.Oald, new(oald, cssDarkGTranslator));
+            _dictionaryTranslatorUnits.Add(UnitName.Cambridge, new(cambridge, cssDarkGTranslator));
+            _dictionaryTranslatorUnits.Add(UnitName.Wiki, new(wiki, cssDarkGTranslator));
+            _dictionaryTranslatorUnits.Add(UnitName.Google, new(google, cssDarkGTranslator));
         }
 
         private void Oald_FinishAllTasks(BrowserItem sender)
@@ -359,7 +371,8 @@ namespace TestProj
 
         private void OaldAutoSound()
         {
-            if (InvokeRequired) {
+            if (InvokeRequired)
+            {
                 Invoke(new OaldAutoSoundDelegate(OaldAutoSound));
                 return;
             }
@@ -399,7 +412,7 @@ namespace TestProj
                 li.SubItems[1].Text = updatedItem.Category;
                 li.SubItems[2].Text = updatedItem.Date.ToString(_dateTimeFormat, CultureInfo.InvariantCulture);
 
-                var isCategoryNew = string.CompareOrdinal(oldItem.Category,updatedItem.Category) != 0;
+                var isCategoryNew = string.CompareOrdinal(oldItem.Category, updatedItem.Category) != 0;
                 AddCategoryIfNeed(isCategoryNew, updatedItem.Category);
                 ProceedAfterAddOrUpdatedHistoryListView();
             }
@@ -412,7 +425,7 @@ namespace TestProj
                 if (string.CompareOrdinal(item.SubItems[0].Text, phrase) == 0 &&
                    string.CompareOrdinal(item.SubItems[1].Text, category) == 0)
                 {
-                   return item;
+                    return item;
                 }
             }
 
@@ -426,16 +439,16 @@ namespace TestProj
 
         private void _history_NewHistoryItemAdded(object sender, NewHistoryItemAddedEventArgs e)
         {
-            AddItemAndGroupToHistoryListView(e.HistoryItem,e.IsCategoryNew);
+            AddItemAndGroupToHistoryListView(e.HistoryItem, e.IsCategoryNew);
         }
 
-        private delegate void AddHistoryItemToListViewDelegate(HistoryDataItem historyItem,bool isCategoryNew);
+        private delegate void AddHistoryItemToListViewDelegate(HistoryDataItem historyItem, bool isCategoryNew);
 
         private void AddItemAndGroupToHistoryListView(HistoryDataItem historyItem, bool isCategoryNew)
         {
             if (InvokeRequired)
             {
-                Invoke(new AddHistoryItemToListViewDelegate(AddItemAndGroupToHistoryListView),historyItem,isCategoryNew);
+                Invoke(new AddHistoryItemToListViewDelegate(AddItemAndGroupToHistoryListView), historyItem, isCategoryNew);
                 return;
             }
 
@@ -451,7 +464,7 @@ namespace TestProj
             ShowHistoryCount();
         }
 
-        private void AddCategoryIfNeed(bool isCategoryNew,string category)
+        private void AddCategoryIfNeed(bool isCategoryNew, string category)
         {
             if (isCategoryNew && AreTheGroupsNeeded())
             {
@@ -461,7 +474,7 @@ namespace TestProj
 
 
         private SortOrder GetHistorySortOrderByDate()
-        { 
+        {
             return MM_UseReverseOrder.Checked ? SortOrder.Descending : SortOrder.Ascending;
         }
 
@@ -479,7 +492,7 @@ namespace TestProj
 
             if (AreTheGroupsNeeded())
                 li.Group = _lstHistory.Groups[historyItem.Category];
-            
+
             _lstHistory.Items.Add(li);
         }
 
@@ -516,7 +529,7 @@ namespace TestProj
             }
         }
 
-        void SetColorsRecursively(Control parent,Color backColor, Color foreColor)
+        void SetColorsRecursively(Control parent, Color backColor, Color foreColor)
         {
             parent.BackColor = backColor;
             parent.ForeColor = foreColor;
@@ -526,7 +539,7 @@ namespace TestProj
                 SetColorsRecursively(child, backColor, foreColor);
             }
 
-            if(parent is MenuStrip)
+            if (parent is MenuStrip)
             {
                 foreach (ToolStripItem menuItem in ((MenuStrip)parent).Items)
                 {
@@ -567,7 +580,7 @@ namespace TestProj
             switch (_currentColorTheme)
             {
                 case ColorTheme.Dark:
-                    return (ControlPaint.Light(backColor),ControlPaint.Dark(foreColor));
+                    return (ControlPaint.Light(backColor), ControlPaint.Dark(foreColor));
                 case ColorTheme.Light:
                     return (ControlPaint.Dark(backColor), ControlPaint.Light(foreColor));
                 default:
@@ -593,12 +606,12 @@ namespace TestProj
             private Color _backColorOfHighlightedItem;
             //private Color _foreColorOfHighlightedItem;
             public MyRenderer(Color backColorOfHighlightedItem, Color backColor/*,Color foreColor*/)
-                :base(new MyProfessionalColorTable(backColor))
+                : base(new MyProfessionalColorTable(backColor))
             {
                 _backColorOfHighlightedItem = backColorOfHighlightedItem;
                 //_foreColorOfHighlightedItem = foreColor;
             }
-            
+
             protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e)
             {
                 Rectangle rc = new Rectangle(Point.Empty, e.Item.Size);
@@ -621,7 +634,7 @@ namespace TestProj
             SetColorsRecursively(this, _colorThemes[theme].Background, _colorThemes[theme].Foreground);
             UseImmersiveDarkMode(Handle, theme == ColorTheme.Dark);
             tabControl1.DisplayStyle = theme == ColorTheme.Dark ? TabStyle.Dark : TabStyle.Default;
-          
+
 
             SetColorThemeForAllUnits();
             ReloadAllBrowsers();
@@ -640,7 +653,7 @@ namespace TestProj
 
         private void InitSorterListView()
         {
-            _lvwColumnSorter = new ListViewColumnSorter {DateTimeFormat = _dateTimeFormat};
+            _lvwColumnSorter = new ListViewColumnSorter { DateTimeFormat = _dateTimeFormat };
             _lvwColumnSorter.ColumnTypes.Add(typeof(string));
             _lvwColumnSorter.ColumnTypes.Add(typeof(string));
             _lvwColumnSorter.ColumnTypes.Add(typeof(DateTime));
@@ -759,7 +772,7 @@ namespace TestProj
             }
         }
 
-        private void AddItemsToHistoryListView(string currentCategory,bool filterByDate, DateTime beginDate, DateTime endDate)
+        private void AddItemsToHistoryListView(string currentCategory, bool filterByDate, DateTime beginDate, DateTime endDate)
         {
             if (beginDate > endDate) throw new ArgumentException("beginDate > endDate");
             foreach (var item in _history)
@@ -798,7 +811,7 @@ namespace TestProj
 
         private void FillHistoryListView()
         {
-            FillHistoryListView(MM_showCurrentCategory.Checked,MM_showChronologically.Checked,IsFilterByDateNeed(),dtBegin.Value, dtEnd.Value);
+            FillHistoryListView(MM_showCurrentCategory.Checked, MM_showChronologically.Checked, IsFilterByDateNeed(), dtBegin.Value, dtEnd.Value);
         }
 
         private void FillHistoryListView(bool showCurrentCategoryOnly, bool chronologically, bool filterByDate,
@@ -819,7 +832,7 @@ namespace TestProj
             _lstHistory.Columns[1].AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize);
             _lstHistory.Columns[2].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
-       
+
         private string _dateTimeFormat = @"dd.MMMM.yyyy HH:mm:ss";
         private string _dateTimeFormatForFile = @"dd.MMMM.yyyy_HH.mm.ss";
 
@@ -829,7 +842,7 @@ namespace TestProj
         {
             if (InvokeRequired)
             {
-                Invoke(new AddCategoryComboboxDelegate(AddCategoryCombobox),category);
+                Invoke(new AddCategoryComboboxDelegate(AddCategoryCombobox), category);
                 return;
             }
 
@@ -853,12 +866,12 @@ namespace TestProj
         {
             _dictionaryTranslatorUnits[UnitName.Oald].Dictionary.Prepare(gotoAfterLoading);
         }
-        
+
 
         delegate void HotKeyPressedDelegate(object sender, HotKeyEventArgs e);
 
-        private VirtualDesktop _previousDesktop;
-
+        //  private VirtualDesktop _previousDesktop;
+        private VirtualDesktopItem _previousDesktop = null;
         void HotKeyManager_HotKeyPressed(object sender, HotKeyEventArgs e)
         {
             if (InvokeRequired)
@@ -901,11 +914,11 @@ namespace TestProj
             //}
 
             //var thisAppDesktop = VirtualDesktop.FromHwnd(Handle);
-            
-            if (!VirtualDesktop.IsCurrentVirtualDesktop(Handle)  || !ReturnToPreviousDesktop())
-            {
-                ShowThisAppDesktop();
-            }
+
+            //if (!VirtualDesktop.IsCurrentVirtualDesktop(Handle) || !ReturnToPreviousDesktop())
+            //{
+            //    ShowThisAppDesktop();
+            //}
         }
 
         private void SearchTextBoxFocus()
@@ -913,24 +926,24 @@ namespace TestProj
             txtToSearch.SelectAll();
             txtToSearch.Focus();
         }
-        [SupportedOSPlatform ("windows")]
+        [SupportedOSPlatform("windows")]
         void SavePreviousDesktop()
         {
             if (_previousDesktopAuto)
-                SetPreviousDesktop (VirtualDesktop.Current);
+                SetPreviousDesktop(_desktops.Current);
         }
 
-        [SupportedOSPlatform ("windows")]
+        [SupportedOSPlatform("windows")]
         private void ShowThisAppDesktop()
         {
-            //var thisAppDesktop = Desktop.FromWindow(Handle);
-            //if (!thisAppDesktop.IsVisible)
-            //{
-            //    SavePreviousDesktop();
-            //    thisAppDesktop.MakeVisible();
-            //}
+            var thisAppDesktop = VirtualDesktopPowerShell.GetDesktopIndexFromHandle(Handle);
+            if (!thisAppDesktop.IsVisible)
+            {
+                SavePreviousDesktop();
+                thisAppDesktop.MakeVisible();
+            }
 
-            if(!VirtualDesktop.IsCurrentVirtualDesktop(Handle))
+            if (!VirtualDesktop.IsCurrentVirtualDesktop(Handle))
             {
                 SavePreviousDesktop();
                 VirtualDesktop.FromHwnd(Handle).Switch();
@@ -948,23 +961,15 @@ namespace TestProj
             Activate();
         }
         [SupportedOSPlatform("Windows")]
-        private void SetPreviousDesktop(VirtualDesktop desktop)
+        private void SetPreviousDesktop(VirtualDesktopItem desktop)
         {
-            //_previousDesktop = desktop;
-            //SetPreviousDesktopMenuText();
-
-            _previousDesktop = desktop;
+             _previousDesktop = desktop;
             SetPreviousDesktopMenuText();
         }
 
         [SupportedOSPlatform("Windows")]
         private void SetPreviousDesktopMenuText()
         {
-            //var name = _previousDesktop != null? Desktop.DesktopNameFromDesktop(_previousDesktop): "None";
-            //var desktopTag = _previousDesktop == null ? " desktop" : "";
-
-            //MM_ReturnDesktop.Text = $"Previous{desktopTag}: {(_previousDesktopAuto ? "(Auto) " : "")} {name}";
-
             var name = _previousDesktop != null ? _previousDesktop.Name : "None";
             var desktopTag = _previousDesktop == null ? " desktop" : "";
 
@@ -981,7 +986,7 @@ namespace TestProj
 
         private void returnToPreviousDesktopToolStripMenuItem_Click(object sender, EventArgs e)
         {
-           ReturnToPreviousDesktop();
+            ReturnToPreviousDesktop();
         }
 
         private async Task SaveHistoryBackup()
@@ -993,9 +998,9 @@ namespace TestProj
 
         private async Task SaveHistory(bool saveMainFile, bool SaveACopy, bool saveBackup)
         {
-            if(saveMainFile) await _history.SaveHistoryToFile();
-            if(SaveACopy)  await _history.SaveHistoryToFileAsACopy();
-            if(saveBackup) await SaveHistoryBackup();
+            if (saveMainFile) await _history.SaveHistoryToFile();
+            if (SaveACopy) await _history.SaveHistoryToFileAsACopy();
+            if (saveBackup) await SaveHistoryBackup();
         }
 
         private async Task SaveTasksBackup()
@@ -1034,7 +1039,7 @@ namespace TestProj
                         await SaveHistory(false, true, false);
                         break;
                     case DialogResult.Cancel:
-                        e.Cancel = true; 
+                        e.Cancel = true;
                         return;
                 }
             }
@@ -1045,11 +1050,11 @@ namespace TestProj
                 switch (dialogResult)
                 {
                     case DialogResult.Cancel:
-                        e.Cancel = true; 
+                        e.Cancel = true;
                         return;
                 }
             }
-            else if(!isUserClosing && isHistoryChanged)
+            else if (!isUserClosing && isHistoryChanged)
             {
                 await SaveHistory(false, true, true);
             }
@@ -1077,7 +1082,7 @@ namespace TestProj
         {
             if (e.KeyCode == Keys.Enter)
             {
-                var cbx = (ComboBox) sender;
+                var cbx = (ComboBox)sender;
                 if (!cbx.Items.Contains(cbx.Text))
                 {
                     cbx.Items.Add(cbx.Text);
@@ -1235,7 +1240,7 @@ namespace TestProj
             {
                 FillHistoryListView();
             }
-                
+
         }
 
         private void btnByDateFilter_Click(object sender, EventArgs e)
@@ -1275,7 +1280,7 @@ namespace TestProj
         private void MM_AutoSortByDate_Click(object sender, EventArgs e)
         {
             AutoSortByDateOrderOptionSave(MM_AutoSortByDate.Checked);
-            if(MM_AutoSortByDate.Checked)
+            if (MM_AutoSortByDate.Checked)
                 SortHistoryListViewByDateIfNeeded();
         }
 
@@ -1290,11 +1295,6 @@ namespace TestProj
             txtToSearch.Focus();
         }
 
-
-        private void MainForm_KeyDown(object sender, KeyEventArgs e)
-        {
-           
-        }
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == (Keys.Control | Keys.Shift | Keys.C))
@@ -1310,15 +1310,7 @@ namespace TestProj
 
             return base.ProcessCmdKey(ref msg, keyData);
         }
-        private void MainForm_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
-        {
-            //if (e.KeyData == (Keys.Control | Keys.Shift | Keys.C))
-            //{
-            //    txtToSearch.Clear();
-            //    txtToSearch.Focus();
-            //}
-        }
-
+        
         private void MM_ShortcutsHelp_Click(object sender, EventArgs e)
         {
             new ShortcutsForm().ShowDialog();
@@ -1381,7 +1373,7 @@ namespace TestProj
         {
             var dlg = new SaveFileDialog();
             var stt = Settings.Default;
-            
+
             if (string.IsNullOrEmpty(stt.HistoryBackupPath))
             {
                 dlg.InitialDirectory = Application.StartupPath;

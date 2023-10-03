@@ -5,10 +5,10 @@ using System.Windows.Forms;
 
 namespace TestProj
 {
-    
+
     public static class HotKeyManager
     {
-       
+
         public static event EventHandler<HotKeyEventArgs> HotKeyPressed;
 
         [STAThread]
@@ -50,7 +50,7 @@ namespace TestProj
         private static volatile MessageWindow _wnd;
         private static volatile IntPtr _hwnd;
         private static ManualResetEvent _windowReadyEvent = new ManualResetEvent(false);
-        
+
         static HotKeyManager()
         {
             Thread messageLoop = new Thread(delegate ()

@@ -11,7 +11,7 @@ namespace TestProj
         {
             BrowserTextSelected?.Invoke(this, e);
         }
-       
+
         public void onselect(string msg)
         {
             if (!string.IsNullOrEmpty(msg))

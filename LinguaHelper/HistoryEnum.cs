@@ -4,12 +4,12 @@ using System.Collections.Generic;
 
 namespace TestProj
 {
-    class HistoryEnum:IEnumerator<HistoryDataItem>
+    class HistoryEnum : IEnumerator<HistoryDataItem>
     {
         private readonly List<HistoryDataItem> _data;
         private int _curIndex = -1;
         private readonly bool _forward;
-        public HistoryEnum(List<HistoryDataItem> data,bool forward=true)
+        public HistoryEnum(List<HistoryDataItem> data, bool forward = true)
         {
             _data = new List<HistoryDataItem>(data);
             _forward = forward;

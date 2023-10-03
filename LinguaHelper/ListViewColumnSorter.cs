@@ -25,7 +25,7 @@ namespace TestProj
         /// Case insensitive comparer object
         /// </summary>
         private readonly CaseInsensitiveComparer _objectCompare;
-        
+
 
         public List<Type> ColumnTypes { get; set; }
         public string DateTimeFormat { get; set; }

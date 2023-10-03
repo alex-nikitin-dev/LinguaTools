@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 
 namespace TestProj
 {
     internal class ColorThemeProvider
     {
-        public  ColorTheme ColorTheme { get; private set; }
+        public ColorTheme ColorTheme { get; private set; }
 
         public Color Background { get; private set; }
         public Color Foreground { get; private set; }
 
-        public uint BackgroundArgb { get=>(uint)Background.ToArgb(); }
+        public uint BackgroundArgb { get => (uint)Background.ToArgb(); }
 
         public uint ForegroundArgb { get => (uint)Foreground.ToArgb(); }
 
@@ -25,7 +20,7 @@ namespace TestProj
             Background = background;
         }
         public ColorThemeProvider(ColorTheme colorTheme, string foreground, string background)
-            :this(colorTheme,ColorTranslator.FromHtml(foreground),ColorTranslator.FromHtml(background))
+            : this(colorTheme, ColorTranslator.FromHtml(foreground), ColorTranslator.FromHtml(background))
         {
 
         }

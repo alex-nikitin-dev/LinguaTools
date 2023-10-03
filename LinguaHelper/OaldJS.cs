@@ -1,5 +1,4 @@
 ﻿using LinguaHelper.Properties;
-using Windows.Media.Capture;
 
 namespace TestProj
 {
@@ -36,12 +35,12 @@ namespace TestProj
             ";
         public static string ForAsyncEvalJSCode =>
             @$"
-            {(Settings.Default.SpeakOnBrowsingOALD ? SpeakOnBrowsing:"")}
+            {(Settings.Default.SpeakOnBrowsingOALD ? SpeakOnBrowsing : "")}
             ";
 
         public static IBrowserJS GetInstance()
         {
-            
+
             return new BrowserJS(PrepareJSCode,
                 null,
                 GenericJS.MainFrameJSCode,

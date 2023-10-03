@@ -17,7 +17,7 @@ namespace TestProj
 
         public HistoryDataItem Copy()
         {
-            return new HistoryDataItem(Phrase,Category,Date);
+            return new HistoryDataItem(Phrase, Category, Date);
 
         }
     }
