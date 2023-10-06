@@ -1,21 +1,23 @@
-﻿namespace LinguaHelper
+﻿using Microsoft.CodeAnalysis.CSharp;
+
+namespace LinguaHelper
 {
     class VirtualDesktopItem
     {
         public int Index { get; private set; }
         public string Name { get; private set; }
-        public bool IsCurrent { get; private set; }
+        public bool IsVisible { get; private set; }
         
-        public VirtualDesktopItem(int index, string name, bool isCurrent)
+        public VirtualDesktopItem(int index, string name, bool isVisible)
         {
             Index = index;
             Name = name;
-            IsCurrent = isCurrent;
+            IsVisible = isVisible;
         }
 
-        public void Switch()
+        public async void Switch()
         {
-            VirtualDesktopPowerShell.SwitchToDesktop(Index);
+             await VirtualDesktopPowerShell.SwitchToDesktopAsync(Index);
         }
     }
 }

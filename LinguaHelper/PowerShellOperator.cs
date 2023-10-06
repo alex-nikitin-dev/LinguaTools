@@ -15,20 +15,49 @@ namespace LinguaHelper
         /// </summary>
         private readonly PowerShell _powerShell;
 
-        public PowerShellOperator()
+        private PowerShellOperator()
         {
             _powerShell = PowerShell.Create();
             if (_powerShell == null) { throw new ArgumentException("Can't create a powershell instance"); }
-            ExecuteCommand("Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process");
-
         }
 
-        public Collection<PSObject> ExecuteCommand(string command)
+        public static async Task<PowerShellOperator> CreateAsync()
+        {
+            var instance = new PowerShellOperator();
+            await instance.SetExecutionPolicyAsync();
+            return instance;
+        }
+        private async Task SetExecutionPolicyAsync()
+        {
+            await ExecuteCommandAsync("Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process");
+        }
+        public PowerShell Get_powerShell()
+        {
+            return _powerShell;
+        }
+
+
+        //public Collection<PSObject> ExecuteCommand(string command)
+        //{
+        //    _powerShell.Commands.Clear();
+        //    _powerShell.AddScript(command);
+        //  //  System.Windows.Forms.MessageBox.Show($"ExecuteCommand before _powerShell.Invoke: {command}");
+        //    HandleErrors();
+        //    var output = _powerShell.Invoke();
+        //   // System.Windows.Forms.MessageBox.Show($"ExecuteCommand after _powerShell.Invoke: {command}");
+        //    HandleErrors();
+        //    return output;
+        //}
+        public async Task<PSDataCollection<PSObject>> ExecuteCommandAsync(string command)
         {
             _powerShell.Commands.Clear();
             _powerShell.AddScript(command);
-            var output = _powerShell.Invoke();
+
+            var asyncResult = _powerShell.BeginInvoke();
+            await Task.Factory.FromAsync(asyncResult, _ => _powerShell.EndInvoke(asyncResult));
+
             HandleErrors();
+            var output = await Task<PSDataCollection<PSObject>>.Factory.FromAsync(asyncResult, _ => _powerShell.EndInvoke(asyncResult));
             return output;
         }
 
@@ -41,7 +70,7 @@ namespace LinguaHelper
             if (_powerShell.Streams.Error.Count > 0)
             {
                 // Handle errors
-                StringBuilder msg = new StringBuilder();
+                var msg = new StringBuilder();
                 foreach (var error in _powerShell.Streams.Error)
                 {
                     msg.AppendLine(error.Exception.ToString());

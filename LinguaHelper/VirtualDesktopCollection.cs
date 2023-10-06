@@ -19,9 +19,10 @@ namespace LinguaHelper
         //public VirtualDesktopItem this[int index] => _desktops[index];
         public VirtualDesktopItem Current => GetCurrentDesktop();
 
+
         private VirtualDesktopItem GetCurrentDesktop()
         {
-            return _desktops.Where(d => d.IsCurrent).FirstOrDefault();
+            return _desktops.Where(d => d.IsVisible).FirstOrDefault();
         }
 
         public IEnumerator<VirtualDesktopItem> GetEnumerator()
