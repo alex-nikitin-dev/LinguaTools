@@ -992,7 +992,7 @@ namespace TestProj
                 var name = desktop.Name;
                 AddReturnDesktopItem(string.IsNullOrEmpty(name) ? $"Desktop {desktop.Index + 1}" : name, desktop);
             }
-            SetPreviousDesktopMenuText();
+            await SetPreviousDesktopMenuText();
         }
         [SupportedOSPlatform("windows")]
         private void AddReturnDesktopItem(string text, object tag, bool @checked = false)
@@ -1255,13 +1255,13 @@ namespace TestProj
             LoginToOALD();
         }
         [SupportedOSPlatform("Windows")]
-        private void MM_ReturnDesktopItem_Click(object sender, EventArgs e)
+        private async void MM_ReturnDesktopItem_Click(object sender, EventArgs e)
         {
             var item = ((ToolStripMenuItem)sender);
             if (item.Tag == null)
             {
                 _previousDesktopAuto = true;
-                SetPreviousDesktopMenuText();
+                await SetPreviousDesktopMenuText();
             }
             else
             {
