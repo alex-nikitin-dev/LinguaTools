@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Management.Automation;
 using System.Threading.Tasks;
 
@@ -118,6 +119,49 @@ namespace LinguaHelper
                                 Convert.ToInt32(desktop.Members["Number"].Value),
                                 desktop.Members["Name"].Value.ToString(),
                                 Convert.ToBoolean(desktop.Members["Visible"].Value));
+        }
+
+        public static async Task<bool> IsVirtualDesktopInstalled()
+        {
+            var powerShell = await PowerShellTask;
+            var result = await powerShell.ExecuteCommandAsync("Get-Module -ListAvailable -Name VirtualDesktop");
+            return result.Count > 0;
+        }
+
+        public static async Task InstallVirtualDesktopAsync()
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "pwsh",
+                Arguments = "-NoProfile -Command \"Install-Module -Name VirtualDesktop -Scope CurrentUser -Force -Confirm:$false\"",
+                Verb = "runas", // This will run the process as administrator
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true, // This prevents the window from being created
+                WindowStyle = ProcessWindowStyle.Hidden // This ensures the window remains hidden
+            };
+
+            using (var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true })
+            {
+                var tcs = new TaskCompletionSource<bool>();
+
+                process.Exited += (sender, args) =>
+                {
+                    tcs.SetResult(true);
+                };
+
+                process.Start();
+
+                await tcs.Task;
+
+                // Optionally, you can check the process.ExitCode here for any errors
+                if (process.ExitCode != 0)
+                {
+                    var errorOutput = await process.StandardError.ReadToEndAsync();
+                    throw new InvalidOperationException($"Error during execution: {errorOutput}");
+                }
+            }
         }
     }
 }

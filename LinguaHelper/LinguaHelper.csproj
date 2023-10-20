@@ -71,12 +71,12 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CefSharp.Common.NETCore" Version="117.2.20" />
-    <PackageReference Include="CefSharp.OffScreen.NETCore" Version="117.2.20" />
-    <PackageReference Include="CefSharp.WinForms.NETCore" Version="117.2.20" />
-    <PackageReference Include="CefSharp.Wpf.NETCore" Version="117.2.20" />
+    <PackageReference Include="CefSharp.Common.NETCore" Version="117.2.40" />
+    <PackageReference Include="CefSharp.OffScreen.NETCore" Version="117.2.40" />
+    <PackageReference Include="CefSharp.WinForms.NETCore" Version="117.2.40" />
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="117.2.40" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.3.7" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.3.8" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
       <PrivateAssets>all</PrivateAssets>
@@ -94,12 +94,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="117.2.2" />
+    <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="117.2.4" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="117.2.2" />
+    <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="117.2.4" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="117.2.2" />
+    <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="117.2.4" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
 ﻿using CefSharp;
+using CefSharp.DevTools.Page;
 using CefSharp.WinForms;
 using LinguaHelper;
 using LinguaHelper.Properties;
@@ -363,47 +364,71 @@ namespace TestProj
         #endregion
 
         #region Exiting Main form closing
+        private bool _promptBeforeClosure = true;
+        private void CloseWithoutPrompt()
+        {
+            _promptBeforeClosure = false;
+            Close();
+        }
+
         private async void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            var isUserClosing = e.CloseReason == CloseReason.UserClosing;
-            var isHistoryChanged = _history.HistoryHasBeenChanged;
+            await ClosingDialogAsync(e);
+            await SaveTasksBackupAsync();
+            UnregisterHotKeys();
+        }
 
-            if (isUserClosing && isHistoryChanged)
+        private async Task ClosingDialogAsync(FormClosingEventArgs e)
+        {
+            var isPromptNeeded = (e.CloseReason == CloseReason.UserClosing) && _promptBeforeClosure;
+            var isHistoryChanged = _history != null && _history.HistoryHasBeenChanged;
+            //covering the code: a and b
+            if (isPromptNeeded && isHistoryChanged)
             {
-                var dialogResult = MessageBox.Show(@"Do you want to save data before exit?", Application.ProductName,
+                await SaveHistoryDialogAsync(e);
+            }
+            //covering the code: a and not b
+            else if (isPromptNeeded && !isHistoryChanged)
+            {
+                PromptForAppClosure(e);
+            }
+            //covering the code: not a and b
+            else if (!isPromptNeeded && isHistoryChanged)
+            {
+                await SaveHistory(true, true, true);
+            }
+            //covering the code: not a and not b (nothing to do)
+        }
+
+        private void PromptForAppClosure(FormClosingEventArgs e)
+        {
+            var dialogResult = MessageBox.Show(@"Do you want to close the app?", Application.ProductName,
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+            switch (dialogResult)
+            {
+                case DialogResult.Cancel:
+                    e.Cancel = true;
+                    return;
+            }
+        }
+
+        private async Task SaveHistoryDialogAsync(FormClosingEventArgs e)
+        {
+            var dialogResult = MessageBox.Show(@"Do you want to save data before exit?", Application.ProductName,
                     MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation);
 
-                switch (dialogResult)
-                {
-                    case DialogResult.Yes:
-                        await SaveHistory(true, false, true);
-                        break;
-                    case DialogResult.No:
-                        await SaveHistory(false, true, false);
-                        break;
-                    case DialogResult.Cancel:
-                        e.Cancel = true;
-                        return;
-                }
-            }
-            if (isUserClosing && !isHistoryChanged)
+            switch (dialogResult)
             {
-                var dialogResult = MessageBox.Show(@"Do you want to close the app?", Application.ProductName,
-                    MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
-                switch (dialogResult)
-                {
-                    case DialogResult.Cancel:
-                        e.Cancel = true;
-                        return;
-                }
+                case DialogResult.Yes:
+                    await SaveHistory(true, false, true);
+                    break;
+                case DialogResult.No:
+                    await SaveHistory(false, true, false);
+                    break;
+                case DialogResult.Cancel:
+                    e.Cancel = true;
+                    return;
             }
-            else if (!isUserClosing && isHistoryChanged)
-            {
-                await SaveHistory(false, true, true);
-            }
-
-            await SaveTasksBackup();
-            UnregisterHotKeys();
         }
 
         private void UnregisterHotKeys()
@@ -678,7 +703,7 @@ namespace TestProj
             if (saveBackup) await SaveHistoryBackup();
         }
 
-        private async Task SaveTasksBackup()
+        private async Task SaveTasksBackupAsync()
         {
             await Task.Run(() =>
             {
@@ -976,9 +1001,27 @@ namespace TestProj
             FirstTabComboboxSelectFromSettings();
         }
 
-        private void VirtualDesktopPSInit()
+        private async Task VirtualDesktopPSInitAsync()
         {
             _previousDesktopIndex = -1;
+            try
+            {
+                if (!await VirtualDesktopPowerShell.IsVirtualDesktopInstalled())
+                {
+                    var result = MessageBox.Show(@"To continue using this application Virtual Desktop Module is needed to be installed. To read more about Virtual Desktop module for powershell you can go to https://github.com/MScholtes/PSVirtualDesktop. If you decide to deny the installation, the application will be closed. Continue installing the module (answer Yes is recommended)?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if(result == DialogResult.Yes)
+                        await VirtualDesktopPowerShell.InstallVirtualDesktopAsync();
+                    else
+                    {
+                        CloseWithoutPrompt();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                ShowErrorMessage("An exception occured during installation of Virtual Desktop module.");
+                CloseWithoutPrompt();
+            }
         }
 
         [SupportedOSPlatform("Windows")]
@@ -1030,7 +1073,7 @@ namespace TestProj
         private async void MainForm_Shown(object sender, EventArgs e)
         {
             CefInit();
-            VirtualDesktopPSInit();
+            await VirtualDesktopPSInitAsync();
             _foreColor = ForeColor;
             _backColor = BackColor;
             _colorThemes = new();
@@ -1498,7 +1541,5 @@ namespace TestProj
             await ReturnToPreviousDesktop();
         }
         #endregion
-
-        
     }
 }

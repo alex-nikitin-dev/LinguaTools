@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Management.Automation;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +7,7 @@ namespace LinguaHelper
 {
     internal class PowerShellOperator
     {
-        // <summary>
+        /// <summary>
         /// The static powershell instance.
         /// </summary>
         private readonly PowerShell _powerShell;
@@ -18,7 +15,6 @@ namespace LinguaHelper
         private PowerShellOperator()
         {
             _powerShell = PowerShell.Create();
-            if (_powerShell == null) { throw new ArgumentException("Can't create a powershell instance"); }
         }
 
         public static async Task<PowerShellOperator> CreateAsync()
@@ -27,49 +23,42 @@ namespace LinguaHelper
             await instance.SetExecutionPolicyAsync();
             return instance;
         }
+
+        /// <summary>
+        /// Set the execution policy of the powershell instance.
+        /// </summary>
+        /// <returns></returns>
         private async Task SetExecutionPolicyAsync()
         {
             await ExecuteCommandAsync("Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process");
         }
-        public PowerShell Get_powerShell()
-        {
-            return _powerShell;
-        }
 
-
-        //public Collection<PSObject> ExecuteCommand(string command)
-        //{
-        //    _powerShell.Commands.Clear();
-        //    _powerShell.AddScript(command);
-        //  //  System.Windows.Forms.MessageBox.Show($"ExecuteCommand before _powerShell.Invoke: {command}");
-        //    HandleErrors();
-        //    var output = _powerShell.Invoke();
-        //   // System.Windows.Forms.MessageBox.Show($"ExecuteCommand after _powerShell.Invoke: {command}");
-        //    HandleErrors();
-        //    return output;
-        //}
+        /// <summary>
+        /// Executes the given command asynchronously and returns the result.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
         public async Task<PSDataCollection<PSObject>> ExecuteCommandAsync(string command)
         {
             _powerShell.Commands.Clear();
             _powerShell.AddScript(command);
 
             var asyncResult = _powerShell.BeginInvoke();
-            await Task.Factory.FromAsync(asyncResult, _ => _powerShell.EndInvoke(asyncResult));
+            var result = await Task<PSDataCollection<PSObject>>.Factory.FromAsync(asyncResult, _ => _powerShell.EndInvoke(asyncResult));
 
             HandleErrors();
-            var output = await Task<PSDataCollection<PSObject>>.Factory.FromAsync(asyncResult, _ => _powerShell.EndInvoke(asyncResult));
-            return output;
+
+            return result;
         }
 
         /// <summary>
         /// Throws an exception if the powershell instance had errors.
         /// </summary>
         /// <exception cref="ArgumentException"></exception>
-        private  void HandleErrors()
+        private void HandleErrors()
         {
             if (_powerShell.Streams.Error.Count > 0)
             {
-                // Handle errors
                 var msg = new StringBuilder();
                 foreach (var error in _powerShell.Streams.Error)
                 {
@@ -81,4 +70,6 @@ namespace LinguaHelper
             }
         }
     }
+
+
 }
