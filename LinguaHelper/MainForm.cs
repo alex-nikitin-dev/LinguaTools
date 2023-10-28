@@ -6,6 +6,7 @@ using LinguaHelper.Properties;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -1001,6 +1002,7 @@ namespace TestProj
             FirstTabComboboxSelectFromSettings();
         }
 
+        [SupportedOSPlatform("windows")]
         private async Task VirtualDesktopPSInitAsync()
         {
             _previousDesktopIndex = -1;
@@ -1010,7 +1012,11 @@ namespace TestProj
                 {
                     var result = MessageBox.Show(@"To continue using this application Virtual Desktop Module is needed to be installed. To read more about Virtual Desktop module for powershell you can go to https://github.com/MScholtes/PSVirtualDesktop. If you decide to deny the installation, the application will be closed. Continue installing the module (answer Yes is recommended)?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                     if(result == DialogResult.Yes)
+                    {
+                        var controls = ShowProgressBar("Please wait while the Virtual Desktop module is being installed...");
                         await VirtualDesktopPowerShell.InstallVirtualDesktopAsync();
+                        RemoveControls(controls);
+                    }    
                     else
                     {
                         CloseWithoutPrompt();
@@ -1022,6 +1028,47 @@ namespace TestProj
                 ShowErrorMessage("An exception occured during installation of Virtual Desktop module.");
                 CloseWithoutPrompt();
             }
+        }
+
+        private void RemoveControls(List<Control> controls)
+        {
+            foreach (var control in controls)
+            {
+                Controls.Remove(control);
+                control.Dispose();
+            }
+        }
+
+        [SupportedOSPlatform("windows")]
+        private List<Control> ShowProgressBar(string message)
+        {
+            var progressBar = new ProgressBar
+            {
+                Dock = DockStyle.None,
+                Style = ProgressBarStyle.Marquee,
+                Size = new Size(500, 50),
+                Anchor = AnchorStyles.None
+            };
+            Controls.Add(progressBar);
+            progressBar.Location = new Point((Width - progressBar.Width) / 2, (Height - progressBar.Height) / 2);
+            progressBar.BringToFront();
+            progressBar.Show();
+
+            var label = new Label
+            {
+                Text = message,
+                Dock = DockStyle.None,
+                TextAlign = ContentAlignment.MiddleCenter,
+                AutoSize = true,
+            };
+
+            Controls.Add(label);
+            label.Location = new Point((Width - label.Width) / 2, (Height - label.Height) / 2 - progressBar.Size.Height);
+            label.BringToFront();
+            label.Show();
+            Application.DoEvents();
+
+            return new List<Control> { progressBar, label };
         }
 
         [SupportedOSPlatform("Windows")]

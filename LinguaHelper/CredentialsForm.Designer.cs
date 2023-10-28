@@ -28,101 +28,110 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnSave = new System.Windows.Forms.Button();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.txtUser = new System.Windows.Forms.TextBox();
-            this.txtPass = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.chkShowPass = new System.Windows.Forms.CheckBox();
-            this.groupBox1.SuspendLayout();
-            this.SuspendLayout();
+            btnSave = new System.Windows.Forms.Button();
+            groupBox1 = new System.Windows.Forms.GroupBox();
+            chkShowPass = new System.Windows.Forms.CheckBox();
+            label2 = new System.Windows.Forms.Label();
+            label1 = new System.Windows.Forms.Label();
+            txtPass = new System.Windows.Forms.TextBox();
+            txtUser = new System.Windows.Forms.TextBox();
+            groupBox1.SuspendLayout();
+            SuspendLayout();
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(296, 180);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(75, 23);
-            this.btnSave.TabIndex = 0;
-            this.btnSave.Text = "Save";
-            this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            btnSave.Anchor = System.Windows.Forms.AnchorStyles.None;
+            btnSave.Location = new System.Drawing.Point(493, 346);
+            btnSave.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
+            btnSave.Name = "btnSave";
+            btnSave.Size = new System.Drawing.Size(125, 44);
+            btnSave.TabIndex = 0;
+            btnSave.Text = "Save";
+            btnSave.UseVisualStyleBackColor = true;
+            btnSave.Click += btnSave_Click;
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.chkShowPass);
-            this.groupBox1.Controls.Add(this.label2);
-            this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Controls.Add(this.txtPass);
-            this.groupBox1.Controls.Add(this.txtUser);
-            this.groupBox1.Location = new System.Drawing.Point(12, 12);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(359, 162);
-            this.groupBox1.TabIndex = 1;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Your credentials";
-            // 
-            // txtUser
-            // 
-            this.txtUser.Location = new System.Drawing.Point(6, 38);
-            this.txtUser.Name = "txtUser";
-            this.txtUser.Size = new System.Drawing.Size(226, 20);
-            this.txtUser.TabIndex = 0;
-            // 
-            // txtPass
-            // 
-            this.txtPass.Location = new System.Drawing.Point(6, 83);
-            this.txtPass.Name = "txtPass";
-            this.txtPass.Size = new System.Drawing.Size(226, 20);
-            this.txtPass.TabIndex = 1;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(238, 45);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(29, 13);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "login";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(238, 86);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(52, 13);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "password";
+            groupBox1.Controls.Add(chkShowPass);
+            groupBox1.Controls.Add(label2);
+            groupBox1.Controls.Add(label1);
+            groupBox1.Controls.Add(txtPass);
+            groupBox1.Controls.Add(txtUser);
+            groupBox1.Location = new System.Drawing.Point(20, 23);
+            groupBox1.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Padding = new System.Windows.Forms.Padding(5, 6, 5, 6);
+            groupBox1.Size = new System.Drawing.Size(598, 312);
+            groupBox1.TabIndex = 1;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Your credentials";
             // 
             // chkShowPass
             // 
-            this.chkShowPass.AutoSize = true;
-            this.chkShowPass.Location = new System.Drawing.Point(6, 130);
-            this.chkShowPass.Name = "chkShowPass";
-            this.chkShowPass.Size = new System.Drawing.Size(101, 17);
-            this.chkShowPass.TabIndex = 4;
-            this.chkShowPass.Text = "Show password";
-            this.chkShowPass.UseVisualStyleBackColor = true;
-            this.chkShowPass.CheckedChanged += new System.EventHandler(this.chkShowPass_CheckedChanged);
+            chkShowPass.AutoSize = true;
+            chkShowPass.Location = new System.Drawing.Point(10, 250);
+            chkShowPass.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
+            chkShowPass.Name = "chkShowPass";
+            chkShowPass.Size = new System.Drawing.Size(164, 29);
+            chkShowPass.TabIndex = 4;
+            chkShowPass.Text = "Show password";
+            chkShowPass.UseVisualStyleBackColor = true;
+            chkShowPass.CheckedChanged += chkShowPass_CheckedChanged;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new System.Drawing.Point(397, 165);
+            label2.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(89, 25);
+            label2.TabIndex = 3;
+            label2.Text = "password";
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new System.Drawing.Point(397, 87);
+            label1.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(52, 25);
+            label1.TabIndex = 2;
+            label1.Text = "login";
+            // 
+            // txtPass
+            // 
+            txtPass.Location = new System.Drawing.Point(10, 160);
+            txtPass.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
+            txtPass.Name = "txtPass";
+            txtPass.Size = new System.Drawing.Size(374, 31);
+            txtPass.TabIndex = 1;
+            // 
+            // txtUser
+            // 
+            txtUser.Location = new System.Drawing.Point(10, 73);
+            txtUser.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
+            txtUser.Name = "txtUser";
+            txtUser.Size = new System.Drawing.Size(374, 31);
+            txtUser.TabIndex = 0;
             // 
             // CredentialsForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(383, 215);
-            this.Controls.Add(this.btnSave);
-            this.Controls.Add(this.groupBox1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "CredentialsForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Credentials Form";
-            this.Load += new System.EventHandler(this.CredentialsForm_Load);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(638, 413);
+            Controls.Add(btnSave);
+            Controls.Add(groupBox1);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "CredentialsForm";
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            Text = "Credentials Form";
+            Load += CredentialsForm_Load;
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
+            ResumeLayout(false);
         }
 
         #endregion

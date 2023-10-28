@@ -21,16 +21,15 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWindowsForms>True</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
+    <Platforms>x64</Platforms>
+
+
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
+  <!--<PropertyGroup Condition="'$(PlatformTarget)' == 'x64'">
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
+    <SelfContained Condition="'$(SelfContained)' == ''">false</SelfContained>
+  </PropertyGroup>-->
   <PropertyGroup>
     <ApplicationIcon>Notebook.ico</ApplicationIcon>
   </PropertyGroup>
@@ -59,29 +58,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.8">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.8 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="CefSharp.Common.NETCore" Version="117.2.40" />
-    <PackageReference Include="CefSharp.OffScreen.NETCore" Version="117.2.40" />
     <PackageReference Include="CefSharp.WinForms.NETCore" Version="117.2.40" />
-    <PackageReference Include="CefSharp.Wpf.NETCore" Version="117.2.40" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.3.8" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.5" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.3.9" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CustomTabControl\CustomTabControl.csproj" />
@@ -93,13 +71,44 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="117.2.4" />
-  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="117.2.4" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="117.2.4" />
-  </ItemGroup>
+  <!--<UsingTask TaskName="RemoveUnwantedRuntimes" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <OutputDirectory Required="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        
+          var runtimesDir = Path.Combine(OutputDirectory, "runtimes");
+          if (Directory.Exists(runtimesDir))
+          {
+              var directories = Directory.GetDirectories(runtimesDir);
+              foreach (var dir in directories)
+              {
+                  if (!dir.EndsWith("win-x64") && !dir.EndsWith("win10-x64") && !dir.EndsWith("win"))
+                  {
+                      Directory.Delete(dir, true);
+                  }
+              }
+          }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+  <Target Name="RemoveUnwantedRuntimes" AfterTargets="Build">
+    <RemoveUnwantedRuntimes OutputDirectory="$(OutDir)" />
+  </Target> -->
+
+ 
+
+
+
+
+
 </Project>

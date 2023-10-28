@@ -187,10 +187,10 @@ namespace TestProj
                 OnFinishAllTasks(this);
             }
 
-            if (BrowserName == "Google")
-            {
-                bool b = false;
-            }
+            //if (BrowserName == "Google")
+            //{
+            //    bool b = false;
+            //}
 
             if (e.Frame.IsMain && !autoRedirecting)
                 _outsideLoadCommand = false;
