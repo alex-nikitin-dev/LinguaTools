@@ -171,26 +171,21 @@ namespace TestProj
             if (_needSetColorTheme && e.Frame.IsMain)
             {
                 _needSetColorTheme = false;
-                InsertColorThemeJS();
+                ExecuteColorThemeJS();
             }
 
             if (e.Frame.IsMain)
             {
-                InsertMainFrameJavaScript();
+                ExecuteMainFrameJavaScript();
                 DoAsyncJSCode();
             }
 
-            InsertOtherJavaScript();
+            ExecuteOtherJavaScript();
 
             if (_outsideLoadCommand && e.Frame.IsMain && !IsAutoRedirectNeeded && !_needPreparing)
             {
                 OnFinishAllTasks(this);
             }
-
-            //if (BrowserName == "Google")
-            //{
-            //    bool b = false;
-            //}
 
             if (e.Frame.IsMain && !autoRedirecting)
                 _outsideLoadCommand = false;
@@ -198,30 +193,43 @@ namespace TestProj
 
         public void DoAsyncJSCode()
         {
-            if (_browserJS != null && !string.IsNullOrEmpty(_browserJS.ForAsyncEvalJSCode))
-            {
-                _browser.EvaluateScriptAsync(_browserJS.ForAsyncEvalJSCode);
-            }
+            EvaluateScriptAsync(_browserJS?.ForAsyncEvalJSCode);
         }
 
-        private void InsertColorThemeJS()
+        private void ExecuteColorThemeJS()
         {
-            //TODO: this solution is wrong. Need to replace with somthing like a dictionary with keys ColorTheme
-            if (_browserJS != null && _browserJS.ColorThemeJSCode != null && _browserJS.ColorThemeJSCode.Length >= 2)
-                _browser.ExecuteScriptAsync(_browserJS.ColorThemeJSCode[(int)ColorTheme]);
+            ExecuteScriptAsync(_browserJS?.ColorThemePrepareJSCode);
+            //TODO: this solution is wrong. Need to replace with somthing like a dictionary with keys ColorTheme (and values JSCode)
+            if (_browserJS != null &&_browserJS.ColorThemeJSCode != null && _browserJS.ColorThemeJSCode.Length >= 2)
+                    ExecuteScriptAsync(_browserJS?.ColorThemeJSCode[(int)ColorTheme]);
         }
-        private void InsertOtherJavaScript()
+        private void ExecuteOtherJavaScript()
         {
-            if (_browserJS != null && !string.IsNullOrEmpty(_browserJS.OtherJSCode))
-                _browser.ExecuteScriptAsync(_browserJS.OtherJSCode);
+            ExecuteScriptAsync(_browserJS?.OtherJSCode);
         }
-        private void InsertMainFrameJavaScript()
+        private void ExecuteMainFrameJavaScript()
         {
-            if (_browserJS != null && !string.IsNullOrEmpty(_browserJS.MainFrameJSCode))
-                _browser.ExecuteScriptAsync(_browserJS.MainFrameJSCode);
+            ExecuteScriptAsync(_browserJS?.MainFrameJSCode);
         }
 
-        private void _browser_LoadingStateChanged(object sender, LoadingStateChangedEventArgs e)
+        private void ExecuteScriptAsync(string script)
+        {
+            if (!string.IsNullOrEmpty(script))
+                _browser.ExecuteScriptAsync(script);
+        }
+
+        private async Task EvaluateScriptAsync(string script)
+        {
+            if (!string.IsNullOrEmpty(script))
+               await _browser.EvaluateScriptAsync(script);
+        }
+
+        private async Task EvaluateLoadingStateChangedJSCodeAsync()
+        {
+            await EvaluateScriptAsync(_browserJS?.LoadingStateChanedJSCode);
+        }
+
+        private async void _browser_LoadingStateChanged(object sender, LoadingStateChangedEventArgs e)
         {
             if (e.IsLoading)
                 return;
@@ -230,6 +238,7 @@ namespace TestProj
             {
                 SetBrowserColorsCSS(CSSDarkTheme);
             }
+            await EvaluateLoadingStateChangedJSCodeAsync();
         }
         private void SetBrowserColorsCSS(string css)
         {

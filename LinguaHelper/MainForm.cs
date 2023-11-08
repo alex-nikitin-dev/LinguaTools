@@ -1391,6 +1391,7 @@ namespace TestProj
 
         private void SetThemeFromSettings()
         {
+            //MessageBox.Show(Settings.Default.GoogleForAsyncEvalJS);
             if (Settings.Default.DarkTheme)
                 SetColorTheme(ColorTheme.Dark);
         }
