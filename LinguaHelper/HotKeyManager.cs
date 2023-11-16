@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace TestProj
+namespace LinguaHelper
 {
 
     public static class HotKeyManager

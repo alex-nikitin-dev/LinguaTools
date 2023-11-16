@@ -12,7 +12,7 @@ namespace LinguaHelper.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.7.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.8.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -109,18 +109,6 @@ namespace LinguaHelper.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("css\\dark.mode.css")]
-        public string DarkCSSColorThemePath {
-            get {
-                return ((string)(this["DarkCSSColorThemePath"]));
-            }
-            set {
-                this["DarkCSSColorThemePath"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string OALDPass {
             get {
@@ -145,66 +133,6 @@ namespace LinguaHelper.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("teach_email")]
-        public string OALDUserID {
-            get {
-                return ((string)(this["OALDUserID"]));
-            }
-            set {
-                this["OALDUserID"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("teach_password")]
-        public string OALDPassID {
-            get {
-                return ((string)(this["OALDPassID"]));
-            }
-            set {
-                this["OALDPassID"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("teach_btn-login")]
-        public string OALDSubmitID {
-            get {
-                return ((string)(this["OALDSubmitID"]));
-            }
-            set {
-                this["OALDSubmitID"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://www.oxfordlearnersdictionaries.com/search/english/?q=")]
-        public string OALD_URL {
-            get {
-                return ((string)(this["OALD_URL"]));
-            }
-            set {
-                this["OALD_URL"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://translate.google.am/?sl=en&tl=ru&hl=en&text=")]
-        public string GT_URL {
-            get {
-                return ((string)(this["GT_URL"]));
-            }
-            set {
-                this["GT_URL"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("https://www.urbandictionary.com/define.php?term=")]
         public string Urban_URL {
             get {
@@ -217,54 +145,6 @@ namespace LinguaHelper.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Google Translator")]
-        public string GT_Name {
-            get {
-                return ((string)(this["GT_Name"]));
-            }
-            set {
-                this["GT_Name"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://www.oxfordlearnersdictionaries.com/account/login")]
-        public string OALDPrepareURL {
-            get {
-                return ((string)(this["OALDPrepareURL"]));
-            }
-            set {
-                this["OALDPrepareURL"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://dictionary.cambridge.org/dictionary/english-russian/")]
-        public string Cambridge_URL {
-            get {
-                return ((string)(this["Cambridge_URL"]));
-            }
-            set {
-                this["Cambridge_URL"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://en.wikipedia.org/wiki/")]
-        public string Wiki_URL {
-            get {
-                return ((string)(this["Wiki_URL"]));
-            }
-            set {
-                this["Wiki_URL"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string firstTabName {
             get {
@@ -272,54 +152,6 @@ namespace LinguaHelper.Properties {
             }
             set {
                 this["firstTabName"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("onetrust-accept-btn-handler")]
-        public string OALD_AcceptAllCookies_ID {
-            get {
-                return ((string)(this["OALD_AcceptAllCookies_ID"]));
-            }
-            set {
-                this["OALD_AcceptAllCookies_ID"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://www.google.com/search?q=")]
-        public string GoogleSearchURL {
-            get {
-                return ((string)(this["GoogleSearchURL"]));
-            }
-            set {
-                this["GoogleSearchURL"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("+meaning")]
-        public string GoogleSearchRequestParams {
-            get {
-                return ((string)(this["GoogleSearchRequestParams"]));
-            }
-            set {
-                this["GoogleSearchRequestParams"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("css\\dark.mode.google.translator.css")]
-        public string DarkCSSGTranslator {
-            get {
-                return ((string)(this["DarkCSSGTranslator"]));
-            }
-            set {
-                this["DarkCSSGTranslator"] = value;
             }
         }
         
@@ -461,6 +293,18 @@ document.addEventListener('DOMContentLoaded', checkThemeChange);")]
             }
             set {
                 this["GoogleColorThemePrepareJS"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("JScriptErrors.log")]
+        public string JsLogPath {
+            get {
+                return ((string)(this["JsLogPath"]));
+            }
+            set {
+                this["JsLogPath"] = value;
             }
         }
     }

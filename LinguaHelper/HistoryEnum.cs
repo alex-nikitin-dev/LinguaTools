@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace TestProj
+namespace LinguaHelper
 {
     class HistoryEnum : IEnumerator<HistoryDataItem>
     {

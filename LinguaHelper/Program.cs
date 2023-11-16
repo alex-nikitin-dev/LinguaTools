@@ -2,7 +2,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace TestProj
+namespace LinguaHelper
 {
     static class Program
     {

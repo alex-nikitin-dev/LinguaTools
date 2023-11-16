@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace TestProj
+namespace LinguaHelper
 {
     public partial class CredentialsForm : Form
     {

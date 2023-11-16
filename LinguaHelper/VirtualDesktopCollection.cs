@@ -4,18 +4,18 @@ using System.Linq;
 
 namespace LinguaHelper
 {
-    internal class VirtualDesktopCollection: IEnumerable<VirtualDesktopItem>
+    internal class VirtualDesktopCollection : IEnumerable<VirtualDesktopItem>
     {
         private List<VirtualDesktopItem> _desktops;
         public VirtualDesktopCollection()
         {
-            _desktops = new ();
+            _desktops = new();
         }
         public void Add(VirtualDesktopItem desktop)
         {
             _desktops.Add(desktop);
         }
-        
+
         //public VirtualDesktopItem this[int index] => _desktops[index];
         public VirtualDesktopItem Current => GetCurrentDesktop();
 

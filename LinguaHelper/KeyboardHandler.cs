@@ -2,7 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Windows.Forms;
-namespace TestProj
+namespace LinguaHelper
 {
     public class KeyboardHandler : IKeyboardHandler
     {

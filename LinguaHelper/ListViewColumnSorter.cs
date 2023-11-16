@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Forms;
-namespace TestProj
+namespace LinguaHelper
 {
     /// <summary>
     /// This class is an implementation of the 'IComparer' interface.

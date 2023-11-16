@@ -1,24 +1,34 @@
-﻿namespace TestProj
-{
-    internal class BrowserJS : IBrowserJS
-    {
-        public string PrepareJSCode { get; set; }
-        public string[] ColorThemeJSCode { get; set; }
-        public string MainFrameJSCode { get; set; }
-        public string OtherJSCode { get; set; }
-        public string ForAsyncEvalJSCode { get; set; }
-        public string LoadingStateChanedJSCode { get; set; }
-        public string ColorThemePrepareJSCode { get; set; }
+﻿using System.IO;
+using System.Text.Json.Serialization;
 
-        public BrowserJS(string prepareJSCode = null, string[] colorThemeJSCode = null, string mainFrameJSCode = null, string otherJSCode = null, string forAsyncEvalJSCode = null, string loadingStateChangedJSCode = null, string colorThemePrepareJSCode = null)
+namespace LinguaHelper
+{
+    internal class BrowserJS
+    {
+        public string MainFrameJSCode { get; private set; }
+        public string BindCefObjectsFuncName { get; private set; }
+        public string LoginFuncName { get; private set; }
+        public string RedirectAfterLoginFuncName { get; private set; }
+        public string DeleteAdFuncName { get; private set; }
+        public string AllItemsToClickFuncName { get; private set; }
+        public string SetDarkThemeFuncName { get; private set; }
+        public string SetLightThemeFuncName { get; private set; }
+
+        [JsonConstructor]
+        public BrowserJS(string mainFrameJSCodePath, string bindCefObjectsFuncName, string loginFuncName, string redirectAfterLoginFuncName, string deleteAdFuncName, string allItemsToClickFuncName, string setDarkThemeFuncName, string setLightThemeFuncName)
         {
-            PrepareJSCode = prepareJSCode;
-            ColorThemeJSCode = colorThemeJSCode;
-            MainFrameJSCode = mainFrameJSCode;
-            OtherJSCode = otherJSCode;
-            ForAsyncEvalJSCode = forAsyncEvalJSCode;
-            LoadingStateChanedJSCode = loadingStateChangedJSCode;
-            ColorThemePrepareJSCode = colorThemePrepareJSCode;
+            if (File.Exists(mainFrameJSCodePath))
+                MainFrameJSCode = File.ReadAllText(mainFrameJSCodePath);
+            else
+                MainFrameJSCode = "";
+
+            BindCefObjectsFuncName = bindCefObjectsFuncName;
+            LoginFuncName = loginFuncName;
+            RedirectAfterLoginFuncName = redirectAfterLoginFuncName;
+            DeleteAdFuncName = deleteAdFuncName;
+            AllItemsToClickFuncName = allItemsToClickFuncName;
+            SetDarkThemeFuncName = setDarkThemeFuncName;
+            SetLightThemeFuncName = setLightThemeFuncName;
         }
     }
 }

@@ -1,13 +1,11 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
-
-namespace LinguaHelper
+﻿namespace LinguaHelper
 {
     class VirtualDesktopItem
     {
         public int Index { get; private set; }
         public string Name { get; private set; }
         public bool IsVisible { get; private set; }
-        
+
         public VirtualDesktopItem(int index, string name, bool isVisible)
         {
             Index = index;
@@ -17,7 +15,7 @@ namespace LinguaHelper
 
         public async void Switch()
         {
-             await VirtualDesktopPowerShell.SwitchToDesktopAsync(Index);
+            await VirtualDesktopPowerShell.SwitchToDesktopAsync(Index);
         }
     }
 }

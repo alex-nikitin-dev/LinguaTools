@@ -1,5 +1,5 @@
 ﻿
-namespace TestProj
+namespace LinguaHelper
 {
     partial class ShortcutsForm
     {

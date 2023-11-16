@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace TestProj
+namespace LinguaHelper
 {
     partial class AboutForm : Form
     {

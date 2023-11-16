@@ -1,4 +1,4 @@
-﻿namespace TestProj
+﻿namespace LinguaHelper
 {
     partial class CredentialsForm
     {

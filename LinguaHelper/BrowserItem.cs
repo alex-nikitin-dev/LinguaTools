@@ -1,23 +1,40 @@
 ﻿using CefSharp;
 using CefSharp.WinForms;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.Versioning;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace TestProj
+namespace LinguaHelper
 {
+    [SupportedOSPlatform("windows")]
     internal class BrowserItem
     {
         readonly ChromiumWebBrowser _browser;
         private readonly string _url;
         private readonly string _requestParams;
-        readonly string _prepareUrl;
+        readonly string _loginUrl;
+        public BoundObject BoundObject { get; }
+        public string BoundObjectName => "browserItemBoundOperator";
         public bool IsClickVergin { get; private set; }
-
-        private IBrowserJS _browserJS;
-
+        private BrowserJS _browserJS;
         public string CSSDarkTheme { get; set; }
+
+        public bool Active { get; private set; }
+        public void Activate()
+        {
+            Active = true;
+        }
+
+        public void Deactivate()
+        {
+            Active = false;
+        }
 
         private ColorTheme _colorTheme;
         public ColorTheme ColorTheme
@@ -29,8 +46,6 @@ namespace TestProj
                 _needSetColorTheme = true;
             }
         }
-
-        //TODO: should't be string
         public string BrowserName { get; }
 
         public ChromiumWebBrowser Browser => _browser;
@@ -42,57 +57,76 @@ namespace TestProj
             string browserName,
             string cssDarkTheme,
             ColorTheme theme,
-           IBrowserJS browserJS,
-            string prepareUrl,
+           BrowserJS browserJS,
+            string loginUrl,
             string requestParams = null,
             bool legacyBinding = false)
         {
             _browser = browser;
+            Active = true;
             IsClickVergin = true;
-            _gotoAfterPreparing = null;
+            _gotoAfterLogin = null;
             _url = url;
             BrowserName = browserName;
             CSSDarkTheme = cssDarkTheme;
-            _needPreparing = false;
+            _needLogin = false;
             _browser.FrameLoadEnd += _browser_FrameLoadEnd;
             _browser.LoadingStateChanged += _browser_LoadingStateChanged;
-            _prepareUrl = prepareUrl;
+            _loginUrl = loginUrl;
             _requestParams = requestParams;
             _browserJS = browserJS;
             _browser.JavascriptObjectRepository.Settings.LegacyBindingEnabled = legacyBinding;
             ColorTheme = theme;
-
-
             _needSetColorTheme = true;
-        }
 
+            BoundObject = new BoundObject();
+            _browser.JavascriptObjectRepository.ResolveObject += (sender, e) =>
+            {
+                var repo = e.ObjectRepository;
+                if (e.ObjectName == BoundObjectName)
+                {
+                    repo.Register(BoundObjectName, BoundObject, new BindingOptions());
+                }
+            };
+
+            _browser.KeyboardHandler = new KeyboardHandler();
+        }
+        [JsonConstructor]
         public BrowserItem(string url,
             string browserName,
-            string cssDarkTheme,
-            ColorTheme theme,
-            IBrowserJS browserJS = null,
-            string prepareUrl = null,
-            string requestParams = null)
+            string cssDarkThemePath,
+            BrowserJS browserJS = null,
+            string loginUrl = null,
+            string requestParams = null,
+            ColorTheme theme = ColorTheme.Dark)
             : this(new ChromiumWebBrowser(),
                   url,
                   browserName,
-                  cssDarkTheme,
+                  null,
                   theme,
                   browserJS,
-                  prepareUrl,
+                  loginUrl,
                   requestParams)
         {
             _browser.Dock = DockStyle.Fill;
+            if (File.Exists(cssDarkThemePath))
+                CSSDarkTheme = File.ReadAllText(cssDarkThemePath);
         }
 
-        public delegate void FinishAllTasksDelegate(BrowserItem sender);
-        public event FinishAllTasksDelegate FinishAllTasks;
-        private void OnFinishAllTasks(BrowserItem sender)
+        public void Show()
         {
-            FinishAllTasks?.Invoke(sender);
+            _browser.Show();
         }
 
-        public void ReloadJSCode(IBrowserJS browserJS)
+        //public delegate void FinishAllTasksDelegate(BrowserItem sender);
+
+        //public event FinishAllTasksDelegate FinishAllTasks;
+        //private void OnFinishAllTasks(BrowserItem sender)
+        //{
+        //    FinishAllTasks?.Invoke(sender);
+        //}
+
+        public void ReloadJSCode(BrowserJS browserJS)
         {
             if (browserJS != null)
                 _browserJS = browserJS;
@@ -100,12 +134,13 @@ namespace TestProj
 
         private bool IsLoadAllowed()
         {
-            return !_needPreparing && !_browser.IsLoading;
+            return !_needLogin && Active;
         }
 
         private void ResetLoadSettings()
         {
-            _gotoAfterPreparing = null;
+            _gotoAfterLogin = null;
+            _jsInjected = false;
         }
 
         private bool _outsideLoadCommand = false;
@@ -119,117 +154,109 @@ namespace TestProj
             }
         }
 
-        private string _gotoAfterPreparing;
+        private string _gotoAfterLogin;
 
-        public void Prepare(string gotoAfterPreparing = null)
+        public void Login(string gotoAfterPreparing = null)
         {
-            if (string.IsNullOrEmpty(_prepareUrl)) return;
+            if (string.IsNullOrEmpty(_loginUrl)) return;
 
-            _needPreparing = true;
-            _gotoAfterPreparing = gotoAfterPreparing;
+            _needLogin = true;
+            _gotoAfterLogin = gotoAfterPreparing;
             _outsideLoadCommand = true;
-            _browser.Load(_prepareUrl);
+            _browser.Load(_loginUrl);
         }
 
-        private bool DoPrepare()
+        private bool DoLogin()
         {
-            if (_browserJS != null && !string.IsNullOrEmpty(_browserJS.PrepareJSCode))
+            if (_needLogin)
             {
-                _browser.EvaluateScriptAsync(_browserJS.PrepareJSCode);
+                _needLogin = false;
+                _browser.EvaluateScriptAsync(_browserJS?.LoginFuncName, "login", "pass");
+                return true;
+            }
+            else if (IsAutoRedirectNeeded)
+            {
+                _browser.EvaluateScriptAsync(_browserJS?.RedirectAfterLoginFuncName, "");
                 return true;
             }
 
             return false;
         }
 
-        private bool IsAutoRedirectNeeded => !string.IsNullOrEmpty(_gotoAfterPreparing);
+        private bool IsAutoRedirectNeeded => !string.IsNullOrEmpty(_gotoAfterLogin);
 
-        private bool _needPreparing;
+        private bool _needLogin;
         private bool _needSetColorTheme;
+        private bool _jsInjected = false;
         private void _browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
         {
-            var autoRedirecting = false;
-
             if (e.Frame.IsValid == false)
                 return;
 
-            if (_needPreparing && e.Frame.IsMain)
+            var autoRedirecting = false;
+            if (e.Frame.IsMain)
             {
-                _needPreparing = false;
-                if (!DoPrepare() && IsAutoRedirectNeeded)
-                {
-                    Go(_gotoAfterPreparing, true);
-                    autoRedirecting = true;
-                }
-            }
-            else if (IsAutoRedirectNeeded && e.Frame.IsMain)
-            {
-                Go(_gotoAfterPreparing, true);
-                autoRedirecting = true;
-            }
-
-            if (_needSetColorTheme && e.Frame.IsMain)
-            {
-                _needSetColorTheme = false;
+                InjectJavaScript();
+                autoRedirecting = DoLogin();
+                BindCefObjects();
                 ExecuteColorThemeJS();
             }
 
-            if (e.Frame.IsMain)
-            {
-                ExecuteMainFrameJavaScript();
-                DoAsyncJSCode();
-            }
+            DeleteAd();
+            ////ProcessAllItemsToClickAsync();
+            //if (_outsideLoadCommand && e.Frame.IsMain && !IsAutoRedirectNeeded && !_needLogin)
+            //{
 
-            ExecuteOtherJavaScript();
+            //    //OnFinishAllTasks(this);
+            //}
 
-            if (_outsideLoadCommand && e.Frame.IsMain && !IsAutoRedirectNeeded && !_needPreparing)
+            if (_outsideLoadCommand && e.Frame.IsMain)
             {
-                OnFinishAllTasks(this);
+                ProcessAllItemsToClickAsync();
             }
 
             if (e.Frame.IsMain && !autoRedirecting)
                 _outsideLoadCommand = false;
         }
-
-        public void DoAsyncJSCode()
+        private void ExecuteJScriptFuncAsync(string funcName, params string[] args)
         {
-            EvaluateScriptAsync(_browserJS?.ForAsyncEvalJSCode);
+            if (_jsInjected)
+                _browser.ExecuteScriptAsync(funcName, args);
+        }
+        private void ExecuteJScriptFuncAsync(string funcName)
+        {
+            ExecuteJScriptFuncAsync(funcName, "");
+        }
+        private void BindCefObjects()
+        {
+            ExecuteJScriptFuncAsync(_browserJS?.BindCefObjectsFuncName);
+        }
+
+        private void DeleteAd()
+        {
+            ExecuteJScriptFuncAsync(_browserJS?.DeleteAdFuncName);
+        }
+
+        private void InjectJavaScript()
+        {
+            if (_jsInjected) return;
+            _jsInjected = true;
+
+            ExecuteJScriptFuncAsync(_browserJS?.MainFrameJSCode);
         }
 
         private void ExecuteColorThemeJS()
         {
-            ExecuteScriptAsync(_browserJS?.ColorThemePrepareJSCode);
-            //TODO: this solution is wrong. Need to replace with somthing like a dictionary with keys ColorTheme (and values JSCode)
-            if (_browserJS != null &&_browserJS.ColorThemeJSCode != null && _browserJS.ColorThemeJSCode.Length >= 2)
-                    ExecuteScriptAsync(_browserJS?.ColorThemeJSCode[(int)ColorTheme]);
-        }
-        private void ExecuteOtherJavaScript()
-        {
-            ExecuteScriptAsync(_browserJS?.OtherJSCode);
-        }
-        private void ExecuteMainFrameJavaScript()
-        {
-            ExecuteScriptAsync(_browserJS?.MainFrameJSCode);
+            if (!_needSetColorTheme) return;
+            _needSetColorTheme = true;
+
+            if (ColorTheme == ColorTheme.Light)
+                ExecuteJScriptFuncAsync(_browserJS?.SetLightThemeFuncName);
+            else if (ColorTheme == ColorTheme.Dark)
+                ExecuteJScriptFuncAsync(_browserJS?.SetDarkThemeFuncName);
         }
 
-        private void ExecuteScriptAsync(string script)
-        {
-            if (!string.IsNullOrEmpty(script))
-                _browser.ExecuteScriptAsync(script);
-        }
-
-        private async Task EvaluateScriptAsync(string script)
-        {
-            if (!string.IsNullOrEmpty(script))
-               await _browser.EvaluateScriptAsync(script);
-        }
-
-        private async Task EvaluateLoadingStateChangedJSCodeAsync()
-        {
-            await EvaluateScriptAsync(_browserJS?.LoadingStateChanedJSCode);
-        }
-
-        private async void _browser_LoadingStateChanged(object sender, LoadingStateChangedEventArgs e)
+        private void _browser_LoadingStateChanged(object sender, LoadingStateChangedEventArgs e)
         {
             if (e.IsLoading)
                 return;
@@ -238,7 +265,8 @@ namespace TestProj
             {
                 SetBrowserColorsCSS(CSSDarkTheme);
             }
-            await EvaluateLoadingStateChangedJSCodeAsync();
+
+            DeleteAd();
         }
         private void SetBrowserColorsCSS(string css)
         {
@@ -257,7 +285,7 @@ namespace TestProj
                 _browser.Reload();
         }
 
-        private async Task<(double x, double y)?> GetElementPositionByClassName(string elementClassName)
+        private async Task<(double x, double y)?> GetElementPositionByClassNameAcync(string elementClassName)
         {
             var jsReponse = await _browser.EvaluateScriptAsync(
             @$"(function () {{
@@ -280,9 +308,9 @@ namespace TestProj
             return null;
         }
 
-        public async void ClickOnElementByClassName(string elementClassName)
+        private async void ClickOnElementByClassNameAsync(string elementClassName)
         {
-            var responce = await GetElementPositionByClassName(elementClassName);
+            var responce = await GetElementPositionByClassNameAcync(elementClassName);
             if (responce != null)
             {
                 var x = (int)Math.Round(responce.Value.x) + 1;
@@ -296,6 +324,25 @@ namespace TestProj
                 host.SendMouseClickEvent(x, y, MouseButtonType.Left, true, 0, CefEventFlags.LeftMouseButton);
 
                 IsClickVergin = false;
+            }
+        }
+
+        /// <summary>
+        /// processes all items to click and returns true if all items are clicked
+        /// </summary>
+        public async void ProcessAllItemsToClickAsync()
+        {
+            var response = await _browser.EvaluateScriptAsync(_browserJS?.AllItemsToClickFuncName, "");
+            if (response != null && response.Success && response.Result != null)
+            {
+                var itemsToClick = (response.Result as List<object>)?.Cast<string>().ToArray();
+                if (itemsToClick != null)
+                {
+                    foreach (var item in itemsToClick)
+                    {
+                        ClickOnElementByClassNameAsync(item);
+                    }
+                }
             }
         }
     }

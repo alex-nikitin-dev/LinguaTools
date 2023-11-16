@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TestProj
+namespace LinguaHelper
 {
     class HistoryDataItem
     {

@@ -1,0 +1,101 @@
+[
+  {
+    "dictionary": {
+      "url": "https://www.oxfordlearnersdictionaries.com/search/english/?q=",
+      "browserName": "OALD",
+      "cssDarkThemePath": "Browser Settings/css/dark.mode.general.css",
+      "browserJS": {
+        "MainFrameJSCodePath": "Browser Settings/oald/Oald.js",
+        "BindCefObjectsFuncName": "bindCefSharpObjects",
+        "LoginFuncName": "browserLogin",
+        "RedirectAfterLoginFuncName": "redirectAfterLogin",
+        "DeleteAdFuncName": "deleteAd",
+        "AllItemsToClickFuncName": "getAllItemsToClick",
+        "SetDarkThemeFuncName": "setDarkTheme",
+        "SetLightThemeFuncName": "setLightTheme"
+      },
+      "loginUrl": "https://www.oxfordlearnersdictionaries.com/account/login",
+      "requestParams": null
+    },
+    "translator": {
+      "url": "https://translate.google.am/?op=translate&sl=en&tl=ru&hl=en&text=",
+      "browserName": "GoogleTranslate",
+      "cssDarkThemePath": "Browser Settings/GoogleTranslate/dark.mode.google.translator.css",
+      "browserJS": null,
+      "loginUrl": null,
+      "requestParams": null
+    }
+  },
+  {
+    "dictionary": {
+      "url": "https://dictionary.cambridge.org/dictionary/english-russian/",
+      "browserName": "Cambridge",
+      "cssDarkThemePath": "Browser Settings/css/dark.mode.general.css",
+      "browserJS": {
+        "MainFrameJSCodePath": "Browser Settings/Cambridge/Cambridge.js",
+        "BindCefObjectsFuncName": "bindCefSharpObjects",
+        "LoginFuncName": "browserLogin",
+        "RedirectAfterLoginFuncName": "redirectAfterLogin",
+        "DeleteAdFuncName": "deleteAd",
+        "AllItemsToClickFuncName": "getAllItemsToClick",
+        "SetDarkThemeFuncName": "setDarkTheme",
+        "SetLightThemeFuncName": "setLightTheme"
+      },
+      "loginUrl": null,
+      "requestParams": null
+    },
+    "translator": {
+      "url": "https://translate.google.am/?op=translate&sl=en&tl=ru&hl=en&text=",
+      "browserName": "GoogleTranslate",
+      "cssDarkThemePath": "Browser Settings/GoogleTranslate/dark.mode.google.translator.css",
+      "browserJS": null,
+      "loginUrl": null,
+      "requestParams": null
+    }
+  }
+  /*,{
+    "url": "https://dictionary.cambridge.org/dictionary/english-russian/",
+    "browserName": "Cambridge",
+    "cssDarkTheme": "dark.mode.general.css",
+    "browserJS": {
+      "PrepareJSCode": "Cambridge/PrepareJSCode.js",
+      "MainFrameJSCode": "Cambridge/MainFrameJSCode.js",
+      "OtherJSCode": "Cambridge/OtherJSCode.js",
+      "ForAsyncEvalJSCode": "Cambridge/ForAsyncEvalJSCode.js",
+      "LoadingStateChanedJSCode": "Cambridge/LoadingStateChanedJSCode.js",
+      "ColorThemePrepareJSCode": "Cambridge/ColorThemePrepareJSCode.js"
+    },
+    "loginUrl": "",
+    "requestParams": ""
+  },
+  {
+    "url": "https://en.wikipedia.org/wiki/",
+    "browserName": "Wiki",
+    "cssDarkTheme": "dark.mode.general.css",
+    "browserJS": {
+      "PrepareJSCode": "Wiki/PrepareJSCode.js",
+      "MainFrameJSCode": "Wiki/MainFrameJSCode.js",
+      "OtherJSCode": "Wiki/OtherJSCode.js",
+      "ForAsyncEvalJSCode": "Wiki/ForAsyncEvalJSCode.js",
+      "LoadingStateChanedJSCode": "Wiki/LoadingStateChanedJSCode.js",
+      "ColorThemePrepareJSCode": "Wiki/ColorThemePrepareJSCode.js"
+    },
+    "loginUrl": "",
+    "requestParams": ""
+  },
+  {
+    "url": "https://www.google.com/search?q=",
+    "browserName": "Google",
+    "cssDarkTheme": null,
+    "browserJS": {
+      "PrepareJSCode": "Google/PrepareJSCode.js",
+      "MainFrameJSCode": "Google/MainFrameJSCode.js",
+      "OtherJSCode": "Google/OtherJSCode.js",
+      "ForAsyncEvalJSCode": "Google/ForAsyncEvalJSCode.js",
+      "LoadingStateChanedJSCode": "Google/LoadingStateChanedJSCode.js",
+      "ColorThemePrepareJSCode": "Google/ColorThemePrepareJSCode.js"
+    },
+    "loginUrl": "",
+    "requestParams": "+meaning"
+  }*/
+]

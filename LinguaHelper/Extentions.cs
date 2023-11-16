@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace TestProj
+namespace LinguaHelper
 {
     public static class Extensions
     {

@@ -1,4 +1,4 @@
-﻿namespace TestProj
+﻿namespace LinguaHelper
 {
     partial class MainForm
     {
@@ -38,6 +38,7 @@
             showTheAppFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             MM_ShowTasks = new System.Windows.Forms.ToolStripMenuItem();
+            showJSErrorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             MM_FirstTab = new System.Windows.Forms.ToolStripMenuItem();
             MM_cbxFirstTab = new System.Windows.Forms.ToolStripComboBox();
@@ -74,6 +75,7 @@
             MM_ShortcutsHelp = new System.Windows.Forms.ToolStripMenuItem();
             cbxCategory = new System.Windows.Forms.ComboBox();
             statusStrip1 = new System.Windows.Forms.StatusStrip();
+            stError = new System.Windows.Forms.ToolStripStatusLabel();
             mainProgress = new System.Windows.Forms.ToolStripProgressBar();
             stHistoryCountShown = new System.Windows.Forms.ToolStripStatusLabel();
             dtBegin = new System.Windows.Forms.DateTimePicker();
@@ -99,7 +101,7 @@
             // txtToSearch
             // 
             txtToSearch.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            txtToSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            txtToSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             txtToSearch.Location = new System.Drawing.Point(4, 31);
             txtToSearch.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             txtToSearch.Name = "txtToSearch";
@@ -120,7 +122,7 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { showDatainiToolStripMenuItem, MM_SetBackupFolder, toolStripSeparator5, showTheAppFolderToolStripMenuItem, toolStripSeparator4, MM_ShowTasks });
+            fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { showDatainiToolStripMenuItem, MM_SetBackupFolder, toolStripSeparator5, showTheAppFolderToolStripMenuItem, toolStripSeparator4, MM_ShowTasks, showJSErrorsToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new System.Drawing.Size(54, 29);
             fileToolStripMenuItem.Text = "File";
@@ -164,6 +166,13 @@
             MM_ShowTasks.Size = new System.Drawing.Size(276, 34);
             MM_ShowTasks.Text = "Show Tasks";
             MM_ShowTasks.Click += MM_ShowTasks_Click;
+            // 
+            // showJSErrorsToolStripMenuItem
+            // 
+            showJSErrorsToolStripMenuItem.Name = "showJSErrorsToolStripMenuItem";
+            showJSErrorsToolStripMenuItem.Size = new System.Drawing.Size(276, 34);
+            showJSErrorsToolStripMenuItem.Text = "Show JS Errors";
+            showJSErrorsToolStripMenuItem.Click += showJSErrorsToolStripMenuItem_Click;
             // 
             // viewToolStripMenuItem
             // 
@@ -420,7 +429,7 @@
             // cbxCategory
             // 
             cbxCategory.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            cbxCategory.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            cbxCategory.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             cbxCategory.FormattingEnabled = true;
             cbxCategory.IntegralHeight = false;
             cbxCategory.Location = new System.Drawing.Point(1428, 31);
@@ -436,25 +445,37 @@
             // statusStrip1
             // 
             statusStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
-            statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { mainProgress, stHistoryCountShown });
-            statusStrip1.Location = new System.Drawing.Point(0, 1156);
+            statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { stError, mainProgress, stHistoryCountShown });
+            statusStrip1.Location = new System.Drawing.Point(0, 1146);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Padding = new System.Windows.Forms.Padding(2, 0, 23, 0);
-            statusStrip1.Size = new System.Drawing.Size(1902, 22);
+            statusStrip1.Size = new System.Drawing.Size(1902, 32);
             statusStrip1.TabIndex = 6;
             statusStrip1.Text = "statusStrip1";
+            // 
+            // stError
+            // 
+            stError.BackColor = System.Drawing.Color.Green;
+            stError.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            stError.DoubleClickEnabled = true;
+            stError.ForeColor = System.Drawing.Color.White;
+            stError.Name = "stError";
+            stError.Size = new System.Drawing.Size(33, 25);
+            stError.Text = "JS ";
+            stError.DoubleClick += stError_DoubleClick;
             // 
             // mainProgress
             // 
             mainProgress.Name = "mainProgress";
-            mainProgress.Size = new System.Drawing.Size(167, 18);
+            mainProgress.Size = new System.Drawing.Size(167, 24);
             mainProgress.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             mainProgress.Visible = false;
             // 
             // stHistoryCountShown
             // 
             stHistoryCountShown.Name = "stHistoryCountShown";
-            stHistoryCountShown.Size = new System.Drawing.Size(0, 15);
+            stHistoryCountShown.Size = new System.Drawing.Size(122, 25);
+            stHistoryCountShown.Text = "History Status";
             // 
             // dtBegin
             // 
@@ -532,7 +553,7 @@
             // txtFindText
             // 
             txtFindText.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            txtFindText.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            txtFindText.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             txtFindText.Location = new System.Drawing.Point(776, 31);
             txtFindText.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             txtFindText.Name = "txtFindText";
@@ -545,7 +566,7 @@
             // 
             label1.AutoSize = true;
             label1.Dock = System.Windows.Forms.DockStyle.Left;
-            label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             label1.Location = new System.Drawing.Point(4, 0);
             label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label1.Name = "label1";
@@ -557,7 +578,7 @@
             // 
             label2.AutoSize = true;
             label2.Dock = System.Windows.Forms.DockStyle.Left;
-            label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             label2.Location = new System.Drawing.Point(776, 0);
             label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label2.Name = "label2";
@@ -568,7 +589,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             label3.Location = new System.Drawing.Point(1428, 0);
             label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label3.Name = "label3";
@@ -595,7 +616,7 @@
             tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            tableLayoutPanel1.Size = new System.Drawing.Size(1902, 1123);
+            tableLayoutPanel1.Size = new System.Drawing.Size(1902, 1113);
             tableLayoutPanel1.TabIndex = 17;
             // 
             // controlPanel
@@ -622,7 +643,7 @@
             controlPanel.RowCount = 2;
             controlPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
             controlPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            controlPanel.Size = new System.Drawing.Size(1896, 76);
+            controlPanel.Size = new System.Drawing.Size(1896, 75);
             controlPanel.TabIndex = 3;
             // 
             // btnClearFind
@@ -657,11 +678,12 @@
             tabControl1.DisplayStyleProvider.TextColorSelected = System.Drawing.SystemColors.ControlText;
             tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             tabControl1.HotTrack = true;
-            tabControl1.Location = new System.Drawing.Point(3, 87);
+            tabControl1.Location = new System.Drawing.Point(3, 86);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new System.Drawing.Size(1896, 1033);
+            tabControl1.Size = new System.Drawing.Size(1896, 1024);
             tabControl1.TabIndex = 4;
+            tabControl1.SelectedIndexChanged += tabControl1_SelectedIndexChanged;
             // 
             // MainForm
             // 
@@ -760,6 +782,8 @@
         private System.Windows.Forms.ToolStripMenuItem MM_ForceLoadFromBrowseField;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem MM_SpeakOnBrowsingOALD;
+        private System.Windows.Forms.ToolStripMenuItem showJSErrorsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripStatusLabel stError;
     }
 }
 

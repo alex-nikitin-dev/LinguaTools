@@ -1,12 +1,10 @@
 ﻿using CefSharp;
-using CefSharp.DevTools.Page;
 using CefSharp.WinForms;
-using LinguaHelper;
 using LinguaHelper.Properties;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -16,8 +14,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace TestProj
+namespace LinguaHelper
 {
+    [SupportedOSPlatform("windows")]
     public partial class MainForm : Form
     {
         #region ctor 
@@ -37,12 +36,13 @@ namespace TestProj
         private History _history;
 
 
-        Dictionary<UnitName, DictionaryTranslatorUnit> _dictionaryTranslatorUnits;
-        private delegate void OaldAutoSoundDelegate();
+        List<DictionaryTranslatorUnit> _dictionaryTranslatorUnits;
+        private delegate void ClickOnBrowserItemsDelegate(BrowserItem browser);
         private delegate void UpdateItemInHistoryListViewDelegate(HistoryDataItem oldItem, HistoryDataItem updatedItem);
         delegate void HotKeyPressedDelegate(object sender, HotKeyEventArgs e);
 
         private int _previousDesktopIndex = -1;
+        [SupportedOSPlatform("windows")]
         public MainForm()
         {
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
@@ -88,12 +88,13 @@ namespace TestProj
         #region Browsers
         private void ReloadOaldJS()
         {
-            _dictionaryTranslatorUnits[UnitName.Oald].Dictionary.ReloadJSCode(OaldJS.GetInstance());
+            throw new NotImplementedException();
+            // _dictionaryTranslatorUnits[UnitName.Oald].Dictionary.ReloadJSCode(OaldJS.GetInstance());
         }
 
         private void StopFinding()
         {
-            foreach (var unit in _dictionaryTranslatorUnits.Values)
+            foreach (var unit in _dictionaryTranslatorUnits)
             {
                 unit.Dictionary.Browser.StopFinding(true);
             }
@@ -101,7 +102,7 @@ namespace TestProj
 
         private void StartFinding(string text)
         {
-            foreach (var unit in _dictionaryTranslatorUnits.Values)
+            foreach (var unit in _dictionaryTranslatorUnits)
             {
                 unit.Dictionary.Browser.Find(txtFindText.Text, true, false, false);
             }
@@ -134,7 +135,8 @@ namespace TestProj
         }
         private void LoginToOALD(string gotoAfterLoading = null)
         {
-            _dictionaryTranslatorUnits[UnitName.Oald].Dictionary.Prepare(gotoAfterLoading);
+            throw new NotImplementedException();
+            // _dictionaryTranslatorUnits[UnitName.Oald].Dictionary.Prepare(gotoAfterLoading);
         }
         void GoBrowsers(string text, bool saveHistory = true, bool force = false, bool silentOALD = false)
         {
@@ -147,7 +149,7 @@ namespace TestProj
 
             _silentOALD = silentOALD;
 
-            foreach (var unit in _dictionaryTranslatorUnits.Values)
+            foreach (var unit in _dictionaryTranslatorUnits)
             {
                 unit.Go(text, force);
             }
@@ -161,51 +163,64 @@ namespace TestProj
         }
         void ReloadAllBrowsers()
         {
-            foreach (var unit in _dictionaryTranslatorUnits.Values)
+            foreach (var unit in _dictionaryTranslatorUnits)
             {
                 unit.ReLoad();
             }
         }
         private void InitBrowsers()
         {
+            //var stt = Settings.Default;
+            //var cssDarkColorTheme = File.ReadAllText(stt.DarkCSSColorThemePath);
+            //var cssDarkGTranslator = File.ReadAllText(stt.DarkCSSGTranslator);
+
+            //var oald = new BrowserItem(stt.OALD_URL,
+            //                           "OALD",
+            //                           cssDarkColorTheme,
+            //                           _currentColorTheme,
+            //                           OaldJS.GetInstance(),
+            //                           stt.OALDPrepareURL);
+            //oald.FinishAllTasks += Oald_FinishAllTasks;
+
+            //var cambridge = new BrowserItem(stt.Cambridge_URL,
+            //                                "Cambridge en-rus",
+            //                                cssDarkColorTheme,
+            //                                _currentColorTheme,
+            //                                CambridgeJS.GetInstance());
+            //var wiki = new BrowserItem(stt.Wiki_URL,
+            //                           "Wikipedia en",
+            //                           cssDarkColorTheme,
+            //                           _currentColorTheme,
+            //                           GenericJS.GetInstance());
+            //var google = new BrowserItem(stt.GoogleSearchURL,
+            //                             "Google",
+            //                             null/*cssDarkColorTheme*/,
+            //                             _currentColorTheme,
+            //                             GoogleJS.GetInstance(),
+            //                             null,
+            //                             stt.GoogleSearchRequestParams);
+
+            //_dictionaryTranslatorUnits.Add(UnitName.Oald, new(oald, new()));
+            //_dictionaryTranslatorUnits.Add(UnitName.Cambridge, new(cambridge, cssDarkGTranslator));
+            //_dictionaryTranslatorUnits.Add(UnitName.Wiki, new(wiki, cssDarkGTranslator));
+            //_dictionaryTranslatorUnits.Add(UnitName.Google, new(google, cssDarkGTranslator));
+
+            _dictionaryTranslatorUnits = JsonConvert.DeserializeObject<List<DictionaryTranslatorUnit>>(File.ReadAllText("Browser Settings\\Browsers.json"));
+            foreach (var unit in _dictionaryTranslatorUnits)
+            {
+                unit.Dictionary.BoundObject.JScriptErrorOccured += BoundObject_JScriptErrorOccured;
+            }
+        }
+
+        /// <summary>
+        ///write the error message to the log file: exact date and time, error message, name, stack
+        /// </summary>
+        private void BoundObject_JScriptErrorOccured(object sender, JScriptErrorEventArgs e)
+        {
             var stt = Settings.Default;
-            DictionaryTranslatorUnit.DefaultTranslatorUrl = stt.GT_URL;
-            DictionaryTranslatorUnit.DefaultTranslatorName = stt.GT_Name;
-            _dictionaryTranslatorUnits = new();
-
-            var cssDarkColorTheme = File.ReadAllText(stt.DarkCSSColorThemePath);
-            var cssDarkGTranslator = File.ReadAllText(stt.DarkCSSGTranslator);
-
-            var oald = new BrowserItem(stt.OALD_URL,
-                                       "OALD",
-                                       cssDarkColorTheme,
-                                       _currentColorTheme,
-                                       OaldJS.GetInstance(),
-                                       stt.OALDPrepareURL);
-            oald.FinishAllTasks += Oald_FinishAllTasks;
-
-            var cambridge = new BrowserItem(stt.Cambridge_URL,
-                                            "Cambridge en-rus",
-                                            cssDarkColorTheme,
-                                            _currentColorTheme,
-                                            CambridgeJS.GetInstance());
-            var wiki = new BrowserItem(stt.Wiki_URL,
-                                       "Wikipedia en",
-                                       cssDarkColorTheme,
-                                       _currentColorTheme,
-                                       GenericJS.GetInstance());
-            var google = new BrowserItem(stt.GoogleSearchURL,
-                                         "Google",
-                                         null/*cssDarkColorTheme*/,
-                                         _currentColorTheme,
-                                         GoogleJS.GetInstance(),
-                                         null,
-                                         stt.GoogleSearchRequestParams);
-
-            _dictionaryTranslatorUnits.Add(UnitName.Oald, new(oald, cssDarkGTranslator));
-            _dictionaryTranslatorUnits.Add(UnitName.Cambridge, new(cambridge, cssDarkGTranslator));
-            _dictionaryTranslatorUnits.Add(UnitName.Wiki, new(wiki, cssDarkGTranslator));
-            _dictionaryTranslatorUnits.Add(UnitName.Google, new(google, cssDarkGTranslator));
+            var logMessage = $@"{DateTime.Now.ToString(_dateTimeFormat, CultureInfo.InvariantCulture)}: {e.Message} {e.Name} {e.Stack}";
+            File.AppendAllText(stt.JsLogPath, logMessage);
+            JScriptStatusError();
         }
         #endregion
 
@@ -241,6 +256,7 @@ namespace TestProj
         {
             SetColorTheme(ColorTheme.Dark);
         }
+        [SupportedOSPlatform("windows")]
         void SetColorsRecursively(Control parent, Color backColor, Color foreColor)
         {
             parent.BackColor = backColor;
@@ -262,6 +278,7 @@ namespace TestProj
                 (parent as MenuStrip).Renderer = new MyRenderer(highLightColors.backColor, backColor);
             }
         }
+        [SupportedOSPlatform("windows")]
         void SetMenuStripColorsRecursively(ToolStripItem parent, Color backColor, Color foreColor)
         {
             parent.BackColor = backColor;
@@ -286,7 +303,7 @@ namespace TestProj
                 }
             }
         }
-
+        [SupportedOSPlatform("windows")]
         private (Color backColor, Color foreColor) GetHighLightColor(Color backColor, Color foreColor)
         {
             switch (_currentColorTheme)
@@ -313,6 +330,7 @@ namespace TestProj
             public override Color ImageMarginGradientMiddle => _backColor;
             public override Color ImageMarginGradientEnd => _backColor;
         }
+        [SupportedOSPlatform("windows")]
         private class MyRenderer : ToolStripProfessionalRenderer
         {
             private Color _backColorOfHighlightedItem;
@@ -339,7 +357,7 @@ namespace TestProj
             //    base.OnRenderItemText(e);
             //}
         }
-
+        [SupportedOSPlatform("windows")]
         void SetColorTheme(ColorTheme theme)
         {
             _currentColorTheme = theme;
@@ -357,7 +375,7 @@ namespace TestProj
 
         private void SetColorThemeForAllUnits()
         {
-            foreach (var unit in _dictionaryTranslatorUnits.Values)
+            foreach (var unit in _dictionaryTranslatorUnits)
             {
                 unit.ColorTheme = _currentColorTheme;
             }
@@ -447,6 +465,10 @@ namespace TestProj
         private void ShowErrorMessage(string message)
         {
             MessageBox.Show(message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        private void ShowInfoMessage(string message)
+        {
+            MessageBox.Show(message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         private void StartProcess(string path)
         {
@@ -1011,12 +1033,12 @@ namespace TestProj
                 if (!await VirtualDesktopPowerShell.IsVirtualDesktopInstalled())
                 {
                     var result = MessageBox.Show(@"To continue using this application Virtual Desktop Module is needed to be installed. To read more about Virtual Desktop module for powershell you can go to https://github.com/MScholtes/PSVirtualDesktop. If you decide to deny the installation, the application will be closed. Continue installing the module (answer Yes is recommended)?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                    if(result == DialogResult.Yes)
+                    if (result == DialogResult.Yes)
                     {
                         var controls = ShowProgressBar("Please wait while the Virtual Desktop module is being installed...");
                         await VirtualDesktopPowerShell.InstallVirtualDesktopAsync();
                         RemoveControls(controls);
-                    }    
+                    }
                     else
                     {
                         CloseWithoutPrompt();
@@ -1147,12 +1169,21 @@ namespace TestProj
         #endregion
 
         #region Main menu click handlers
+        private void showJSErrorsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var logPath = Settings.Default.JsLogPath;
+            if (File.Exists(logPath))
+                StartProcess(logPath);
+            else
+                ShowInfoMessage($"There is no file {logPath}. And probably that's a good sign: most likely there is no java script errors so far.");
+        }
         void SetForceLoadFromBrowseField(bool predicate)
         {
             var stt = Settings.Default;
             stt.ForceLoadFromBrowse = predicate;
             stt.Save();
         }
+        [SupportedOSPlatform("windows")]
         private void MM_cbxFirstTab_SelectedIndexChanged(object sender, EventArgs e)
         {
             var stt = Settings.Default;
@@ -1166,14 +1197,14 @@ namespace TestProj
                 ShowErrorMessage($"There is no tab which has name {MM_cbxFirstTab.Text}");
             }
         }
-
+        [SupportedOSPlatform("windows")]
         private void FindClearAndFocus()
         {
             txtFindText.Text = "";
             txtFindText.Focus();
             FindInDictionaries("");
         }
-
+        [SupportedOSPlatform("windows")]
         private void btnClearFind_Click(object sender, EventArgs e)
         {
             FindClearAndFocus();
@@ -1182,7 +1213,7 @@ namespace TestProj
         {
             ChooseBackupFolderDialog();
         }
-
+        [SupportedOSPlatform("windows")]
         private void setOALDCredentialsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var stt = Settings.Default;
@@ -1197,6 +1228,7 @@ namespace TestProj
             stt.Save();
             ReloadOaldJS();
         }
+        [SupportedOSPlatform("windows")]
         private void MM_ShortcutsHelp_Click(object sender, EventArgs e)
         {
             new ShortcutsForm().ShowDialog();
@@ -1208,11 +1240,12 @@ namespace TestProj
             stt.OALDLoginOnStart = predicate;
             stt.Save();
         }
-
+        [SupportedOSPlatform("windows")]
         private void MM_LoginToOALDOnStart_Click(object sender, EventArgs e)
         {
             SetLoginToOALDOnStart(((ToolStripMenuItem)sender).Checked);
         }
+        [SupportedOSPlatform("windows")]
         private void MM_AutoSortByDate_Click(object sender, EventArgs e)
         {
             AutoSortByDateOrderOptionSave(MM_AutoSortByDate.Checked);
@@ -1224,12 +1257,13 @@ namespace TestProj
         {
             SearchClearAndFocus();
         }
-
+        [SupportedOSPlatform("windows")]
         private void SearchClearAndFocus()
         {
             txtToSearch.Clear();
             txtToSearch.Focus();
         }
+        [SupportedOSPlatform("windows")]
         private void MM_ForceLoadFromBrowseField_Click(object sender, EventArgs e)
         {
             SetForceLoadFromBrowseField(((ToolStripMenuItem)sender).Checked);
@@ -1239,7 +1273,8 @@ namespace TestProj
 
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            _dictionaryTranslatorUnits[UnitName.Oald].Dictionary.ClickOnElementByClassName(".sound.audio_play_button.pron-us.icon-audio");
+            throw new NotImplementedException();
+            //_dictionaryTranslatorUnits[UnitName.Oald].Dictionary.ClickOnElementByClassName(".sound.audio_play_button.pron-us.icon-audio");
         }
         void SetSpeakOnBrowsingOALD(bool predicate)
         {
@@ -1249,6 +1284,7 @@ namespace TestProj
 
             ReloadOaldJS();
         }
+        [SupportedOSPlatform("windows")]
         private void MM_SpeakOnBrowsingOALD_Click(object sender, EventArgs e)
         {
             SetSpeakOnBrowsingOALD(((ToolStripMenuItem)sender).Checked);
@@ -1373,6 +1409,24 @@ namespace TestProj
 
         #endregion
 
+        #region Status bar
+        private void stError_DoubleClick(object sender, EventArgs e)
+        {
+            JScriptStatusErrorReset();
+        }
+
+        private void JScriptStatusErrorReset()
+        {
+            stError.BackColor = Color.Green;
+        }
+
+        private void JScriptStatusError()
+        {
+            stError.BackColor = Color.Red;
+        }
+
+        #endregion
+
         #region Settings
         private void LoadSettings()
         {
@@ -1398,22 +1452,22 @@ namespace TestProj
         #endregion
 
         #region Sound
-        private void Oald_FinishAllTasks(BrowserItem sender)
+        private void Dictionary_FinishAllTasks(BrowserItem sender)
         {
-            OaldAutoSound();
+            ClickOnBrowserItems(sender);
         }
 
-        private void OaldAutoSound()
+        private void ClickOnBrowserItems(BrowserItem browser)
         {
             if (InvokeRequired)
             {
-                Invoke(new OaldAutoSoundDelegate(OaldAutoSound));
+                Invoke(new ClickOnBrowserItemsDelegate(ClickOnBrowserItems), browser);
                 return;
             }
             if (!MM_SpeakOnBrowsingOALD.Checked || _silentOALD) return;
-
-            var name = Settings.Default.OALD_AudioButton_ID;
-            _dictionaryTranslatorUnits[UnitName.Oald].Dictionary.ClickOnElementByClassName(@$".{name.Replace(' ', '.')}");
+            browser.ProcessAllItemsToClickAsync();
+            //var name = Settings.Default.OALD_AudioButton_ID;
+            //_dictionaryTranslatorUnits[UnitName.Oald].Dictionary.ClickOnElementByClassNameAsync(@$".{name.Replace(' ', '.')}");
         }
         #endregion
 
@@ -1435,13 +1489,14 @@ namespace TestProj
         private void InitTabs()
         {
             tabControl1.Font = new Font(family: tabControl1.Font.FontFamily, 12, FontStyle.Regular);
-            foreach (var unit in _dictionaryTranslatorUnits.Values)
+            foreach (var unit in _dictionaryTranslatorUnits)
             {
                 var table = CreateTableForUnit();
                 AutoLayoutUnit(table, unit);
 
                 var dictionaryName = unit.Dictionary.BrowserName;
                 tabControl1.TabPages.Add(dictionaryName, dictionaryName);
+                tabControl1.TabPages[dictionaryName].Tag = unit;
                 tabControl1.TabPages[dictionaryName]?.Controls.Add(table);
             }
             tabControl1.TabPages.Add("tabHistory", "History");
@@ -1502,14 +1557,25 @@ namespace TestProj
 
             return true;
         }
-
-        enum UnitName
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Oald,
-            Cambridge,
-            Wiki,
-            Google
+            var curUnit = tabControl1.TabPages[tabControl1.SelectedIndex].Tag as DictionaryTranslatorUnit;
+            foreach (var unit in _dictionaryTranslatorUnits)
+            {
+                if (unit == curUnit)
+                    unit.Translator.Activate();
+                else
+                    unit.Translator.Deactivate();
+            }
+
         }
+        //enum UnitName
+        //{
+        //    Oald,
+        //    Cambridge,
+        //    Wiki,
+        //    Google
+        //}
         #endregion
 
         #region Virtual desktops
@@ -1589,5 +1655,7 @@ namespace TestProj
             await ReturnToPreviousDesktop();
         }
         #endregion
+
+       
     }
 }

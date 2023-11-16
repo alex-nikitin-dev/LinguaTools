@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace TestProj
+namespace LinguaHelper
 {
     internal class ColorThemeProvider
     {

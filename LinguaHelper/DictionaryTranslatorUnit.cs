@@ -1,6 +1,6 @@
-﻿using CefSharp;
+﻿using System.Text.Json.Serialization;
 
-namespace TestProj
+namespace LinguaHelper
 {
     internal class DictionaryTranslatorUnit
     {
@@ -9,11 +9,6 @@ namespace TestProj
 
         public BrowserItem Dictionary => _dictionary;
         public BrowserItem Translator => _translator;
-
-        public static string DefaultTranslatorUrl { get; set; }
-        public static string DefaultTranslatorName { get; set; }
-
-        private readonly BoundObject _boundObject;
 
         private ColorTheme _colorTheme;
         public ColorTheme ColorTheme
@@ -30,42 +25,13 @@ namespace TestProj
             _dictionary.ColorTheme = _colorTheme;
             _translator.ColorTheme = _colorTheme;
         }
-
-        private DictionaryTranslatorUnit(BrowserItem dictionary, BrowserItem translator = null)
+        [JsonConstructor]
+        public DictionaryTranslatorUnit(BrowserItem dictionary, BrowserItem translator)
         {
             _dictionary = dictionary;
-            _translator = translator ?? new BrowserItem(DefaultTranslatorUrl,
-                DefaultTranslatorName,
-                _dictionary.CSSDarkTheme,
-                _dictionary.ColorTheme
-                /*dictionary.ColorThemes*/);
+            _translator = translator;
 
-            _boundObject = new BoundObject();
-            _boundObject.BrowserTextSelected += _boundObject_BrowserTextSelected;
-            //_dictionary.Browser.JavascriptObjectRepository.Register("dictionaryOperator1", _boundObject);
-            //_dictionary.Browser.LoadingStateChanged += (s, a) =>
-            //{
-            //    if (a.IsLoading) return;
-            //    _dictionary.Browser.ExecuteScriptAsync("CefSharp.BindObjectAsync('dictionaryOperator1');");
-            //};
-
-            _dictionary.Browser.JavascriptObjectRepository.ResolveObject += (sender, e) =>
-            {
-                var repo = e.ObjectRepository;
-                if (e.ObjectName == "dictionaryOperator1")
-                {
-                    repo.Register("dictionaryOperator1", _boundObject, new BindingOptions());
-                }
-            };
-
-            _dictionary.Browser.KeyboardHandler = new KeyboardHandler();
-            _translator.Browser.KeyboardHandler = new KeyboardHandler();
-        }
-
-        public DictionaryTranslatorUnit(BrowserItem dictionary, string cssDarkTranslator)
-            : this(dictionary)
-        {
-            _translator.CSSDarkTheme = cssDarkTranslator;
+            _dictionary.BoundObject.BrowserTextSelected += _boundObject_BrowserTextSelected;
         }
 
         private void _boundObject_BrowserTextSelected(object sender, BrowserTextSelectedEventArgs e)
@@ -86,8 +52,8 @@ namespace TestProj
 
         public void Show()
         {
-            _dictionary.Browser.Show();
-            _translator.Browser.Show();
+            _dictionary.Show();
+            _translator.Show();
         }
     }
 }

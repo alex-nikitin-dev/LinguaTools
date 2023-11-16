@@ -5,7 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace TestProj
+namespace LinguaHelper
 {
     class History : IEnumerable<HistoryDataItem>
     {

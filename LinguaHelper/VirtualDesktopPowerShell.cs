@@ -14,7 +14,7 @@ namespace LinguaHelper
 
         private static Task<PowerShellOperator> PowerShellTask => _powerShellTask.Value;
 
-        
+
         /// <summary>
         /// Returns the index of the current virtual desktop.
         /// </summary>
