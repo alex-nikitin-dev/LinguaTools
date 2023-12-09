@@ -1,4 +1,5 @@
 ﻿using CefSharp;
+using CefSharp.DevTools.Log;
 using CefSharp.WinForms;
 using LinguaHelper.Properties;
 using Newtonsoft.Json;
@@ -36,7 +37,7 @@ namespace LinguaHelper
         private History _history;
 
 
-        List<DictionaryTranslatorUnit> _dictionaryTranslatorUnits;
+        List<DictionaryTranslatorUnit> _units;
         private delegate void ClickOnBrowserItemsDelegate(BrowserItem browser);
         private delegate void UpdateItemInHistoryListViewDelegate(HistoryDataItem oldItem, HistoryDataItem updatedItem);
         delegate void HotKeyPressedDelegate(object sender, HotKeyEventArgs e);
@@ -94,7 +95,7 @@ namespace LinguaHelper
 
         private void StopFinding()
         {
-            foreach (var unit in _dictionaryTranslatorUnits)
+            foreach (var unit in _units)
             {
                 unit.Dictionary.Browser.StopFinding(true);
             }
@@ -102,7 +103,7 @@ namespace LinguaHelper
 
         private void StartFinding(string text)
         {
-            foreach (var unit in _dictionaryTranslatorUnits)
+            foreach (var unit in _units)
             {
                 unit.Dictionary.Browser.Find(txtFindText.Text, true, false, false);
             }
@@ -138,7 +139,7 @@ namespace LinguaHelper
             throw new NotImplementedException();
             // _dictionaryTranslatorUnits[UnitName.Oald].Dictionary.Prepare(gotoAfterLoading);
         }
-        void GoBrowsers(string text, bool saveHistory = true, bool force = false, bool silentOALD = false)
+        void GoBrowsers(string text,bool isUserCommand, bool saveHistory = true, bool force = false, bool silentOALD = false)
         {
             text = PrepareTextToProceed(text);
             if (string.IsNullOrEmpty(text)) return;
@@ -149,9 +150,9 @@ namespace LinguaHelper
 
             _silentOALD = silentOALD;
 
-            foreach (var unit in _dictionaryTranslatorUnits)
+            foreach (var unit in _units)
             {
-                unit.Go(text, force);
+                unit.Go(text, isUserCommand, force);
             }
 
             //if(MM_NeedUrbanDictionary.Checked) GoUrbanDictionary(text);
@@ -163,7 +164,7 @@ namespace LinguaHelper
         }
         void ReloadAllBrowsers()
         {
-            foreach (var unit in _dictionaryTranslatorUnits)
+            foreach (var unit in _units)
             {
                 unit.ReLoad();
             }
@@ -205,11 +206,18 @@ namespace LinguaHelper
             //_dictionaryTranslatorUnits.Add(UnitName.Wiki, new(wiki, cssDarkGTranslator));
             //_dictionaryTranslatorUnits.Add(UnitName.Google, new(google, cssDarkGTranslator));
 
-            _dictionaryTranslatorUnits = JsonConvert.DeserializeObject<List<DictionaryTranslatorUnit>>(File.ReadAllText("Browser Settings\\Browsers.json"));
-            foreach (var unit in _dictionaryTranslatorUnits)
+            _units = JsonConvert.DeserializeObject<List<DictionaryTranslatorUnit>>(File.ReadAllText("Browser Settings\\Browsers.json"));
+            foreach (var unit in _units)
             {
                 unit.Dictionary.BoundObject.JScriptErrorOccured += BoundObject_JScriptErrorOccured;
+                unit.Dictionary.BrowerErrorOccured += BrowerErrorOccured;
+                unit.Translator.BrowerErrorOccured += BrowerErrorOccured;
             }
+        }
+
+        private void BrowerErrorOccured(BrowserItem sender, string message)
+        {
+            WriteToLog(message, LogRecordCategory.Browser);
         }
 
         /// <summary>
@@ -217,10 +225,24 @@ namespace LinguaHelper
         /// </summary>
         private void BoundObject_JScriptErrorOccured(object sender, JScriptErrorEventArgs e)
         {
-            var stt = Settings.Default;
-            var logMessage = $@"{DateTime.Now.ToString(_dateTimeFormat, CultureInfo.InvariantCulture)}: {e.Message} {e.Name} {e.Stack}";
-            File.AppendAllText(stt.JsLogPath, logMessage);
+            WriteToLog($"{e.Message} {e.Name} {e.Stack}",LogRecordCategory.JScript);
             JScriptStatusError();
+        }
+
+        #endregion
+
+        #region Log processing
+        enum LogRecordCategory
+        {
+            Browser,
+            JScript,
+            General
+        }
+        private void WriteToLog(string message, LogRecordCategory logRecordCategory)
+        {
+            var stt = Settings.Default;
+            var logRecord = $@"{DateTime.Now.ToString(_dateTimeFormat, CultureInfo.InvariantCulture)}: <{logRecordCategory}> {message}";
+            File.AppendAllText(stt.ErrorLogPath, logRecord);
         }
         #endregion
 
@@ -375,7 +397,7 @@ namespace LinguaHelper
 
         private void SetColorThemeForAllUnits()
         {
-            foreach (var unit in _dictionaryTranslatorUnits)
+            foreach (var unit in _units)
             {
                 unit.ColorTheme = _currentColorTheme;
             }
@@ -527,7 +549,7 @@ namespace LinguaHelper
                (e.Key & Keys.X) == Keys.X)
             {
                 await ShowThisAppDesktop();
-                GoBrowsers(Clipboard.GetText());
+                GoBrowsers(Clipboard.GetText(),true);
             }
             else if ((e.Modifiers & KeyModifiers.Control) == KeyModifiers.Control &&
                 (e.Modifiers & KeyModifiers.Shift) == KeyModifiers.Shift &&
@@ -846,7 +868,7 @@ namespace LinguaHelper
             var selectedItem = _lstHistory.SelectedItems[0];
             tabControl1.SelectedTab = tabControl1.TabPages[0];
             cbxCategory.Text = selectedItem.SubItems[1].Text;
-            GoBrowsers(selectedItem.Text);
+            GoBrowsers(selectedItem.Text,true);
         }
 
         private void DeleteHistoryItem(object sender, EventArgs e)
@@ -999,7 +1021,7 @@ namespace LinguaHelper
         {
             if (e.KeyCode == Keys.Enter)
             {
-                GoBrowsers(txtToSearch.Text, MM_ForceLoadFromBrowseField.Checked);
+                GoBrowsers(txtToSearch.Text, true, true, MM_ForceLoadFromBrowseField.Checked);
             }
         }
         #endregion
@@ -1162,20 +1184,19 @@ namespace LinguaHelper
             if (MM_LoginToOALDOnStart.Checked)
                 LoginToOALD("test");
 
-            GoBrowsers("test", false, false, true);
+            GoBrowsers("test",false, false, false, true);
             SetThemeFromSettings();
-
         }
         #endregion
 
         #region Main menu click handlers
         private void showJSErrorsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var logPath = Settings.Default.JsLogPath;
+            var logPath = Settings.Default.ErrorLogPath;
             if (File.Exists(logPath))
                 StartProcess(logPath);
             else
-                ShowInfoMessage($"There is no file {logPath}. And probably that's a good sign: most likely there is no java script errors so far.");
+                ShowInfoMessage($"There is no file {logPath}. And probably that's a good sign: most likely there is no errors so far.");
         }
         void SetForceLoadFromBrowseField(bool predicate)
         {
@@ -1451,24 +1472,24 @@ namespace LinguaHelper
         }
         #endregion
 
-        #region Sound
-        private void Dictionary_FinishAllTasks(BrowserItem sender)
-        {
-            ClickOnBrowserItems(sender);
-        }
+        #region Sound <depriecated> 
+        //private void Dictionary_FinishAllTasks(BrowserItem sender)
+        //{
+        //    ClickOnBrowserItems(sender);
+        //}
 
-        private void ClickOnBrowserItems(BrowserItem browser)
-        {
-            if (InvokeRequired)
-            {
-                Invoke(new ClickOnBrowserItemsDelegate(ClickOnBrowserItems), browser);
-                return;
-            }
-            if (!MM_SpeakOnBrowsingOALD.Checked || _silentOALD) return;
-            browser.ProcessAllItemsToClickAsync();
-            //var name = Settings.Default.OALD_AudioButton_ID;
-            //_dictionaryTranslatorUnits[UnitName.Oald].Dictionary.ClickOnElementByClassNameAsync(@$".{name.Replace(' ', '.')}");
-        }
+        //private void ClickOnBrowserItems(BrowserItem browser)
+        //{
+        //    if (InvokeRequired)
+        //    {
+        //        Invoke(new ClickOnBrowserItemsDelegate(ClickOnBrowserItems), browser);
+        //        return;
+        //    }
+        //    if (!MM_SpeakOnBrowsingOALD.Checked || _silentOALD) return;
+        //    browser.ProcessAllItemsToClickAsync();
+        //    //var name = Settings.Default.OALD_AudioButton_ID;
+        //    //_dictionaryTranslatorUnits[UnitName.Oald].Dictionary.ClickOnElementByClassNameAsync(@$".{name.Replace(' ', '.')}");
+        //}
         #endregion
 
         #region Tab control
@@ -1489,7 +1510,7 @@ namespace LinguaHelper
         private void InitTabs()
         {
             tabControl1.Font = new Font(family: tabControl1.Font.FontFamily, 12, FontStyle.Regular);
-            foreach (var unit in _dictionaryTranslatorUnits)
+            foreach (var unit in _units)
             {
                 var table = CreateTableForUnit();
                 AutoLayoutUnit(table, unit);
@@ -1560,7 +1581,7 @@ namespace LinguaHelper
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
             var curUnit = tabControl1.TabPages[tabControl1.SelectedIndex].Tag as DictionaryTranslatorUnit;
-            foreach (var unit in _dictionaryTranslatorUnits)
+            foreach (var unit in _units)
             {
                 if (unit == curUnit)
                     unit.Translator.Activate();

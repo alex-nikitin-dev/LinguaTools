@@ -10,12 +10,14 @@ namespace LinguaHelper
         public string LoginFuncName { get; private set; }
         public string RedirectAfterLoginFuncName { get; private set; }
         public string DeleteAdFuncName { get; private set; }
-        public string AllItemsToClickFuncName { get; private set; }
+        public string[] AllItemsToClick { get; private set; }
         public string SetDarkThemeFuncName { get; private set; }
         public string SetLightThemeFuncName { get; private set; }
+        public string IsJsInjectedFuncName { get; private set; }
+        public string AcceptAllCookiesFuncName { get; private set; }
 
         [JsonConstructor]
-        public BrowserJS(string mainFrameJSCodePath, string bindCefObjectsFuncName, string loginFuncName, string redirectAfterLoginFuncName, string deleteAdFuncName, string allItemsToClickFuncName, string setDarkThemeFuncName, string setLightThemeFuncName)
+        public BrowserJS(string mainFrameJSCodePath, string bindCefObjectsFuncName, string loginFuncName, string redirectAfterLoginFuncName, string deleteAdFuncName, string[] allItemsToClick, string setDarkThemeFuncName, string setLightThemeFuncName,string isJsInjectedFuncName, string acceptAllCookiesFuncName)
         {
             if (File.Exists(mainFrameJSCodePath))
                 MainFrameJSCode = File.ReadAllText(mainFrameJSCodePath);
@@ -26,9 +28,11 @@ namespace LinguaHelper
             LoginFuncName = loginFuncName;
             RedirectAfterLoginFuncName = redirectAfterLoginFuncName;
             DeleteAdFuncName = deleteAdFuncName;
-            AllItemsToClickFuncName = allItemsToClickFuncName;
+            AllItemsToClick = allItemsToClick != null ? (string[])allItemsToClick.Clone() : new string[0];
             SetDarkThemeFuncName = setDarkThemeFuncName;
             SetLightThemeFuncName = setLightThemeFuncName;
+            IsJsInjectedFuncName = isJsInjectedFuncName;
+            AcceptAllCookiesFuncName = acceptAllCookiesFuncName;
         }
     }
 }

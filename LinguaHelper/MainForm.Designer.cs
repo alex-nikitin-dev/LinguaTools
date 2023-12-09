@@ -171,7 +171,7 @@
             // 
             showJSErrorsToolStripMenuItem.Name = "showJSErrorsToolStripMenuItem";
             showJSErrorsToolStripMenuItem.Size = new System.Drawing.Size(276, 34);
-            showJSErrorsToolStripMenuItem.Text = "Show JS Errors";
+            showJSErrorsToolStripMenuItem.Text = "Show Errors Log";
             showJSErrorsToolStripMenuItem.Click += showJSErrorsToolStripMenuItem_Click;
             // 
             // viewToolStripMenuItem

@@ -10,9 +10,13 @@
         "LoginFuncName": "browserLogin",
         "RedirectAfterLoginFuncName": "redirectAfterLogin",
         "DeleteAdFuncName": "deleteAd",
-        "AllItemsToClickFuncName": "getAllItemsToClick",
+        "AllItemsToClick": [
+          ".sound.audio_play_button.pron-us.icon-audio"
+        ],
         "SetDarkThemeFuncName": "setDarkTheme",
-        "SetLightThemeFuncName": "setLightTheme"
+        "SetLightThemeFuncName": "setLightTheme",
+        "IsJsInjectedFuncName": "isJsInjected",
+        "AcceptAllCookiesFuncName": "acceptAllCookies"
       },
       "loginUrl": "https://www.oxfordlearnersdictionaries.com/account/login",
       "requestParams": null
@@ -25,8 +29,8 @@
       "loginUrl": null,
       "requestParams": null
     }
-  },
-  {
+  }
+  /*{
     "dictionary": {
       "url": "https://dictionary.cambridge.org/dictionary/english-russian/",
       "browserName": "Cambridge",
@@ -39,7 +43,9 @@
         "DeleteAdFuncName": "deleteAd",
         "AllItemsToClickFuncName": "getAllItemsToClick",
         "SetDarkThemeFuncName": "setDarkTheme",
-        "SetLightThemeFuncName": "setLightTheme"
+        "SetLightThemeFuncName": "setLightTheme",
+        "IsJsInjectedFuncName": "isJsInjected",
+        "AcceptAllCookiesFuncName": "acceptAllCookies"
       },
       "loginUrl": null,
       "requestParams": null
@@ -52,7 +58,7 @@
       "loginUrl": null,
       "requestParams": null
     }
-  }
+  }*/
   /*,{
     "url": "https://dictionary.cambridge.org/dictionary/english-russian/",
     "browserName": "Cambridge",

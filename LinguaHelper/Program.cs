@@ -1,9 +1,11 @@
 ﻿using LinguaHelper.Properties;
 using System;
+using System.Runtime.Versioning;
 using System.Windows.Forms;
 
 namespace LinguaHelper
 {
+    [SupportedOSPlatform("Windows")]
     static class Program
     {
         /// <summary>
@@ -15,7 +17,6 @@ namespace LinguaHelper
             Application.EnableVisualStyles();
             Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
             Application.SetCompatibleTextRenderingDefault(false);
-            Settings.Default.Reset();
             Application.Run(new MainForm());
         }
     }

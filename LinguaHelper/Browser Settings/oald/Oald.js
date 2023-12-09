@@ -3,6 +3,8 @@ async function bindCefSharpObjects() {
 	document.body.onmouseup = function () {
 		browserItemBoundOperator.onselect(document.getSelection().toString());
 	}
+
+	//window.jsInjected = true;
 }
 function setItem(itemId, itemValue) {
 	document.getElementById(itemId).value = itemValue;
@@ -53,17 +55,18 @@ function clickElementById(id) {
 }
 
 function sendErrorMessage(error) {
+	//alert("OK");
 	browserItemBoundOperator.onJsError(JSON.stringify({ message: error.message, name: error.name, stack: error.stack }));
 }
 function deleteAd(){
 	//alert("OK");
 	removeAllElementsByPattern('[id ^= "ad_"]');
 	removeElementById('topslot_container')
-	clickElementById('onetrust-accept-btn-handler');
 }
-function getAllItemsToClick() {
-	//alert("OK");
-	return ['.sound.audio_play_button.pron-us.icon-audio'];
+
+function acceptAllCookies() {
+	//alert("acceptAllCookies");
+clickElementById('onetrust-accept-btn-handler');
 }
 
 function setDarkTheme() {
@@ -71,4 +74,8 @@ function setDarkTheme() {
 }
 function setLightTheme() {
 
+}
+
+function isJsInjected() {
+	return true;
 }

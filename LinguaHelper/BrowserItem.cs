@@ -1,9 +1,7 @@
 ﻿using CefSharp;
 using CefSharp.WinForms;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Versioning;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -15,6 +13,7 @@ namespace LinguaHelper
     [SupportedOSPlatform("windows")]
     internal class BrowserItem
     {
+        #region .ctor
         readonly ChromiumWebBrowser _browser;
         private readonly string _url;
         private readonly string _requestParams;
@@ -26,16 +25,8 @@ namespace LinguaHelper
         public string CSSDarkTheme { get; set; }
 
         public bool Active { get; private set; }
-        public void Activate()
-        {
-            Active = true;
-        }
 
-        public void Deactivate()
-        {
-            Active = false;
-        }
-
+        private bool _needSetColorTheme;
         private ColorTheme _colorTheme;
         public ColorTheme ColorTheme
         {
@@ -70,8 +61,11 @@ namespace LinguaHelper
             BrowserName = browserName;
             CSSDarkTheme = cssDarkTheme;
             _needLogin = false;
+            
             _browser.FrameLoadEnd += _browser_FrameLoadEnd;
-            _browser.LoadingStateChanged += _browser_LoadingStateChanged;
+            var requestHandler = new CustomRequestHandler();
+            requestHandler.UserGesture += RequestHandler_UserGesture;
+            _browser.RequestHandler = requestHandler;
             _loginUrl = loginUrl;
             _requestParams = requestParams;
             _browserJS = browserJS;
@@ -91,6 +85,14 @@ namespace LinguaHelper
 
             _browser.KeyboardHandler = new KeyboardHandler();
         }
+
+        
+
+        private void RequestHandler_UserGesture()
+        {
+            _userLoadCommand = true;
+        }
+
         [JsonConstructor]
         public BrowserItem(string url,
             string browserName,
@@ -112,12 +114,45 @@ namespace LinguaHelper
             if (File.Exists(cssDarkThemePath))
                 CSSDarkTheme = File.ReadAllText(cssDarkThemePath);
         }
+        #endregion
 
+        #region public Actions
+        bool _userLoadCommand;
+        public void Go(string text,bool isUserCommand, bool force = false)
+        {
+            if (force || IsLoadAllowed())
+            {
+                _userLoadCommand = isUserCommand;    
+                _browser.Load($"{_url}{text}{_requestParams}");
+            }
+        }
         public void Show()
         {
             _browser.Show();
         }
+        public void Activate()
+        {
+            Active = true;
+        }
 
+        public void Deactivate()
+        {
+            Active = false;
+        }
+
+        public void ReLoad()
+        {
+            if (_browser.IsBrowserInitialized)
+                _browser.Reload();
+        }
+        //public void ReloadJSCode(BrowserJS browserJS)
+        //{
+        //    if (browserJS != null)
+        //        _browserJS = browserJS;
+        //}
+        #endregion
+
+        #region events
         //public delegate void FinishAllTasksDelegate(BrowserItem sender);
 
         //public event FinishAllTasksDelegate FinishAllTasks;
@@ -126,34 +161,10 @@ namespace LinguaHelper
         //    FinishAllTasks?.Invoke(sender);
         //}
 
-        public void ReloadJSCode(BrowserJS browserJS)
-        {
-            if (browserJS != null)
-                _browserJS = browserJS;
-        }
 
-        private bool IsLoadAllowed()
-        {
-            return !_needLogin && Active;
-        }
-
-        private void ResetLoadSettings()
-        {
-            _gotoAfterLogin = null;
-            _jsInjected = false;
-        }
-
-        private bool _outsideLoadCommand = false;
-        public void Go(string text, bool force = false)
-        {
-            if (force || IsLoadAllowed())
-            {
-                ResetLoadSettings();
-                _outsideLoadCommand = true;
-                _browser.Load($"{_url}{text}{_requestParams}");
-            }
-        }
-
+        #endregion
+      
+        #region Login
         private string _gotoAfterLogin;
 
         public void Login(string gotoAfterPreparing = null)
@@ -162,21 +173,21 @@ namespace LinguaHelper
 
             _needLogin = true;
             _gotoAfterLogin = gotoAfterPreparing;
-            _outsideLoadCommand = true;
+            //_outsideLoadCommand = true;
             _browser.Load(_loginUrl);
         }
 
-        private bool DoLogin()
+        private bool DoLogin(bool injectJs = true)
         {
             if (_needLogin)
             {
                 _needLogin = false;
-                _browser.EvaluateScriptAsync(_browserJS?.LoginFuncName, "login", "pass");
+                ExecuteJScriptFuncAsync(_browserJS?.LoginFuncName, injectJs, "login", "pass");
                 return true;
             }
             else if (IsAutoRedirectNeeded)
             {
-                _browser.EvaluateScriptAsync(_browserJS?.RedirectAfterLoginFuncName, "");
+                ExecuteJScriptFuncAsync(_browserJS?.RedirectAfterLoginFuncName,injectJs, "");
                 return true;
             }
 
@@ -186,105 +197,131 @@ namespace LinguaHelper
         private bool IsAutoRedirectNeeded => !string.IsNullOrEmpty(_gotoAfterLogin);
 
         private bool _needLogin;
-        private bool _needSetColorTheme;
-        private bool _jsInjected = false;
+        #endregion
+
+        #region Checking JavaScript injected
+        private  void InjectJavaScript()
+        {
+            try
+            {
+                //var response = await EvaluateJScriptFuncAsync(_browserJS?.IsJsInjectedFuncName, false);
+                //if(response.Success && (response.Result as bool? == true))
+                //{
+                //    ExecuteJScriptFuncAsync(_browserJS?.MainFrameJSCode, false);
+                //}
+                ExecuteJScriptFuncAsync(_browserJS?.MainFrameJSCode, false);
+            }
+            catch
+            {
+                // This catch block is triggered if isJsInjected() function is not defined,
+                // which implies that the JS has not been injected yet.
+                // return false;
+            }
+        }
+        #endregion
+
+        #region FrameLoadEnd event
         private void _browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
         {
-            if (e.Frame.IsValid == false)
+            if (!e.Frame.IsValid)
                 return;
 
-            var autoRedirecting = false;
             if (e.Frame.IsMain)
             {
                 InjectJavaScript();
-                autoRedirecting = DoLogin();
-                BindCefObjects();
-                ExecuteColorThemeJS();
+                ApplyColorTheme();
+                BindCefObjects(false);
+                ExecuteColorThemeJS(false);
+                DeleteAd(false);
+                AcceptAllCookies(false);
+                DoUserCommands();
             }
+        }
 
-            DeleteAd();
-            ////ProcessAllItemsToClickAsync();
-            //if (_outsideLoadCommand && e.Frame.IsMain && !IsAutoRedirectNeeded && !_needLogin)
-            //{
-
-            //    //OnFinishAllTasks(this);
-            //}
-
-            if (_outsideLoadCommand && e.Frame.IsMain)
+        private void DoUserCommands()
+        {
+            if (_userLoadCommand)
             {
+                _userLoadCommand = false;
                 ProcessAllItemsToClickAsync();
             }
-
-            if (e.Frame.IsMain && !autoRedirecting)
-                _outsideLoadCommand = false;
-        }
-        private void ExecuteJScriptFuncAsync(string funcName, params string[] args)
-        {
-            if (_jsInjected)
-                _browser.ExecuteScriptAsync(funcName, args);
-        }
-        private void ExecuteJScriptFuncAsync(string funcName)
-        {
-            ExecuteJScriptFuncAsync(funcName, "");
-        }
-        private void BindCefObjects()
-        {
-            ExecuteJScriptFuncAsync(_browserJS?.BindCefObjectsFuncName);
         }
 
-        private void DeleteAd()
+        private bool IsLoadAllowed()
         {
-            ExecuteJScriptFuncAsync(_browserJS?.DeleteAdFuncName);
+            return !_needLogin && Active;
         }
 
-        private void InjectJavaScript()
+        #endregion
+
+        #region JavaScript evaluation
+        private async Task<JavascriptResponse> EvaluateJScriptFuncAsync(string funcName, bool injectJs, params string[] args)
         {
-            if (_jsInjected) return;
-            _jsInjected = true;
-
-            ExecuteJScriptFuncAsync(_browserJS?.MainFrameJSCode);
+            if (injectJs) InjectJavaScript();
+            return await _browser.EvaluateScriptAsync(funcName, args);
         }
+        private async Task<JavascriptResponse> EvaluateJScriptFuncAsync(string funcName, bool injectJs)
+        {
+            return await EvaluateJScriptFuncAsync(funcName, injectJs, "");
+        }
+        #endregion
 
-        private void ExecuteColorThemeJS()
+        #region JavaScript execution
+        private void ExecuteJScriptFuncAsync(string funcName, bool injectJs, params string[] args)
+        {
+           if(injectJs)InjectJavaScript();
+            _browser.ExecuteScriptAsync(funcName, args);
+        }
+        private void ExecuteJScriptFuncAsync(string funcName,bool injectJs)
+        {
+            ExecuteJScriptFuncAsync(funcName, injectJs, "");
+        }
+        #endregion
+
+        #region JavaScript calling
+        private void BindCefObjects(bool injectJs = true)
+        {
+            ExecuteJScriptFuncAsync(_browserJS?.BindCefObjectsFuncName, injectJs);
+        }
+        private void AcceptAllCookies(bool injectJs = true)
+        {
+            ExecuteJScriptFuncAsync(_browserJS?.AcceptAllCookiesFuncName, injectJs);
+        }
+        private async void DeleteAd(bool injectJs = true)
+        {
+            await EvaluateJScriptFuncAsync(_browserJS?.DeleteAdFuncName,injectJs);
+        }
+        private void ExecuteColorThemeJS(bool injectJs = true)
         {
             if (!_needSetColorTheme) return;
-            _needSetColorTheme = true;
 
             if (ColorTheme == ColorTheme.Light)
-                ExecuteJScriptFuncAsync(_browserJS?.SetLightThemeFuncName);
+                ExecuteJScriptFuncAsync(_browserJS?.SetLightThemeFuncName, injectJs);
             else if (ColorTheme == ColorTheme.Dark)
-                ExecuteJScriptFuncAsync(_browserJS?.SetDarkThemeFuncName);
-        }
-
-        private void _browser_LoadingStateChanged(object sender, LoadingStateChangedEventArgs e)
-        {
-            if (e.IsLoading)
-                return;
-
-            if (ColorTheme == ColorTheme.Dark)
-            {
-                SetBrowserColorsCSS(CSSDarkTheme);
-            }
-
-            DeleteAd();
+                ExecuteJScriptFuncAsync(_browserJS?.SetDarkThemeFuncName, injectJs);
         }
         private void SetBrowserColorsCSS(string css)
         {
             if (css == null) return;
 
-            _browser.ExecuteScriptAsync($@"
+            ExecuteJScriptFuncAsync($@"
                     var style1 = document.createElement('style');
                     style1.innerText = `{css}`;
                     document.head.appendChild(style1);
-                    ");
+                    ", false);
         }
-
-        public void ReLoad()
+        private void ApplyColorTheme()
         {
-            if (_browser.IsBrowserInitialized)
-                _browser.Reload();
+            switch (ColorTheme)
+            {
+                case ColorTheme.Dark:
+                    SetBrowserColorsCSS(CSSDarkTheme);
+                    break;
+            }
         }
+        #endregion
 
+        #region Clicking on elements
         private async Task<(double x, double y)?> GetElementPositionByClassNameAcync(string elementClassName)
         {
             var jsReponse = await _browser.EvaluateScriptAsync(
@@ -327,23 +364,33 @@ namespace LinguaHelper
             }
         }
 
+        public delegate void BrowerErrorDelegate(BrowserItem sender, string message);
+        public event BrowerErrorDelegate BrowerErrorOccured;
+        protected virtual void OnBrowerErrorOccured(BrowserItem sender, string message)
+        {
+            BrowerErrorOccured?.Invoke(sender, message);
+        }
+        private bool CanExecuteJavascriptInMainFrame()
+        {
+            if (_browser.CanExecuteJavascriptInMainFrame)
+                return true;
+            else
+                OnBrowerErrorOccured(this, $"Can't execute javascript in main frame of {_browser.Address}");
+
+            return false;
+        }
+
         /// <summary>
         /// processes all items to click and returns true if all items are clicked
         /// </summary>
-        public async void ProcessAllItemsToClickAsync()
+        public void ProcessAllItemsToClickAsync()
         {
-            var response = await _browser.EvaluateScriptAsync(_browserJS?.AllItemsToClickFuncName, "");
-            if (response != null && response.Success && response.Result != null)
+            if(!CanExecuteJavascriptInMainFrame()) return;
+            foreach (var item in _browserJS.AllItemsToClick)
             {
-                var itemsToClick = (response.Result as List<object>)?.Cast<string>().ToArray();
-                if (itemsToClick != null)
-                {
-                    foreach (var item in itemsToClick)
-                    {
-                        ClickOnElementByClassNameAsync(item);
-                    }
-                }
+                ClickOnElementByClassNameAsync(item);
             }
         }
+        #endregion
     }
 }

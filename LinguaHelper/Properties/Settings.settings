@@ -104,8 +104,8 @@ function checkThemeChange() {
 // Call this function on page load.
 document.addEventListener('DOMContentLoaded', checkThemeChange);</Value>
     </Setting>
-    <Setting Name="JsLogPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">JScriptErrors.log</Value>
+    <Setting Name="ErrorLogPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ErrorsLog.log</Value>
     </Setting>
   </Settings>
 </SettingsFile>

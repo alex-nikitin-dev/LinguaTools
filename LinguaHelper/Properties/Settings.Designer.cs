@@ -298,13 +298,13 @@ document.addEventListener('DOMContentLoaded', checkThemeChange);")]
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("JScriptErrors.log")]
-        public string JsLogPath {
+        [global::System.Configuration.DefaultSettingValueAttribute("ErrorsLog.log")]
+        public string ErrorLogPath {
             get {
-                return ((string)(this["JsLogPath"]));
+                return ((string)(this["ErrorLogPath"]));
             }
             set {
-                this["JsLogPath"] = value;
+                this["ErrorLogPath"] = value;
             }
         }
     }

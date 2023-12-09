@@ -1,7 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Runtime.Versioning;
+using System.Text.Json.Serialization;
 
 namespace LinguaHelper
 {
+    [SupportedOSPlatform("windows")]
     internal class DictionaryTranslatorUnit
     {
         readonly BrowserItem _dictionary;
@@ -36,12 +38,12 @@ namespace LinguaHelper
 
         private void _boundObject_BrowserTextSelected(object sender, BrowserTextSelectedEventArgs e)
         {
-            _translator.Go(e.Text);
+            _translator.Go(e.Text, false);
         }
-        public void Go(string text, bool force = false)
+        public void Go(string text,bool isUserCommand, bool force = false)
         {
-            _dictionary.Go(text, force);
-            _translator.Go(text, force);
+            _dictionary.Go(text, isUserCommand, force);
+           // _translator.Go(text, force);
         }
 
         public void ReLoad()
