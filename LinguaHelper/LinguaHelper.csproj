@@ -49,10 +49,16 @@
     <None Update="Browser Settings\Browsers.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Browser Settings\Cambridge\Cambridge.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Browser Settings\css\dark.mode.general.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Browser Settings\css\dick.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Browser Settings\General\GeneralBrowser.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Browser Settings\GoogleTranslate\dark.mode.google.translator OLD.css">

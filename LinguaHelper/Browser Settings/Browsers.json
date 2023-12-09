@@ -5,7 +5,8 @@
       "browserName": "OALD",
       "cssDarkThemePath": "Browser Settings/css/dark.mode.general.css",
       "browserJS": {
-        "MainFrameJSCodePath": "Browser Settings/oald/Oald.js",
+        "SpecificJSCodePath": "Browser Settings/oald/Oald.js",
+        "GeneralJSCodePath": "Browser Settings/General/GeneralBrowser.js",
         "BindCefObjectsFuncName": "bindCefSharpObjects",
         "LoginFuncName": "browserLogin",
         "RedirectAfterLoginFuncName": "redirectAfterLogin",
@@ -29,7 +30,69 @@
       "loginUrl": null,
       "requestParams": null
     }
+  },
+  {
+    "dictionary": {
+      "url": "https://dictionary.cambridge.org/dictionary/english-russian/",
+      "browserName": "Cambridge",
+      "cssDarkThemePath": "Browser Settings/css/dark.mode.general.css",
+      "browserJS": {
+        "SpecificJSCodePath": "Browser Settings/Cambridge/Cambridge.js",
+        "GeneralJSCodePath": "Browser Settings/General/GeneralBrowser.js",
+        "BindCefObjectsFuncName": "bindCefSharpObjects",
+        "LoginFuncName": "browserLogin",
+        "RedirectAfterLoginFuncName": "redirectAfterLogin",
+        "DeleteAdFuncName": "deleteAd",
+        "AllItemsToClick": null,
+        "SetDarkThemeFuncName": "setDarkTheme",
+        "SetLightThemeFuncName": "setLightTheme",
+        "IsJsInjectedFuncName": "isJsInjected",
+        "AcceptAllCookiesFuncName": "acceptAllCookies"
+      },
+      "loginUrl": null,
+      "requestParams": null
+    },
+    "translator": {
+      "url": "https://translate.google.am/?op=translate&sl=en&tl=ru&hl=en&text=",
+      "browserName": "GoogleTranslate",
+      "cssDarkThemePath": "Browser Settings/GoogleTranslate/dark.mode.google.translator.css",
+      "browserJS": null,
+      "loginUrl": null,
+      "requestParams": null
+    }
+  },
+  {
+    "dictionary": {
+      "url": "https://en.wikipedia.org/wiki/",
+      "browserName": "Wikipedia",
+      "cssDarkThemePath": "Browser Settings/css/dark.mode.general.css",
+      "browserJS": {
+        "SpecificJSCodePath": null,
+        "GeneralJSCodePath": "Browser Settings/General/GeneralBrowser.js",
+        "BindCefObjectsFuncName": "bindCefSharpObjects",
+        "LoginFuncName": null,
+        "RedirectAfterLoginFuncName": null,
+        "DeleteAdFuncName": null,
+        "AllItemsToClick": null,
+        "SetDarkThemeFuncName": null,
+        "SetLightThemeFuncName": null,
+        "IsJsInjectedFuncName": "isJsInjected",
+        "AcceptAllCookiesFuncName": null
+      },
+      "loginUrl": null,
+      "requestParams": null
+    },
+    "translator": {
+      "url": "https://translate.google.am/?op=translate&sl=en&tl=ru&hl=en&text=",
+      "browserName": "GoogleTranslate",
+      "cssDarkThemePath": "Browser Settings/GoogleTranslate/dark.mode.google.translator.css",
+      "browserJS": null,
+      "loginUrl": null,
+      "requestParams": null
+    }
   }
+
+
   /*{
     "dictionary": {
       "url": "https://dictionary.cambridge.org/dictionary/english-russian/",

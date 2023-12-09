@@ -15,7 +15,6 @@ namespace LinguaHelper
             // Check if the navigation is initiated by a user gesture, such as a mouse click
             if (userGesture)
             {
-                // Log or handle the link click here
                 OnUserGesture();
             }
 

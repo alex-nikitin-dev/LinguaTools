@@ -86,12 +86,7 @@ namespace LinguaHelper
             _browser.KeyboardHandler = new KeyboardHandler();
         }
 
-        
-
-        private void RequestHandler_UserGesture()
-        {
-            _userLoadCommand = true;
-        }
+       
 
         [JsonConstructor]
         public BrowserItem(string url,
@@ -152,18 +147,6 @@ namespace LinguaHelper
         //}
         #endregion
 
-        #region events
-        //public delegate void FinishAllTasksDelegate(BrowserItem sender);
-
-        //public event FinishAllTasksDelegate FinishAllTasks;
-        //private void OnFinishAllTasks(BrowserItem sender)
-        //{
-        //    FinishAllTasks?.Invoke(sender);
-        //}
-
-
-        #endregion
-      
         #region Login
         private string _gotoAfterLogin;
 
@@ -173,7 +156,6 @@ namespace LinguaHelper
 
             _needLogin = true;
             _gotoAfterLogin = gotoAfterPreparing;
-            //_outsideLoadCommand = true;
             _browser.Load(_loginUrl);
         }
 
@@ -199,36 +181,43 @@ namespace LinguaHelper
         private bool _needLogin;
         #endregion
 
-        #region Checking JavaScript injected
-        private  void InjectJavaScript()
+        #region JavaScript injection
+        private async Task InjectJavaScript()
         {
             try
             {
-                //var response = await EvaluateJScriptFuncAsync(_browserJS?.IsJsInjectedFuncName, false);
-                //if(response.Success && (response.Result as bool? == true))
-                //{
-                //    ExecuteJScriptFuncAsync(_browserJS?.MainFrameJSCode, false);
-                //}
-                ExecuteJScriptFuncAsync(_browserJS?.MainFrameJSCode, false);
+                if (_browserJS == null) return; 
+                var response = await EvaluateJScriptFuncAsync(_browserJS?.IsJsInjectedFuncName, false);
+                if (!(response != null && response.Success && (response.Result as bool? == true)))
+                {
+                    ExecuteJScriptFuncAsync(_browserJS?.WholeJSCode, false);
+                }
+                else
+                {
+                    OnBrowerErrorOccured(this, $"Can't check if Java Script is injected on {_browser.Address}");
+                }
             }
-            catch
+            catch (Exception e)
             {
-                // This catch block is triggered if isJsInjected() function is not defined,
-                // which implies that the JS has not been injected yet.
-                // return false;
+                OnBrowerErrorOccured(this, $"Java Script injection exception on {_browser.Address}: {e.Message}");
             }
         }
+
         #endregion
 
-        #region FrameLoadEnd event
-        private void _browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
+        #region Browser events
+        private void RequestHandler_UserGesture()
+        {
+            _userLoadCommand = true;
+        }
+        private async void _browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
         {
             if (!e.Frame.IsValid)
                 return;
 
             if (e.Frame.IsMain)
             {
-                InjectJavaScript();
+                await InjectJavaScript();
                 ApplyColorTheme();
                 BindCefObjects(false);
                 ExecuteColorThemeJS(false);
@@ -257,8 +246,11 @@ namespace LinguaHelper
         #region JavaScript evaluation
         private async Task<JavascriptResponse> EvaluateJScriptFuncAsync(string funcName, bool injectJs, params string[] args)
         {
-            if (injectJs) InjectJavaScript();
-            return await _browser.EvaluateScriptAsync(funcName, args);
+            if (injectJs) await InjectJavaScript();
+            if (!string.IsNullOrEmpty(funcName))
+                return await _browser.EvaluateScriptAsync(funcName, args);
+            else
+                return null;
         }
         private async Task<JavascriptResponse> EvaluateJScriptFuncAsync(string funcName, bool injectJs)
         {
@@ -267,10 +259,11 @@ namespace LinguaHelper
         #endregion
 
         #region JavaScript execution
-        private void ExecuteJScriptFuncAsync(string funcName, bool injectJs, params string[] args)
+        private async void ExecuteJScriptFuncAsync(string funcName, bool injectJs, params string[] args)
         {
-           if(injectJs)InjectJavaScript();
-            _browser.ExecuteScriptAsync(funcName, args);
+            if (injectJs) await InjectJavaScript();
+            if (!string.IsNullOrEmpty(funcName))
+                _browser.ExecuteScriptAsync(funcName, args);
         }
         private void ExecuteJScriptFuncAsync(string funcName,bool injectJs)
         {
@@ -375,7 +368,7 @@ namespace LinguaHelper
             if (_browser.CanExecuteJavascriptInMainFrame)
                 return true;
             else
-                OnBrowerErrorOccured(this, $"Can't execute javascript in main frame of {_browser.Address}");
+                OnBrowerErrorOccured(this, $"Can't execute javascript in main frame of the address = {_browser.Address}");
 
             return false;
         }
@@ -385,6 +378,7 @@ namespace LinguaHelper
         /// </summary>
         public void ProcessAllItemsToClickAsync()
         {
+            if(_browserJS == null) return;  
             if(!CanExecuteJavascriptInMainFrame()) return;
             foreach (var item in _browserJS.AllItemsToClick)
             {

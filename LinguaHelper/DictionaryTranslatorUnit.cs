@@ -43,7 +43,7 @@ namespace LinguaHelper
         public void Go(string text,bool isUserCommand, bool force = false)
         {
             _dictionary.Go(text, isUserCommand, force);
-           // _translator.Go(text, force);
+            _translator.Go(text, force);
         }
 
         public void ReLoad()

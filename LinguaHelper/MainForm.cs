@@ -241,7 +241,7 @@ namespace LinguaHelper
         private void WriteToLog(string message, LogRecordCategory logRecordCategory)
         {
             var stt = Settings.Default;
-            var logRecord = $@"{DateTime.Now.ToString(_dateTimeFormat, CultureInfo.InvariantCulture)}: <{logRecordCategory}> {message}";
+            var logRecord = $@"{DateTime.Now.ToString(_dateTimeFormat, CultureInfo.InvariantCulture)}: <{logRecordCategory}> {message}{Environment.NewLine}";
             File.AppendAllText(stt.ErrorLogPath, logRecord);
         }
         #endregion
