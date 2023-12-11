@@ -7,9 +7,8 @@ function redirectAfterLogin() {
 }
 function deleteAd(){
 	removeAllElementsByPattern('[id ^= "ad_"]');
-	removeAllElementsByPattern('[class ^= "tz0 topslot-container"]')
-	removeAllElementsByPattern('[class ^= "hdn hdb-m hfl-m"]')
-	//hdn hdb-m hfl-m
+	removeAllElementsByPattern('[class ^= "tz0 topslot-container"]');
+	removeAllElementsByPattern('[class ^= "hdn hdb-m hfl-m"]');
 }
 
 function acceptAllCookies() {

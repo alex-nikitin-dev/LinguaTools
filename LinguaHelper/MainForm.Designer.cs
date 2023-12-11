@@ -49,6 +49,7 @@
             setOALDCredentialsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             MM_ForceLoadFromBrowseField = new System.Windows.Forms.ToolStripMenuItem();
             MM_SpeakOnBrowsingOALD = new System.Windows.Forms.ToolStripMenuItem();
+            MM_ActivateTabsAfterAppStarts = new System.Windows.Forms.ToolStripMenuItem();
             historyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             MM_save = new System.Windows.Forms.ToolStripMenuItem();
             MM_saveAsCopy = new System.Windows.Forms.ToolStripMenuItem();
@@ -196,7 +197,7 @@
             // 
             // mainToolStripMenuItem
             // 
-            mainToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { MM_NeedUrbanDictionary, loginToOALDToolStripMenuItem, MM_LoginToOALDOnStart, setOALDCredentialsToolStripMenuItem, MM_ForceLoadFromBrowseField, MM_SpeakOnBrowsingOALD });
+            mainToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { MM_NeedUrbanDictionary, loginToOALDToolStripMenuItem, MM_LoginToOALDOnStart, setOALDCredentialsToolStripMenuItem, MM_ForceLoadFromBrowseField, MM_SpeakOnBrowsingOALD, MM_ActivateTabsAfterAppStarts });
             mainToolStripMenuItem.Name = "mainToolStripMenuItem";
             mainToolStripMenuItem.Size = new System.Drawing.Size(91, 29);
             mainToolStripMenuItem.Text = "Browser";
@@ -205,36 +206,40 @@
             // 
             MM_NeedUrbanDictionary.CheckOnClick = true;
             MM_NeedUrbanDictionary.Name = "MM_NeedUrbanDictionary";
-            MM_NeedUrbanDictionary.Size = new System.Drawing.Size(352, 34);
-            MM_NeedUrbanDictionary.Text = "Need Urban Dictionary";
+            MM_NeedUrbanDictionary.Size = new System.Drawing.Size(502, 34);
+            MM_NeedUrbanDictionary.Text = "Need Urban Dictionary [Deprecated]";
+            MM_NeedUrbanDictionary.Visible = false;
             MM_NeedUrbanDictionary.Click += MM_NeedUrbanDictionary_Click;
             // 
             // loginToOALDToolStripMenuItem
             // 
             loginToOALDToolStripMenuItem.Name = "loginToOALDToolStripMenuItem";
-            loginToOALDToolStripMenuItem.Size = new System.Drawing.Size(352, 34);
-            loginToOALDToolStripMenuItem.Text = "Login to OALD";
+            loginToOALDToolStripMenuItem.Size = new System.Drawing.Size(502, 34);
+            loginToOALDToolStripMenuItem.Text = "Login to OALD  [Deprecated]";
+            loginToOALDToolStripMenuItem.Visible = false;
             loginToOALDToolStripMenuItem.Click += loginToOALDToolStripMenuItem_Click;
             // 
             // MM_LoginToOALDOnStart
             // 
             MM_LoginToOALDOnStart.CheckOnClick = true;
             MM_LoginToOALDOnStart.Name = "MM_LoginToOALDOnStart";
-            MM_LoginToOALDOnStart.Size = new System.Drawing.Size(352, 34);
-            MM_LoginToOALDOnStart.Text = "Login to OALD on Start";
+            MM_LoginToOALDOnStart.Size = new System.Drawing.Size(502, 34);
+            MM_LoginToOALDOnStart.Text = "Login to OALD on Start  [Deprecated]";
+            MM_LoginToOALDOnStart.Visible = false;
             MM_LoginToOALDOnStart.Click += MM_LoginToOALDOnStart_Click;
             // 
             // setOALDCredentialsToolStripMenuItem
             // 
             setOALDCredentialsToolStripMenuItem.Name = "setOALDCredentialsToolStripMenuItem";
-            setOALDCredentialsToolStripMenuItem.Size = new System.Drawing.Size(352, 34);
-            setOALDCredentialsToolStripMenuItem.Text = "Set OALD Credentials";
+            setOALDCredentialsToolStripMenuItem.Size = new System.Drawing.Size(502, 34);
+            setOALDCredentialsToolStripMenuItem.Text = "Set OALD Credentials  [Deprecated]";
+            setOALDCredentialsToolStripMenuItem.Visible = false;
             setOALDCredentialsToolStripMenuItem.Click += setOALDCredentialsToolStripMenuItem_Click;
             // 
             // MM_ForceLoadFromBrowseField
             // 
             MM_ForceLoadFromBrowseField.Name = "MM_ForceLoadFromBrowseField";
-            MM_ForceLoadFromBrowseField.Size = new System.Drawing.Size(352, 34);
+            MM_ForceLoadFromBrowseField.Size = new System.Drawing.Size(502, 34);
             MM_ForceLoadFromBrowseField.Text = "Force Load From Browse Field";
             MM_ForceLoadFromBrowseField.Click += MM_ForceLoadFromBrowseField_Click;
             // 
@@ -244,9 +249,17 @@
             MM_SpeakOnBrowsingOALD.CheckOnClick = true;
             MM_SpeakOnBrowsingOALD.CheckState = System.Windows.Forms.CheckState.Checked;
             MM_SpeakOnBrowsingOALD.Name = "MM_SpeakOnBrowsingOALD";
-            MM_SpeakOnBrowsingOALD.Size = new System.Drawing.Size(352, 34);
-            MM_SpeakOnBrowsingOALD.Text = "Speak On Browsing (OALD)";
+            MM_SpeakOnBrowsingOALD.Size = new System.Drawing.Size(502, 34);
+            MM_SpeakOnBrowsingOALD.Text = "Click on All Items (Current Browser)  [Deprecated]";
+            MM_SpeakOnBrowsingOALD.Visible = false;
             MM_SpeakOnBrowsingOALD.Click += MM_SpeakOnBrowsingOALD_Click;
+            // 
+            // MM_ActivateTabsAfterAppStarts
+            // 
+            MM_ActivateTabsAfterAppStarts.Name = "MM_ActivateTabsAfterAppStarts";
+            MM_ActivateTabsAfterAppStarts.Size = new System.Drawing.Size(502, 34);
+            MM_ActivateTabsAfterAppStarts.Text = "Activate Tabs After App Starts";
+            MM_ActivateTabsAfterAppStarts.Click += activateTabsAfterAppStartsToolStripMenuItem_Click;
             // 
             // historyToolStripMenuItem
             // 
@@ -356,14 +369,14 @@
             // darkToolStripMenuItem
             // 
             darkToolStripMenuItem.Name = "darkToolStripMenuItem";
-            darkToolStripMenuItem.Size = new System.Drawing.Size(153, 34);
+            darkToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             darkToolStripMenuItem.Text = "Dark";
             darkToolStripMenuItem.Click += darkToolStripMenuItem_Click;
             // 
             // lightToolStripMenuItem
             // 
             lightToolStripMenuItem.Name = "lightToolStripMenuItem";
-            lightToolStripMenuItem.Size = new System.Drawing.Size(153, 34);
+            lightToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             lightToolStripMenuItem.Text = "Light";
             lightToolStripMenuItem.Click += lightToolStripMenuItem_Click;
             // 
@@ -380,7 +393,7 @@
             MM_HotKeyEnabled.CheckOnClick = true;
             MM_HotKeyEnabled.CheckState = System.Windows.Forms.CheckState.Checked;
             MM_HotKeyEnabled.Name = "MM_HotKeyEnabled";
-            MM_HotKeyEnabled.Size = new System.Drawing.Size(245, 34);
+            MM_HotKeyEnabled.Size = new System.Drawing.Size(270, 34);
             MM_HotKeyEnabled.Text = "Hot Key Enabled";
             // 
             // windowToolStripMenuItem
@@ -415,14 +428,14 @@
             // MM_About
             // 
             MM_About.Name = "MM_About";
-            MM_About.Size = new System.Drawing.Size(189, 34);
+            MM_About.Size = new System.Drawing.Size(270, 34);
             MM_About.Text = "About";
             MM_About.Click += MM_About_Click;
             // 
             // MM_ShortcutsHelp
             // 
             MM_ShortcutsHelp.Name = "MM_ShortcutsHelp";
-            MM_ShortcutsHelp.Size = new System.Drawing.Size(189, 34);
+            MM_ShortcutsHelp.Size = new System.Drawing.Size(270, 34);
             MM_ShortcutsHelp.Text = "Shortcuts";
             MM_ShortcutsHelp.Click += MM_ShortcutsHelp_Click;
             // 
@@ -784,6 +797,7 @@
         private System.Windows.Forms.ToolStripMenuItem MM_SpeakOnBrowsingOALD;
         private System.Windows.Forms.ToolStripMenuItem showJSErrorsToolStripMenuItem;
         private System.Windows.Forms.ToolStripStatusLabel stError;
+        private System.Windows.Forms.ToolStripMenuItem MM_ActivateTabsAfterAppStarts;
     }
 }
 

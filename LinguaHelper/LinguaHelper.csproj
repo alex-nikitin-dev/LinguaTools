@@ -22,7 +22,7 @@
     <UseWindowsForms>True</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <PlatformTarget>x64</PlatformTarget>
-    <Platforms>x64</Platforms>
+    <Platforms>x64;AnyCPU</Platforms>
 
 
   </PropertyGroup>
@@ -67,6 +67,9 @@
     <None Update="Browser Settings\GoogleTranslate\dark.mode.google.translator.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Browser Settings\Google\Google.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Browser Settings\oald\Oald.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -90,6 +93,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CustomTabControl\CustomTabControl.csproj" />
+    <ProjectReference Include="..\RichTabControl\RichTabControl.csproj" />
+    <ProjectReference Include="..\ThemeManager\ThemeManager.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Settings.Designer.cs">

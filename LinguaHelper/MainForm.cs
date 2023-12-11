@@ -1,5 +1,4 @@
 ﻿using CefSharp;
-using CefSharp.DevTools.Log;
 using CefSharp.WinForms;
 using LinguaHelper.Properties;
 using Newtonsoft.Json;
@@ -9,7 +8,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -21,16 +19,13 @@ namespace LinguaHelper
     public partial class MainForm : Form
     {
         #region ctor 
-        bool _firstGoBrowsers = true;
-        bool _silentOALD = false;
-
         private int? _hotKeyGo;
         private int? _hotKeySwitch;
         private int? _hotKeyShow;
 
-        private Color _foreColor;
-        private Color _backColor;
-        ColorTheme _currentColorTheme = ColorTheme.Light;
+       // private Color _foreColor;
+       // private Color _backColor;
+       // ColorTheme _currentColorTheme = ColorTheme.Light;
         Dictionary<ColorTheme, ColorThemeProvider> _colorThemes;
 
         private ListView _lstHistory;
@@ -139,7 +134,7 @@ namespace LinguaHelper
             throw new NotImplementedException();
             // _dictionaryTranslatorUnits[UnitName.Oald].Dictionary.Prepare(gotoAfterLoading);
         }
-        void GoBrowsers(string text,bool isUserCommand, bool saveHistory = true, bool force = false, bool silentOALD = false)
+        void GoBrowsers(string text, bool isUserCommand, bool saveHistory = true, bool force = false, bool silentOALD = false)
         {
             text = PrepareTextToProceed(text);
             if (string.IsNullOrEmpty(text)) return;
@@ -148,18 +143,9 @@ namespace LinguaHelper
             if (saveHistory)
                 _history.AddHistoryItem(text, GetCategory());
 
-            _silentOALD = silentOALD;
-
             foreach (var unit in _units)
             {
                 unit.Go(text, isUserCommand, force);
-            }
-
-            //if(MM_NeedUrbanDictionary.Checked) GoUrbanDictionary(text);
-            if (_firstGoBrowsers)
-            {
-                _firstGoBrowsers = false;
-                ActivateTabs();
             }
         }
         void ReloadAllBrowsers()
@@ -171,41 +157,6 @@ namespace LinguaHelper
         }
         private void InitBrowsers()
         {
-            //var stt = Settings.Default;
-            //var cssDarkColorTheme = File.ReadAllText(stt.DarkCSSColorThemePath);
-            //var cssDarkGTranslator = File.ReadAllText(stt.DarkCSSGTranslator);
-
-            //var oald = new BrowserItem(stt.OALD_URL,
-            //                           "OALD",
-            //                           cssDarkColorTheme,
-            //                           _currentColorTheme,
-            //                           OaldJS.GetInstance(),
-            //                           stt.OALDPrepareURL);
-            //oald.FinishAllTasks += Oald_FinishAllTasks;
-
-            //var cambridge = new BrowserItem(stt.Cambridge_URL,
-            //                                "Cambridge en-rus",
-            //                                cssDarkColorTheme,
-            //                                _currentColorTheme,
-            //                                CambridgeJS.GetInstance());
-            //var wiki = new BrowserItem(stt.Wiki_URL,
-            //                           "Wikipedia en",
-            //                           cssDarkColorTheme,
-            //                           _currentColorTheme,
-            //                           GenericJS.GetInstance());
-            //var google = new BrowserItem(stt.GoogleSearchURL,
-            //                             "Google",
-            //                             null/*cssDarkColorTheme*/,
-            //                             _currentColorTheme,
-            //                             GoogleJS.GetInstance(),
-            //                             null,
-            //                             stt.GoogleSearchRequestParams);
-
-            //_dictionaryTranslatorUnits.Add(UnitName.Oald, new(oald, new()));
-            //_dictionaryTranslatorUnits.Add(UnitName.Cambridge, new(cambridge, cssDarkGTranslator));
-            //_dictionaryTranslatorUnits.Add(UnitName.Wiki, new(wiki, cssDarkGTranslator));
-            //_dictionaryTranslatorUnits.Add(UnitName.Google, new(google, cssDarkGTranslator));
-
             _units = JsonConvert.DeserializeObject<List<DictionaryTranslatorUnit>>(File.ReadAllText("Browser Settings\\Browsers.json"));
             foreach (var unit in _units)
             {
@@ -225,7 +176,7 @@ namespace LinguaHelper
         /// </summary>
         private void BoundObject_JScriptErrorOccured(object sender, JScriptErrorEventArgs e)
         {
-            WriteToLog($"{e.Message} {e.Name} {e.Stack}",LogRecordCategory.JScript);
+            WriteToLog($"{e.Message} {e.Name} {e.Stack}", LogRecordCategory.JScript);
             JScriptStatusError();
         }
 
@@ -247,159 +198,24 @@ namespace LinguaHelper
         #endregion
 
         #region Color themes
-        [DllImport("dwmapi.dll")]
-        private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
-
-        private const int DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1 = 19;
-        private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
-
-        internal static bool UseImmersiveDarkMode(IntPtr handle, bool enabled)
-        {
-            if (IsWindows10OrGreater(17763))
-            {
-                var attribute = DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1;
-                if (IsWindows10OrGreater(18985))
-                {
-                    attribute = DWMWA_USE_IMMERSIVE_DARK_MODE;
-                }
-
-                int useImmersiveDarkMode = enabled ? 1 : 0;
-                return DwmSetWindowAttribute(handle, attribute, ref useImmersiveDarkMode, sizeof(int)) == 0;
-            }
-
-            return false;
-        }
-
-        private static bool IsWindows10OrGreater(int build = -1)
-        {
-            return Environment.OSVersion.Version.Major >= 10 && Environment.OSVersion.Version.Build >= build;
-        }
-        private void darkToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SetColorTheme(ColorTheme.Dark);
-        }
-        [SupportedOSPlatform("windows")]
-        void SetColorsRecursively(Control parent, Color backColor, Color foreColor)
-        {
-            parent.BackColor = backColor;
-            parent.ForeColor = foreColor;
-
-            foreach (Control child in parent.Controls)
-            {
-                SetColorsRecursively(child, backColor, foreColor);
-            }
-
-            if (parent is MenuStrip)
-            {
-                foreach (ToolStripItem menuItem in ((MenuStrip)parent).Items)
-                {
-                    SetMenuStripColorsRecursively(menuItem, backColor, foreColor);
-                }
-
-                var highLightColors = GetHighLightColor(backColor, foreColor);
-                (parent as MenuStrip).Renderer = new MyRenderer(highLightColors.backColor, backColor);
-            }
-        }
-        [SupportedOSPlatform("windows")]
-        void SetMenuStripColorsRecursively(ToolStripItem parent, Color backColor, Color foreColor)
-        {
-            parent.BackColor = backColor;
-            parent.ForeColor = foreColor;
-
-
-            if (parent is ToolStripMenuItem)
-            {
-                var parentsDropDown = (parent as ToolStripMenuItem).DropDown;
-                ((parentsDropDown as ToolStripDropDownMenu)!).ShowCheckMargin = true;
-                ((parentsDropDown as ToolStripDropDownMenu)!).ShowImageMargin = false;
-                parentsDropDown.BackColor = backColor;
-                parentsDropDown.ForeColor = foreColor;
-                parentsDropDown.Invalidate(true);
-            }
-
-            if (parent is ToolStripDropDownItem)
-            {
-                foreach (ToolStripItem childItem in (parent as ToolStripDropDownItem).DropDownItems)
-                {
-                    SetMenuStripColorsRecursively(childItem, backColor, foreColor);
-                }
-            }
-        }
-        [SupportedOSPlatform("windows")]
-        private (Color backColor, Color foreColor) GetHighLightColor(Color backColor, Color foreColor)
-        {
-            switch (_currentColorTheme)
-            {
-                case ColorTheme.Dark:
-                    return (ControlPaint.Light(backColor), ControlPaint.Dark(foreColor));
-                case ColorTheme.Light:
-                    return (ControlPaint.Dark(backColor), ControlPaint.Light(foreColor));
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        public class MyProfessionalColorTable : ProfessionalColorTable
-        {
-
-            Color _backColor;
-            public MyProfessionalColorTable(Color backColor)
-            {
-                _backColor = backColor;
-            }
-
-            public override Color ImageMarginGradientBegin => _backColor;
-            public override Color ImageMarginGradientMiddle => _backColor;
-            public override Color ImageMarginGradientEnd => _backColor;
-        }
-        [SupportedOSPlatform("windows")]
-        private class MyRenderer : ToolStripProfessionalRenderer
-        {
-            private Color _backColorOfHighlightedItem;
-            //private Color _foreColorOfHighlightedItem;
-            public MyRenderer(Color backColorOfHighlightedItem, Color backColor/*,Color foreColor*/)
-                : base(new MyProfessionalColorTable(backColor))
-            {
-                _backColorOfHighlightedItem = backColorOfHighlightedItem;
-                //_foreColorOfHighlightedItem = foreColor;
-            }
-
-            protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e)
-            {
-                Rectangle rc = new Rectangle(Point.Empty, e.Item.Size);
-                Color backColor = e.Item.Selected ? _backColorOfHighlightedItem : e.Item.BackColor;
-                using SolidBrush brush = new(backColor);
-                e.Graphics.FillRectangle(brush, rc);
-                // base.OnRenderMenuItemBackground(e);
-            }
-
-            //protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
-            //{
-            //    e.TextColor = e.Item.Selected ? _foreColorOfHighlightedItem : e.Item.ForeColor;
-            //    base.OnRenderItemText(e);
-            //}
-        }
         [SupportedOSPlatform("windows")]
         void SetColorTheme(ColorTheme theme)
         {
-            _currentColorTheme = theme;
-            SetColorsRecursively(this, _colorThemes[theme].Background, _colorThemes[theme].Foreground);
-            UseImmersiveDarkMode(Handle, theme == ColorTheme.Dark);
-            tabControl1.DisplayStyle = theme == ColorTheme.Dark ? TabStyle.Dark : TabStyle.Default;
-
-
-            SetColorThemeForAllUnits();
-            ReloadAllBrowsers();
-
             Settings.Default.DarkTheme = theme == ColorTheme.Dark;
             Settings.Default.Save();
+
+            var themeManager = ThemeManagerLoader.LoadThemeManager();
+            themeManager.ApplyTheme(this);
+            tabControl1.DisplayStyle = theme == ColorTheme.Dark ? TabStyle.Dark : TabStyle.Default;
+            SetColorThemeForAllUnits(theme);
+            ReloadAllBrowsers();
         }
 
-        private void SetColorThemeForAllUnits()
+        private void SetColorThemeForAllUnits(ColorTheme theme)
         {
             foreach (var unit in _units)
             {
-                unit.ColorTheme = _currentColorTheme;
+                unit.ColorTheme = theme;
             }
         }
         #endregion
@@ -522,6 +338,12 @@ namespace LinguaHelper
             text = new Regex("[ ]{2,}", RegexOptions.None).Replace(text, " ");
             return text;
         }
+
+        private void ActivateTabsIfNeeded()
+        {
+            if(Settings.Default.ActivateTabsAfterAppStarts)
+                ActivateTabs();
+        }
         private void ActivateTabs()
         {
             var selected = tabControl1.SelectedIndex;
@@ -549,7 +371,7 @@ namespace LinguaHelper
                (e.Key & Keys.X) == Keys.X)
             {
                 await ShowThisAppDesktop();
-                GoBrowsers(Clipboard.GetText(),true);
+                GoBrowsers(Clipboard.GetText(), true);
             }
             else if ((e.Modifiers & KeyModifiers.Control) == KeyModifiers.Control &&
                 (e.Modifiers & KeyModifiers.Shift) == KeyModifiers.Shift &&
@@ -868,7 +690,7 @@ namespace LinguaHelper
             var selectedItem = _lstHistory.SelectedItems[0];
             tabControl1.SelectedTab = tabControl1.TabPages[0];
             cbxCategory.Text = selectedItem.SubItems[1].Text;
-            GoBrowsers(selectedItem.Text,true);
+            GoBrowsers(selectedItem.Text, true);
         }
 
         private void DeleteHistoryItem(object sender, EventArgs e)
@@ -1165,9 +987,9 @@ namespace LinguaHelper
         {
             CefInit();
             await VirtualDesktopPSInitAsync();
-            _foreColor = ForeColor;
-            _backColor = BackColor;
-            _colorThemes = new();
+           // _foreColor = ForeColor;
+            //_backColor = BackColor;
+            //_colorThemes = new();
 
             LoadSettings();
             InitHotKeys();
@@ -1184,12 +1006,17 @@ namespace LinguaHelper
             if (MM_LoginToOALDOnStart.Checked)
                 LoginToOALD("test");
 
-            GoBrowsers("test",false, false, false, true);
+            //GoBrowsers("test", false, false, false, true);
+            ActivateTabsIfNeeded();
             SetThemeFromSettings();
         }
         #endregion
 
         #region Main menu click handlers
+        private void darkToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SetColorTheme(ColorTheme.Dark);
+        }
         private void showJSErrorsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var logPath = Settings.Default.ErrorLogPath;
@@ -1237,17 +1064,18 @@ namespace LinguaHelper
         [SupportedOSPlatform("windows")]
         private void setOALDCredentialsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var stt = Settings.Default;
-            var dialog = new CredentialsForm
-            {
-                Credentials = new Credentials(stt.OALDUser, stt.OALDPass)
-            };
+            throw new NotImplementedException();
+            //var stt = Settings.Default;
+            //var dialog = new CredentialsForm
+            //{
+            //    Credentials = new Credentials(stt.OALDUser, stt.OALDPass)
+            //};
 
-            if (dialog.ShowDialog() != DialogResult.OK) return;
-            stt.OALDUser = dialog.Credentials.UserName;
-            stt.OALDPass = dialog.Credentials.Password;
-            stt.Save();
-            ReloadOaldJS();
+            //if (dialog.ShowDialog() != DialogResult.OK) return;
+            //stt.OALDUser = dialog.Credentials.UserName;
+            //stt.OALDPass = dialog.Credentials.Password;
+            //stt.Save();
+            //ReloadOaldJS();
         }
         [SupportedOSPlatform("windows")]
         private void MM_ShortcutsHelp_Click(object sender, EventArgs e)
@@ -1264,6 +1092,7 @@ namespace LinguaHelper
         [SupportedOSPlatform("windows")]
         private void MM_LoginToOALDOnStart_Click(object sender, EventArgs e)
         {
+            throw new NotImplementedException();
             SetLoginToOALDOnStart(((ToolStripMenuItem)sender).Checked);
         }
         [SupportedOSPlatform("windows")]
@@ -1308,6 +1137,7 @@ namespace LinguaHelper
         [SupportedOSPlatform("windows")]
         private void MM_SpeakOnBrowsingOALD_Click(object sender, EventArgs e)
         {
+            throw new NotImplementedException();
             SetSpeakOnBrowsingOALD(((ToolStripMenuItem)sender).Checked);
         }
         private void MM_UseReverseOrder_Click(object sender, EventArgs e)
@@ -1319,8 +1149,34 @@ namespace LinguaHelper
 
         private void MM_ShowTasks_Click(object sender, EventArgs e)
         {
-            StartProcess(Settings.Default.TaskFilePath);
+            var stt = Settings.Default;
+            if (File.Exists(stt.TaskFilePath) || SetTaskPath())
+                StartProcess(Settings.Default.TaskFilePath);
         }
+
+        /// <summary>
+        /// Opens the dialog to choose the task file path and saves it to the settings.
+        /// </summary>
+        private bool SetTaskPath()
+        {
+            var dialog = new OpenFileDialog
+            {
+                Filter = @"Task files (*.docx)|*.docx|All files (*.*)|*.*",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                Title = @"Choose the task file"
+            };
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                var stt = Settings.Default;
+                stt.TaskFilePath = dialog.FileName;
+                stt.Save();
+                return true;
+            }
+
+            return false;
+        }
+
         private void MM_UseDateFilter_Click(object sender, EventArgs e)
         {
             SwitchVisibleDateTimeFilter(MM_UseDateFilter.Checked);
@@ -1395,10 +1251,12 @@ namespace LinguaHelper
         }
         private void MM_NeedUrbanDictionary_Click(object sender, EventArgs e)
         {
+            throw new NotImplementedException();
             ShowUrban(MM_NeedUrbanDictionary.Checked);
         }
         private void loginToOALDToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            throw new NotImplementedException();
             LoginToOALD();
         }
         [SupportedOSPlatform("Windows")]
@@ -1427,7 +1285,12 @@ namespace LinguaHelper
             }
         }
 
-
+        private void activateTabsAfterAppStartsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var stt = Settings.Default;
+            stt.ActivateTabsAfterAppStarts = ((ToolStripMenuItem)sender).Checked;
+            stt.Save();
+        }
         #endregion
 
         #region Status bar
@@ -1455,12 +1318,13 @@ namespace LinguaHelper
             MM_LoginToOALDOnStart.Checked = stt.OALDLoginOnStart;
             MM_ForceLoadFromBrowseField.Checked = stt.ForceLoadFromBrowse;
             MM_SpeakOnBrowsingOALD.Checked = stt.SpeakOnBrowsingOALD;
+            MM_ActivateTabsAfterAppStarts.Checked = stt.ActivateTabsAfterAppStarts;
 
-            _colorThemes.Clear();
-            _colorThemes.Add(ColorTheme.Dark, new(ColorTheme.Dark, stt.DarkForeground, stt.DarkBackground));
-            _colorThemes.Add(ColorTheme.Light, new(ColorTheme.Light, _foreColor, _backColor));
+           // _colorThemes.Clear();
+            //_colorThemes.Add(ColorTheme.Dark, new(ColorTheme.Dark, stt.DarkForeground, stt.DarkBackground));
+            //_colorThemes.Add(ColorTheme.Light, new(ColorTheme.Light, _foreColor, _backColor));
 
-            _currentColorTheme = stt.DarkTheme ? ColorTheme.Dark : ColorTheme.Light;
+            //_currentColorTheme = stt.DarkTheme ? ColorTheme.Dark : ColorTheme.Light;
         }
 
 
@@ -1676,7 +1540,5 @@ namespace LinguaHelper
             await ReturnToPreviousDesktop();
         }
         #endregion
-
-       
     }
 }

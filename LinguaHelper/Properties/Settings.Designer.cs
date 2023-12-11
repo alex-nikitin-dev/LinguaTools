@@ -97,7 +97,7 @@ namespace LinguaHelper.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Tasks.docx")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string TaskFilePath {
             get {
                 return ((string)(this["TaskFilePath"]));
@@ -181,25 +181,13 @@ namespace LinguaHelper.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool ForceLoadFromBrowse {
             get {
                 return ((bool)(this["ForceLoadFromBrowse"]));
             }
             set {
                 this["ForceLoadFromBrowse"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("sound audio_play_button pron-us icon-audio")]
-        public string OALD_AudioButton_ID {
-            get {
-                return ((string)(this["OALD_AudioButton_ID"]));
-            }
-            set {
-                this["OALD_AudioButton_ID"] = value;
             }
         }
         
@@ -217,87 +205,6 @@ namespace LinguaHelper.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ToggleGoogleTheme(\"dark\");")]
-        public string GoogleDarkThemeJS {
-            get {
-                return ((string)(this["GoogleDarkThemeJS"]));
-            }
-            set {
-                this["GoogleDarkThemeJS"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ToggleGoogleTheme(\"light\");")]
-        public string GoogleLightThemeJS {
-            get {
-                return ((string)(this["GoogleLightThemeJS"]));
-            }
-            set {
-                this["GoogleLightThemeJS"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"function ToggleGoogleTheme(desiredTheme) 
-{
-//alert(""OK"");
-  var toggleClassName = 'q0yked';
-  var toggleElements = document.getElementsByClassName(toggleClassName);
-
-	if (toggleElements.length > 3) 
-	{
-		var darkModeToggle = toggleElements[3].children[0];
-		var toggleText = darkModeToggle.innerText;
-
-		var isDarkModeCurrentlyOn = toggleText.includes('On');
-		var isLightModeCurrentlyOn = toggleText.includes('Off');
-
-		if(desiredTheme === 'light' && !isLightModeCurrentlyOn)
-		{
-			localStorage.setItem('themeChange', 'lightPending');
-			darkModeToggle.click();
-		}
-		else if(desiredTheme === 'dark' && !isDarkModeCurrentlyOn)
-		{
-			localStorage.setItem('themeChange', 'darkPending');
-			darkModeToggle.click();
-		}
-	}
-}
-function checkThemeChange() {
-  if (localStorage.getItem('themeChange') === 'lightPending') {
-    // Clear the flag first to prevent an infinite loop.
-    localStorage.removeItem('themeChange');
-    
-    // Then perform the second click.
-    ToggleGoogleTheme('light');
-  }
-  else if (localStorage.getItem('themeChange') === 'darkPending')
-  {
-	  // Clear the flag first to prevent an infinite loop.
-    localStorage.removeItem('themeChange');
-    
-    // Then perform the second click.
-    ToggleGoogleTheme('dark');
-  }
-}
-
-// Call this function on page load.
-document.addEventListener('DOMContentLoaded', checkThemeChange);")]
-        public string GoogleColorThemePrepareJS {
-            get {
-                return ((string)(this["GoogleColorThemePrepareJS"]));
-            }
-            set {
-                this["GoogleColorThemePrepareJS"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("ErrorsLog.log")]
         public string ErrorLogPath {
             get {
@@ -305,6 +212,42 @@ document.addEventListener('DOMContentLoaded', checkThemeChange);")]
             }
             set {
                 this["ErrorLogPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ActivateTabsAfterAppStarts {
+            get {
+                return ((bool)(this["ActivateTabsAfterAppStarts"]));
+            }
+            set {
+                this["ActivateTabsAfterAppStarts"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#3d3d3d")]
+        public string DarkSelectedBackground {
+            get {
+                return ((string)(this["DarkSelectedBackground"]));
+            }
+            set {
+                this["DarkSelectedBackground"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#fafafa")]
+        public string DarkSelectedForegound {
+            get {
+                return ((string)(this["DarkSelectedForegound"]));
+            }
+            set {
+                this["DarkSelectedForegound"] = value;
             }
         }
     }

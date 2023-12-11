@@ -90,25 +90,24 @@
       "loginUrl": null,
       "requestParams": null
     }
-  }
-
-
-  /*{
+  },
+  {
     "dictionary": {
-      "url": "https://dictionary.cambridge.org/dictionary/english-russian/",
-      "browserName": "Cambridge",
-      "cssDarkThemePath": "Browser Settings/css/dark.mode.general.css",
+      "url": "https://www.google.com/search?q=",
+      "browserName": "Google",
+      "cssDarkThemePath": null,
       "browserJS": {
-        "MainFrameJSCodePath": "Browser Settings/Cambridge/Cambridge.js",
+        "SpecificJSCodePath": "Browser Settings/Google/Google.js",
+        "GeneralJSCodePath": "Browser Settings/General/GeneralBrowser.js",
         "BindCefObjectsFuncName": "bindCefSharpObjects",
-        "LoginFuncName": "browserLogin",
-        "RedirectAfterLoginFuncName": "redirectAfterLogin",
-        "DeleteAdFuncName": "deleteAd",
-        "AllItemsToClickFuncName": "getAllItemsToClick",
+        "LoginFuncName": null,
+        "RedirectAfterLoginFuncName": null,
+        "DeleteAdFuncName": null,
+        "AllItemsToClick": null,
         "SetDarkThemeFuncName": "setDarkTheme",
         "SetLightThemeFuncName": "setLightTheme",
         "IsJsInjectedFuncName": "isJsInjected",
-        "AcceptAllCookiesFuncName": "acceptAllCookies"
+        "AcceptAllCookiesFuncName": null
       },
       "loginUrl": null,
       "requestParams": null
@@ -121,50 +120,5 @@
       "loginUrl": null,
       "requestParams": null
     }
-  }*/
-  /*,{
-    "url": "https://dictionary.cambridge.org/dictionary/english-russian/",
-    "browserName": "Cambridge",
-    "cssDarkTheme": "dark.mode.general.css",
-    "browserJS": {
-      "PrepareJSCode": "Cambridge/PrepareJSCode.js",
-      "MainFrameJSCode": "Cambridge/MainFrameJSCode.js",
-      "OtherJSCode": "Cambridge/OtherJSCode.js",
-      "ForAsyncEvalJSCode": "Cambridge/ForAsyncEvalJSCode.js",
-      "LoadingStateChanedJSCode": "Cambridge/LoadingStateChanedJSCode.js",
-      "ColorThemePrepareJSCode": "Cambridge/ColorThemePrepareJSCode.js"
-    },
-    "loginUrl": "",
-    "requestParams": ""
-  },
-  {
-    "url": "https://en.wikipedia.org/wiki/",
-    "browserName": "Wiki",
-    "cssDarkTheme": "dark.mode.general.css",
-    "browserJS": {
-      "PrepareJSCode": "Wiki/PrepareJSCode.js",
-      "MainFrameJSCode": "Wiki/MainFrameJSCode.js",
-      "OtherJSCode": "Wiki/OtherJSCode.js",
-      "ForAsyncEvalJSCode": "Wiki/ForAsyncEvalJSCode.js",
-      "LoadingStateChanedJSCode": "Wiki/LoadingStateChanedJSCode.js",
-      "ColorThemePrepareJSCode": "Wiki/ColorThemePrepareJSCode.js"
-    },
-    "loginUrl": "",
-    "requestParams": ""
-  },
-  {
-    "url": "https://www.google.com/search?q=",
-    "browserName": "Google",
-    "cssDarkTheme": null,
-    "browserJS": {
-      "PrepareJSCode": "Google/PrepareJSCode.js",
-      "MainFrameJSCode": "Google/MainFrameJSCode.js",
-      "OtherJSCode": "Google/OtherJSCode.js",
-      "ForAsyncEvalJSCode": "Google/ForAsyncEvalJSCode.js",
-      "LoadingStateChanedJSCode": "Google/LoadingStateChanedJSCode.js",
-      "ColorThemePrepareJSCode": "Google/ColorThemePrepareJSCode.js"
-    },
-    "loginUrl": "",
-    "requestParams": "+meaning"
-  }*/
+  }
 ]

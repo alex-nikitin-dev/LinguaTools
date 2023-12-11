@@ -10,13 +10,11 @@ function redirectAfterLogin() {
 }
 
 function deleteAd(){
-	//alert("OK");
 	removeAllElementsByPattern('[id ^= "ad_"]');
-	removeElementById('topslot_container')
+	removeElementById('topslot_container');
 }
 
 function acceptAllCookies() {
-	//alert("acceptAllCookies");
 clickElementById('onetrust-accept-btn-handler');
 }
 

@@ -35,7 +35,6 @@ namespace LinguaHelper
             labelVersion = new System.Windows.Forms.Label();
             labelCopyright = new System.Windows.Forms.Label();
             labelCompanyName = new System.Windows.Forms.Label();
-            textBoxDescription = new System.Windows.Forms.TextBox();
             okButton = new System.Windows.Forms.Button();
             tableLayoutPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)logoPictureBox).BeginInit();
@@ -44,14 +43,13 @@ namespace LinguaHelper
             // tableLayoutPanel
             // 
             tableLayoutPanel.ColumnCount = 2;
-            tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33F));
-            tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 67F));
+            tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 38.0952377F));
+            tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 61.9047623F));
             tableLayoutPanel.Controls.Add(logoPictureBox, 0, 0);
             tableLayoutPanel.Controls.Add(labelProductName, 1, 0);
             tableLayoutPanel.Controls.Add(labelVersion, 1, 1);
             tableLayoutPanel.Controls.Add(labelCopyright, 1, 2);
             tableLayoutPanel.Controls.Add(labelCompanyName, 1, 3);
-            tableLayoutPanel.Controls.Add(textBoxDescription, 1, 4);
             tableLayoutPanel.Controls.Add(okButton, 1, 5);
             tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             tableLayoutPanel.Location = new System.Drawing.Point(15, 17);
@@ -62,20 +60,22 @@ namespace LinguaHelper
             tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            tableLayoutPanel.Size = new System.Drawing.Size(1197, 921);
+            tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 52.85285F));
+            tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.50750732F));
+            tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            tableLayoutPanel.Size = new System.Drawing.Size(965, 645);
             tableLayoutPanel.TabIndex = 0;
             // 
             // logoPictureBox
             // 
             logoPictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            logoPictureBox.ErrorImage = null;
             logoPictureBox.Image = (System.Drawing.Image)resources.GetObject("logoPictureBox.Image");
             logoPictureBox.Location = new System.Drawing.Point(5, 6);
             logoPictureBox.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
             logoPictureBox.Name = "logoPictureBox";
             tableLayoutPanel.SetRowSpan(logoPictureBox, 6);
-            logoPictureBox.Size = new System.Drawing.Size(385, 909);
+            logoPictureBox.Size = new System.Drawing.Size(357, 633);
             logoPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             logoPictureBox.TabIndex = 12;
             logoPictureBox.TabStop = false;
@@ -83,11 +83,11 @@ namespace LinguaHelper
             // labelProductName
             // 
             labelProductName.Dock = System.Windows.Forms.DockStyle.Fill;
-            labelProductName.Location = new System.Drawing.Point(405, 0);
+            labelProductName.Location = new System.Drawing.Point(377, 0);
             labelProductName.Margin = new System.Windows.Forms.Padding(10, 0, 5, 0);
             labelProductName.MaximumSize = new System.Drawing.Size(0, 33);
             labelProductName.Name = "labelProductName";
-            labelProductName.Size = new System.Drawing.Size(787, 33);
+            labelProductName.Size = new System.Drawing.Size(583, 33);
             labelProductName.TabIndex = 19;
             labelProductName.Text = "Product Name";
             labelProductName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -95,11 +95,11 @@ namespace LinguaHelper
             // labelVersion
             // 
             labelVersion.Dock = System.Windows.Forms.DockStyle.Fill;
-            labelVersion.Location = new System.Drawing.Point(405, 92);
+            labelVersion.Location = new System.Drawing.Point(377, 64);
             labelVersion.Margin = new System.Windows.Forms.Padding(10, 0, 5, 0);
             labelVersion.MaximumSize = new System.Drawing.Size(0, 33);
             labelVersion.Name = "labelVersion";
-            labelVersion.Size = new System.Drawing.Size(787, 33);
+            labelVersion.Size = new System.Drawing.Size(583, 33);
             labelVersion.TabIndex = 0;
             labelVersion.Text = "Version";
             labelVersion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -107,49 +107,35 @@ namespace LinguaHelper
             // labelCopyright
             // 
             labelCopyright.Dock = System.Windows.Forms.DockStyle.Fill;
-            labelCopyright.Location = new System.Drawing.Point(405, 184);
+            labelCopyright.Location = new System.Drawing.Point(377, 128);
             labelCopyright.Margin = new System.Windows.Forms.Padding(10, 0, 5, 0);
             labelCopyright.MaximumSize = new System.Drawing.Size(0, 33);
             labelCopyright.Name = "labelCopyright";
-            labelCopyright.Size = new System.Drawing.Size(787, 33);
+            labelCopyright.Size = new System.Drawing.Size(583, 33);
             labelCopyright.TabIndex = 21;
-            labelCopyright.Text = "Copyright © Oleksii Nikitin (alex.nikitin.gm@gmail.com), 2022";
+            labelCopyright.Text = "Copyright © Oleksii Nikitin (alex.nikitin.dev@gmail.com), 2023";
             labelCopyright.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // labelCompanyName
             // 
             labelCompanyName.Dock = System.Windows.Forms.DockStyle.Fill;
-            labelCompanyName.Location = new System.Drawing.Point(405, 276);
+            labelCompanyName.Location = new System.Drawing.Point(377, 192);
             labelCompanyName.Margin = new System.Windows.Forms.Padding(10, 0, 5, 0);
             labelCompanyName.MaximumSize = new System.Drawing.Size(0, 33);
             labelCompanyName.Name = "labelCompanyName";
-            labelCompanyName.Size = new System.Drawing.Size(787, 33);
+            labelCompanyName.Size = new System.Drawing.Size(583, 33);
             labelCompanyName.TabIndex = 22;
             labelCompanyName.Text = "Company Name";
             labelCompanyName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // textBoxDescription
-            // 
-            textBoxDescription.Dock = System.Windows.Forms.DockStyle.Fill;
-            textBoxDescription.Location = new System.Drawing.Point(405, 374);
-            textBoxDescription.Margin = new System.Windows.Forms.Padding(10, 6, 5, 6);
-            textBoxDescription.Multiline = true;
-            textBoxDescription.Name = "textBoxDescription";
-            textBoxDescription.ReadOnly = true;
-            textBoxDescription.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            textBoxDescription.Size = new System.Drawing.Size(787, 448);
-            textBoxDescription.TabIndex = 23;
-            textBoxDescription.TabStop = false;
-            textBoxDescription.Text = "Description";
             // 
             // okButton
             // 
             okButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
             okButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            okButton.Location = new System.Drawing.Point(1067, 876);
+            okButton.Location = new System.Drawing.Point(835, 601);
             okButton.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
             okButton.Name = "okButton";
-            okButton.Size = new System.Drawing.Size(125, 39);
+            okButton.Size = new System.Drawing.Size(125, 38);
             okButton.TabIndex = 24;
             okButton.Text = "&OK";
             // 
@@ -158,7 +144,7 @@ namespace LinguaHelper
             AcceptButton = okButton;
             AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(1227, 955);
+            ClientSize = new System.Drawing.Size(995, 679);
             Controls.Add(tableLayoutPanel);
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
@@ -170,8 +156,8 @@ namespace LinguaHelper
             ShowInTaskbar = false;
             StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             Text = "AboutForm";
+            Shown += AboutForm_Shown;
             tableLayoutPanel.ResumeLayout(false);
-            tableLayoutPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)logoPictureBox).EndInit();
             ResumeLayout(false);
         }
@@ -184,7 +170,7 @@ namespace LinguaHelper
         private System.Windows.Forms.Label labelVersion;
         private System.Windows.Forms.Label labelCopyright;
         private System.Windows.Forms.Label labelCompanyName;
-        private System.Windows.Forms.TextBox textBoxDescription;
         private System.Windows.Forms.Button okButton;
+
     }
 }

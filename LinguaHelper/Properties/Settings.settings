@@ -21,7 +21,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="TaskFilePath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Tasks.docx</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="OALDPass" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -42,70 +42,22 @@
       <Value Profile="(Default)">#dadada</Value>
     </Setting>
     <Setting Name="ForceLoadFromBrowse" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="OALD_AudioButton_ID" Type="System.String" Scope="User">
-      <Value Profile="(Default)">sound audio_play_button pron-us icon-audio</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="SpeakOnBrowsingOALD" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="GoogleDarkThemeJS" Type="System.String" Scope="User">
-      <Value Profile="(Default)">ToggleGoogleTheme("dark");</Value>
-    </Setting>
-    <Setting Name="GoogleLightThemeJS" Type="System.String" Scope="User">
-      <Value Profile="(Default)">ToggleGoogleTheme("light");</Value>
-    </Setting>
-    <Setting Name="GoogleColorThemePrepareJS" Type="System.String" Scope="User">
-      <Value Profile="(Default)">function ToggleGoogleTheme(desiredTheme) 
-{
-//alert("OK");
-  var toggleClassName = 'q0yked';
-  var toggleElements = document.getElementsByClassName(toggleClassName);
-
-	if (toggleElements.length &gt; 3) 
-	{
-		var darkModeToggle = toggleElements[3].children[0];
-		var toggleText = darkModeToggle.innerText;
-
-		var isDarkModeCurrentlyOn = toggleText.includes('On');
-		var isLightModeCurrentlyOn = toggleText.includes('Off');
-
-		if(desiredTheme === 'light' &amp;&amp; !isLightModeCurrentlyOn)
-		{
-			localStorage.setItem('themeChange', 'lightPending');
-			darkModeToggle.click();
-		}
-		else if(desiredTheme === 'dark' &amp;&amp; !isDarkModeCurrentlyOn)
-		{
-			localStorage.setItem('themeChange', 'darkPending');
-			darkModeToggle.click();
-		}
-	}
-}
-function checkThemeChange() {
-  if (localStorage.getItem('themeChange') === 'lightPending') {
-    // Clear the flag first to prevent an infinite loop.
-    localStorage.removeItem('themeChange');
-    
-    // Then perform the second click.
-    ToggleGoogleTheme('light');
-  }
-  else if (localStorage.getItem('themeChange') === 'darkPending')
-  {
-	  // Clear the flag first to prevent an infinite loop.
-    localStorage.removeItem('themeChange');
-    
-    // Then perform the second click.
-    ToggleGoogleTheme('dark');
-  }
-}
-
-// Call this function on page load.
-document.addEventListener('DOMContentLoaded', checkThemeChange);</Value>
-    </Setting>
     <Setting Name="ErrorLogPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">ErrorsLog.log</Value>
+    </Setting>
+    <Setting Name="ActivateTabsAfterAppStarts" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="DarkSelectedBackground" Type="System.String" Scope="User">
+      <Value Profile="(Default)">#3d3d3d</Value>
+    </Setting>
+    <Setting Name="DarkSelectedForegound" Type="System.String" Scope="User">
+      <Value Profile="(Default)">#fafafa</Value>
     </Setting>
   </Settings>
 </SettingsFile>
