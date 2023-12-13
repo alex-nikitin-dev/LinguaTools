@@ -19,9 +19,10 @@ namespace LinguaHelper
         public string IsJsInjectedFuncName { get; private set; }
         public string AcceptAllCookiesFuncName { get; private set; }
         public string WholeJSCode { get; private set; }
+        public string SetDefaultPageTextFuncName { get; private set; }
 
         [JsonConstructor]
-        public BrowserJS(string specificJSCodePath, string generalJSCodePath, string bindCefObjectsFuncName, string loginFuncName, string redirectAfterLoginFuncName, string deleteAdFuncName, string[] allItemsToClick, string setDarkThemeFuncName, string setLightThemeFuncName,string isJsInjectedFuncName, string acceptAllCookiesFuncName)
+        public BrowserJS(string specificJSCodePath, string generalJSCodePath, string bindCefObjectsFuncName, string loginFuncName, string redirectAfterLoginFuncName, string deleteAdFuncName, string[] allItemsToClick, string setDarkThemeFuncName, string setLightThemeFuncName,string isJsInjectedFuncName, string acceptAllCookiesFuncName, string setDefaultPageTextFuncName)
         {
             SpecificJSCode = LoadJSCode(specificJSCodePath);
             GeneralJSCode = LoadJSCode(generalJSCodePath);
@@ -36,6 +37,7 @@ namespace LinguaHelper
             SetLightThemeFuncName = setLightThemeFuncName;
             IsJsInjectedFuncName = isJsInjectedFuncName;
             AcceptAllCookiesFuncName = acceptAllCookiesFuncName;
+            SetDefaultPageTextFuncName = setDefaultPageTextFuncName;
         }
 
         private string LoadJSCode(string path)

@@ -73,18 +73,6 @@ namespace LinguaHelper.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool OALDLoginOnStart {
-            get {
-                return ((bool)(this["OALDLoginOnStart"]));
-            }
-            set {
-                this["OALDLoginOnStart"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string HistoryBackupPath {
             get {
@@ -128,18 +116,6 @@ namespace LinguaHelper.Properties {
             }
             set {
                 this["OALDUser"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://www.urbandictionary.com/define.php?term=")]
-        public string Urban_URL {
-            get {
-                return ((string)(this["Urban_URL"]));
-            }
-            set {
-                this["Urban_URL"] = value;
             }
         }
         
@@ -248,6 +224,18 @@ namespace LinguaHelper.Properties {
             }
             set {
                 this["DarkSelectedForegound"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowOnlyTodaysEntries {
+            get {
+                return ((bool)(this["ShowOnlyTodaysEntries"]));
+            }
+            set {
+                this["ShowOnlyTodaysEntries"] = value;
             }
         }
     }

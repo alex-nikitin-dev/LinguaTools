@@ -4,6 +4,7 @@
       "url": "https://www.oxfordlearnersdictionaries.com/search/english/?q=",
       "browserName": "OALD",
       "cssDarkThemePath": "Browser Settings/css/dark.mode.general.css",
+      "cssDarkThemeDefaultPagePath": "Browser Settings/css/dark.mode.general.css",
       "browserJS": {
         "SpecificJSCodePath": "Browser Settings/oald/Oald.js",
         "GeneralJSCodePath": "Browser Settings/General/GeneralBrowser.js",
@@ -17,18 +18,29 @@
         "SetDarkThemeFuncName": "setDarkTheme",
         "SetLightThemeFuncName": "setLightTheme",
         "IsJsInjectedFuncName": "isJsInjected",
-        "AcceptAllCookiesFuncName": "acceptAllCookies"
+        "AcceptAllCookiesFuncName": "acceptAllCookies",
+        "SetDefaultPageTextFuncName": "setDefaultPageText"
       },
       "loginUrl": "https://www.oxfordlearnersdictionaries.com/account/login",
-      "requestParams": null
+      "requestParams": null,
+      "defaultPagePath": "Browser Settings/Default/Default.html",
+      "defaultWelcomeText": "Oxford Advanced Learner's Dictionary"
     },
     "translator": {
       "url": "https://translate.google.am/?op=translate&sl=en&tl=ru&hl=en&text=",
       "browserName": "GoogleTranslate",
       "cssDarkThemePath": "Browser Settings/GoogleTranslate/dark.mode.google.translator.css",
-      "browserJS": null,
+      "cssDarkThemeDefaultPagePath": "Browser Settings/css/dark.mode.general.css",
+      "browserJS": {
+        "GeneralJSCodePath": "Browser Settings/General/GeneralBrowser.js",
+        "BindCefObjectsFuncName": "bindCefSharpObjects",
+        "IsJsInjectedFuncName": "isJsInjected",
+        "SetDefaultPageTextFuncName": "setDefaultPageText"
+      },
       "loginUrl": null,
-      "requestParams": null
+      "requestParams": null,
+      "defaultPagePath": "Browser Settings/Default/Default.html",
+      "defaultWelcomeText": "Google Translator"
     }
   },
   {
@@ -36,6 +48,7 @@
       "url": "https://dictionary.cambridge.org/dictionary/english-russian/",
       "browserName": "Cambridge",
       "cssDarkThemePath": "Browser Settings/css/dark.mode.general.css",
+      "cssDarkThemeDefaultPagePath": "Browser Settings/css/dark.mode.general.css",
       "browserJS": {
         "SpecificJSCodePath": "Browser Settings/Cambridge/Cambridge.js",
         "GeneralJSCodePath": "Browser Settings/General/GeneralBrowser.js",
@@ -47,18 +60,29 @@
         "SetDarkThemeFuncName": "setDarkTheme",
         "SetLightThemeFuncName": "setLightTheme",
         "IsJsInjectedFuncName": "isJsInjected",
-        "AcceptAllCookiesFuncName": "acceptAllCookies"
+        "AcceptAllCookiesFuncName": "acceptAllCookies",
+        "SetDefaultPageTextFuncName": "setDefaultPageText"
       },
       "loginUrl": null,
-      "requestParams": null
+      "requestParams": null,
+      "defaultPagePath": "Browser Settings/Default/Default.html",
+      "defaultWelcomeText": "Cambridge Dictionary"
     },
     "translator": {
       "url": "https://translate.google.am/?op=translate&sl=en&tl=ru&hl=en&text=",
       "browserName": "GoogleTranslate",
       "cssDarkThemePath": "Browser Settings/GoogleTranslate/dark.mode.google.translator.css",
-      "browserJS": null,
+      "cssDarkThemeDefaultPagePath": "Browser Settings/css/dark.mode.general.css",
+      "browserJS": {
+        "GeneralJSCodePath": "Browser Settings/General/GeneralBrowser.js",
+        "BindCefObjectsFuncName": "bindCefSharpObjects",
+        "IsJsInjectedFuncName": "isJsInjected",
+        "SetDefaultPageTextFuncName": "setDefaultPageText"
+      },
       "loginUrl": null,
-      "requestParams": null
+      "requestParams": null,
+      "defaultPagePath": "Browser Settings/Default/Default.html",
+      "defaultWelcomeText": "Google Translator"
     }
   },
   {
@@ -66,6 +90,7 @@
       "url": "https://en.wikipedia.org/wiki/",
       "browserName": "Wikipedia",
       "cssDarkThemePath": "Browser Settings/css/dark.mode.general.css",
+      "cssDarkThemeDefaultPagePath": "Browser Settings/css/dark.mode.general.css",
       "browserJS": {
         "SpecificJSCodePath": null,
         "GeneralJSCodePath": "Browser Settings/General/GeneralBrowser.js",
@@ -77,18 +102,29 @@
         "SetDarkThemeFuncName": null,
         "SetLightThemeFuncName": null,
         "IsJsInjectedFuncName": "isJsInjected",
-        "AcceptAllCookiesFuncName": null
+        "AcceptAllCookiesFuncName": null,
+        "SetDefaultPageTextFuncName": "setDefaultPageText"
       },
       "loginUrl": null,
-      "requestParams": null
+      "requestParams": null,
+      "defaultPagePath": "Browser Settings/Default/Default.html",
+      "defaultWelcomeText": "Wikipedia"
     },
     "translator": {
       "url": "https://translate.google.am/?op=translate&sl=en&tl=ru&hl=en&text=",
       "browserName": "GoogleTranslate",
       "cssDarkThemePath": "Browser Settings/GoogleTranslate/dark.mode.google.translator.css",
-      "browserJS": null,
+      "cssDarkThemeDefaultPagePath": "Browser Settings/css/dark.mode.general.css",
+      "browserJS": {
+        "GeneralJSCodePath": "Browser Settings/General/GeneralBrowser.js",
+        "BindCefObjectsFuncName": "bindCefSharpObjects",
+        "IsJsInjectedFuncName": "isJsInjected",
+        "SetDefaultPageTextFuncName": "setDefaultPageText"
+      },
       "loginUrl": null,
-      "requestParams": null
+      "requestParams": null,
+      "defaultPagePath": "Browser Settings/Default/Default.html",
+      "defaultWelcomeText": "Google Translator"
     }
   },
   {
@@ -96,6 +132,7 @@
       "url": "https://www.google.com/search?q=",
       "browserName": "Google",
       "cssDarkThemePath": null,
+      "cssDarkThemeDefaultPagePath": "Browser Settings/css/dark.mode.general.css",
       "browserJS": {
         "SpecificJSCodePath": "Browser Settings/Google/Google.js",
         "GeneralJSCodePath": "Browser Settings/General/GeneralBrowser.js",
@@ -107,18 +144,29 @@
         "SetDarkThemeFuncName": "setDarkTheme",
         "SetLightThemeFuncName": "setLightTheme",
         "IsJsInjectedFuncName": "isJsInjected",
-        "AcceptAllCookiesFuncName": null
+        "AcceptAllCookiesFuncName": null,
+        "SetDefaultPageTextFuncName": "setDefaultPageText"
       },
       "loginUrl": null,
-      "requestParams": null
+      "requestParams": null,
+      "defaultPagePath": "Browser Settings/Default/Default.html",
+      "defaultWelcomeText": "Google search"
     },
     "translator": {
       "url": "https://translate.google.am/?op=translate&sl=en&tl=ru&hl=en&text=",
       "browserName": "GoogleTranslate",
       "cssDarkThemePath": "Browser Settings/GoogleTranslate/dark.mode.google.translator.css",
-      "browserJS": null,
+      "cssDarkThemeDefaultPagePath": "Browser Settings/css/dark.mode.general.css",
+      "browserJS": {
+        "GeneralJSCodePath": "Browser Settings/General/GeneralBrowser.js",
+        "BindCefObjectsFuncName": "bindCefSharpObjects",
+        "IsJsInjectedFuncName": "isJsInjected",
+        "SetDefaultPageTextFuncName": "setDefaultPageText"
+      },
       "loginUrl": null,
-      "requestParams": null
+      "requestParams": null,
+      "defaultPagePath": "Browser Settings/Default/Default.html",
+      "defaultWelcomeText": "Google Translator"
     }
   }
 ]

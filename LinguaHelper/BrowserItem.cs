@@ -1,6 +1,7 @@
 ﻿using CefSharp;
 using CefSharp.WinForms;
 using System;
+using System.Drawing;
 using System.IO;
 using System.Runtime.Versioning;
 using System.Text.Json.Serialization;
@@ -23,6 +24,7 @@ namespace LinguaHelper
         public bool IsClickVergin { get; private set; }
         private BrowserJS _browserJS;
         public string CSSDarkTheme { get; set; }
+        public string CSSDarkThemeDefaultPage { get; set; }
 
         public bool Active { get; private set; }
 
@@ -42,35 +44,44 @@ namespace LinguaHelper
         public ChromiumWebBrowser Browser => _browser;
 
         public string Url => _url;
-
+        private string _defaultPagePath;
+        private string _defaultWelcomeText;
         private BrowserItem(ChromiumWebBrowser browser,
             string url,
             string browserName,
             string cssDarkTheme,
+            string cssDarkThemeDefault,
             ColorTheme theme,
            BrowserJS browserJS,
             string loginUrl,
             string requestParams = null,
+            string defaultPagePath = null,
+            string defaultWelcomeText = null,
             bool legacyBinding = false)
         {
             _browser = browser;
-            Active = true;
+            BrowserSettings browserSettings = new BrowserSettings();
+            browserSettings.LocalStorage = CefState.Enabled;
+            _browser.BrowserSettings = browserSettings;
+            Active = false;
             IsClickVergin = true;
             _gotoAfterLogin = null;
             _url = url;
             BrowserName = browserName;
             CSSDarkTheme = cssDarkTheme;
+            CSSDarkThemeDefaultPage = cssDarkThemeDefault;
             _needLogin = false;
-            
+            _colorTheme = theme;
             _browser.FrameLoadEnd += _browser_FrameLoadEnd;
             var requestHandler = new CustomRequestHandler();
             requestHandler.UserGesture += RequestHandler_UserGesture;
             _browser.RequestHandler = requestHandler;
             _loginUrl = loginUrl;
             _requestParams = requestParams;
+            _defaultPagePath = Path.Exists(Path.GetFullPath(defaultPagePath)) ? defaultPagePath : null;
+            _defaultWelcomeText = defaultWelcomeText;
             _browserJS = browserJS;
             _browser.JavascriptObjectRepository.Settings.LegacyBindingEnabled = legacyBinding;
-            ColorTheme = theme;
             _needSetColorTheme = true;
 
             BoundObject = new BoundObject();
@@ -86,28 +97,34 @@ namespace LinguaHelper
             _browser.KeyboardHandler = new KeyboardHandler();
         }
 
-       
-
         [JsonConstructor]
         public BrowserItem(string url,
             string browserName,
             string cssDarkThemePath,
+            string cssDarkThemeDefaultPagePath,
             BrowserJS browserJS = null,
             string loginUrl = null,
             string requestParams = null,
-            ColorTheme theme = ColorTheme.Dark)
+            string defaultPagePath = null,
+            string defaultWelcomeText = null,
+            ColorTheme theme = ColorTheme.Light)
             : this(new ChromiumWebBrowser(),
                   url,
                   browserName,
                   null,
+                  null,
                   theme,
                   browserJS,
                   loginUrl,
-                  requestParams)
+                  requestParams,
+                  defaultPagePath,
+                  defaultWelcomeText)
         {
             _browser.Dock = DockStyle.Fill;
             if (File.Exists(cssDarkThemePath))
                 CSSDarkTheme = File.ReadAllText(cssDarkThemePath);
+            if (File.Exists(cssDarkThemeDefaultPagePath))
+                CSSDarkThemeDefaultPage = File.ReadAllText(cssDarkThemeDefaultPagePath);
         }
         #endregion
 
@@ -117,10 +134,60 @@ namespace LinguaHelper
         {
             if (force || IsLoadAllowed())
             {
+                IsDefaultPageLoaded = false;
                 _userLoadCommand = isUserCommand;    
                 _browser.Load($"{_url}{text}{_requestParams}");
             }
+            else
+            {
+                LoadDefaultPage();
+            }
         }
+        private void LoadFile(string path)
+        {
+            try
+            { 
+                _browser.Load($"file:///{GetEscapedFilePath(path)}");
+            }
+            catch (Exception e)
+            {
+                OnBrowerErrorOccured(this, $"Load file exception on {_browser.Address}: {e.Message}");
+            }
+        }
+        private string GetEscapedFilePath(string path)
+        {
+            try
+            {
+                string fullPath = Path.GetFullPath(path);
+                string[] pathSegments = fullPath.Split(Path.DirectorySeparatorChar);
+                for (int i = 0; i < pathSegments.Length; i++)
+                {
+                    pathSegments[i] = Uri.EscapeDataString(pathSegments[i]);
+                }
+                return string.Join("/", pathSegments);
+            }
+            catch (Exception e)
+            {
+                OnBrowerErrorOccured(this, $"Cannot get escaped file path: {path}: {e.Message}");
+            }
+
+            return null;
+        }
+        /// <summary>
+        /// The default page has loaded and shown in the browser
+        /// </summary>
+        private bool IsDefaultPageLoaded = false;
+        public void LoadDefaultPage()
+        {
+            if (_defaultPagePath != null)
+            {
+                IsDefaultPageLoaded = true;
+                LoadFile(_defaultPagePath);
+            }
+            else
+                OnBrowerErrorOccured(this, $"The default page:\"{_defaultPagePath}\" doesn't exists");
+        }
+
         public void Show()
         {
             _browser.Show();
@@ -135,9 +202,9 @@ namespace LinguaHelper
             Active = false;
         }
 
-        public void ReLoad()
+        public void ReLoad(bool force = false)
         {
-            if (_browser.IsBrowserInitialized)
+            if (_browser.IsBrowserInitialized && (IsLoadAllowed() || force || IsDefaultPageLoaded))
                 _browser.Reload();
         }
         //public void ReloadJSCode(BrowserJS browserJS)
@@ -219,14 +286,19 @@ namespace LinguaHelper
             {
                 await InjectJavaScript();
                 ApplyColorTheme();
-                BindCefObjects(false);
+                if(!IsDefaultPageLoaded) BindCefObjects(false);
                 ExecuteColorThemeJS(false);
-                DeleteAd(false);
-                AcceptAllCookies(false);
-                DoUserCommands();
+                if(!IsDefaultPageLoaded) DeleteAd(false);
+                if (!IsDefaultPageLoaded) AcceptAllCookies(false);
+                if (!IsDefaultPageLoaded) DoUserCommands();
+                if(IsDefaultPageLoaded) SetDefaultPageText();
             }
         }
-
+        private void SetDefaultPageText()
+        {
+            if (_defaultWelcomeText != null)
+                ExecuteJScriptFuncAsync(_browserJS?.SetDefaultPageTextFuncName, false, _defaultWelcomeText);
+        }
         private void DoUserCommands()
         {
             if (_userLoadCommand)
@@ -247,10 +319,22 @@ namespace LinguaHelper
         private async Task<JavascriptResponse> EvaluateJScriptFuncAsync(string funcName, bool injectJs, params string[] args)
         {
             if (injectJs) await InjectJavaScript();
-            if (!string.IsNullOrEmpty(funcName))
+            try
+            {
+                if (!CanExecuteJavascriptInMainFrame())
+                    return null;
+
+                if (string.IsNullOrEmpty(funcName))
+                    return null;
+                    
                 return await _browser.EvaluateScriptAsync(funcName, args);
-            else
+                
+            }
+            catch (Exception e)
+            {
+                OnBrowerErrorOccured(this, $"EvaluateJScriptFuncAsync {_browser.Address}, Message: {e.Message}");
                 return null;
+            }
         }
         private async Task<JavascriptResponse> EvaluateJScriptFuncAsync(string funcName, bool injectJs)
         {
@@ -259,11 +343,22 @@ namespace LinguaHelper
         #endregion
 
         #region JavaScript execution
+
         private async void ExecuteJScriptFuncAsync(string funcName, bool injectJs, params string[] args)
         {
             if (injectJs) await InjectJavaScript();
-            if (!string.IsNullOrEmpty(funcName))
-                _browser.ExecuteScriptAsync(funcName, args);
+            try
+            {
+                if (!CanExecuteJavascriptInMainFrame())
+                    return;
+
+                if (!string.IsNullOrEmpty(funcName))
+                    _browser.ExecuteScriptAsync(funcName, args);
+            }
+            catch (Exception e)
+            {
+                OnBrowerErrorOccured(this, $"ExecuteJScriptFuncAsync {_browser.Address}, Message: {e.Message}");
+            }           
         }
         private void ExecuteJScriptFuncAsync(string funcName,bool injectJs)
         {
@@ -308,7 +403,7 @@ namespace LinguaHelper
             switch (ColorTheme)
             {
                 case ColorTheme.Dark:
-                    SetBrowserColorsCSS(CSSDarkTheme);
+                    SetBrowserColorsCSS(IsDefaultPageLoaded ? CSSDarkThemeDefaultPage : CSSDarkTheme);
                     break;
             }
         }
@@ -363,12 +458,13 @@ namespace LinguaHelper
         {
             BrowerErrorOccured?.Invoke(sender, message);
         }
-        private bool CanExecuteJavascriptInMainFrame()
+        private bool CanExecuteJavascriptInMainFrame(string message=null, bool generateException = false)
         {
             if (_browser.CanExecuteJavascriptInMainFrame)
                 return true;
-            else
-                OnBrowerErrorOccured(this, $"Can't execute javascript in main frame of the address = {_browser.Address}");
+            
+            if (generateException)
+                OnBrowerErrorOccured(this, $"CanExecuteJavascriptInMainFrame is false. address = {_browser.Address} additional info: {(message == null ? "none":message)}");
 
             return false;
         }

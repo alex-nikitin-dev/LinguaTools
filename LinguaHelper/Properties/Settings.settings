@@ -14,9 +14,6 @@
     <Setting Name="AutoSortByDate" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="OALDLoginOnStart" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="HistoryBackupPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
@@ -28,9 +25,6 @@
     </Setting>
     <Setting Name="OALDUser" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="Urban_URL" Type="System.String" Scope="User">
-      <Value Profile="(Default)">https://www.urbandictionary.com/define.php?term=</Value>
     </Setting>
     <Setting Name="firstTabName" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -58,6 +52,9 @@
     </Setting>
     <Setting Name="DarkSelectedForegound" Type="System.String" Scope="User">
       <Value Profile="(Default)">#fafafa</Value>
+    </Setting>
+    <Setting Name="ShowOnlyTodaysEntries" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

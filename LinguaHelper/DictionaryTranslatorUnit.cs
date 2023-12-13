@@ -1,4 +1,5 @@
-﻿using System.Runtime.Versioning;
+﻿using System.Drawing;
+using System.Runtime.Versioning;
 using System.Text.Json.Serialization;
 
 namespace LinguaHelper
@@ -19,20 +20,16 @@ namespace LinguaHelper
             set
             {
                 _colorTheme = value;
-                ColorThemeUpdate();
+                _dictionary.ColorTheme = value;
+                _translator.ColorTheme = value;
             }
         }
-        private void ColorThemeUpdate()
-        {
-            _dictionary.ColorTheme = _colorTheme;
-            _translator.ColorTheme = _colorTheme;
-        }
+       
         [JsonConstructor]
         public DictionaryTranslatorUnit(BrowserItem dictionary, BrowserItem translator)
         {
             _dictionary = dictionary;
             _translator = translator;
-
             _dictionary.BoundObject.BrowserTextSelected += _boundObject_BrowserTextSelected;
         }
 
@@ -43,13 +40,17 @@ namespace LinguaHelper
         public void Go(string text,bool isUserCommand, bool force = false)
         {
             _dictionary.Go(text, isUserCommand, force);
-            _translator.Go(text, force);
+            _translator.Go(text, isUserCommand, force);
         }
-
-        public void ReLoad()
+        public void LoadDefaultPage()
         {
-            _dictionary.ReLoad();
-            _translator.ReLoad();
+            _dictionary.LoadDefaultPage();
+            _translator.LoadDefaultPage();
+        }
+        public void ReLoad(bool force = false)
+        {
+            _dictionary.ReLoad(force);
+            _translator.ReLoad(force);
         }
 
         public void Show()

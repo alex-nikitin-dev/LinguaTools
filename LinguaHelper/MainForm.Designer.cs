@@ -238,6 +238,9 @@
             // 
             // MM_ForceLoadFromBrowseField
             // 
+            MM_ForceLoadFromBrowseField.Checked = true;
+            MM_ForceLoadFromBrowseField.CheckOnClick = true;
+            MM_ForceLoadFromBrowseField.CheckState = System.Windows.Forms.CheckState.Checked;
             MM_ForceLoadFromBrowseField.Name = "MM_ForceLoadFromBrowseField";
             MM_ForceLoadFromBrowseField.Size = new System.Drawing.Size(502, 34);
             MM_ForceLoadFromBrowseField.Text = "Force Load From Browse Field";
@@ -256,6 +259,9 @@
             // 
             // MM_ActivateTabsAfterAppStarts
             // 
+            MM_ActivateTabsAfterAppStarts.Checked = true;
+            MM_ActivateTabsAfterAppStarts.CheckOnClick = true;
+            MM_ActivateTabsAfterAppStarts.CheckState = System.Windows.Forms.CheckState.Checked;
             MM_ActivateTabsAfterAppStarts.Name = "MM_ActivateTabsAfterAppStarts";
             MM_ActivateTabsAfterAppStarts.Size = new System.Drawing.Size(502, 34);
             MM_ActivateTabsAfterAppStarts.Text = "Activate Tabs After App Starts";
@@ -369,14 +375,14 @@
             // darkToolStripMenuItem
             // 
             darkToolStripMenuItem.Name = "darkToolStripMenuItem";
-            darkToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            darkToolStripMenuItem.Size = new System.Drawing.Size(153, 34);
             darkToolStripMenuItem.Text = "Dark";
             darkToolStripMenuItem.Click += darkToolStripMenuItem_Click;
             // 
             // lightToolStripMenuItem
             // 
             lightToolStripMenuItem.Name = "lightToolStripMenuItem";
-            lightToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            lightToolStripMenuItem.Size = new System.Drawing.Size(153, 34);
             lightToolStripMenuItem.Text = "Light";
             lightToolStripMenuItem.Click += lightToolStripMenuItem_Click;
             // 
@@ -393,7 +399,7 @@
             MM_HotKeyEnabled.CheckOnClick = true;
             MM_HotKeyEnabled.CheckState = System.Windows.Forms.CheckState.Checked;
             MM_HotKeyEnabled.Name = "MM_HotKeyEnabled";
-            MM_HotKeyEnabled.Size = new System.Drawing.Size(270, 34);
+            MM_HotKeyEnabled.Size = new System.Drawing.Size(245, 34);
             MM_HotKeyEnabled.Text = "Hot Key Enabled";
             // 
             // windowToolStripMenuItem
@@ -428,14 +434,14 @@
             // MM_About
             // 
             MM_About.Name = "MM_About";
-            MM_About.Size = new System.Drawing.Size(270, 34);
+            MM_About.Size = new System.Drawing.Size(189, 34);
             MM_About.Text = "About";
             MM_About.Click += MM_About_Click;
             // 
             // MM_ShortcutsHelp
             // 
             MM_ShortcutsHelp.Name = "MM_ShortcutsHelp";
-            MM_ShortcutsHelp.Size = new System.Drawing.Size(270, 34);
+            MM_ShortcutsHelp.Size = new System.Drawing.Size(189, 34);
             MM_ShortcutsHelp.Text = "Shortcuts";
             MM_ShortcutsHelp.Click += MM_ShortcutsHelp_Click;
             // 

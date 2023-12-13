@@ -161,6 +161,7 @@ namespace LinguaHelper
             foreach (var unit in _units)
             {
                 unit.Dictionary.BoundObject.JScriptErrorOccured += BoundObject_JScriptErrorOccured;
+                unit.Translator.BoundObject.JScriptErrorOccured += BoundObject_JScriptErrorOccured;
                 unit.Dictionary.BrowerErrorOccured += BrowerErrorOccured;
                 unit.Translator.BrowerErrorOccured += BrowerErrorOccured;
             }
@@ -168,7 +169,7 @@ namespace LinguaHelper
 
         private void BrowerErrorOccured(BrowserItem sender, string message)
         {
-            WriteToLog(message, LogRecordCategory.Browser);
+            WriteToLog($"Browser name: {sender.BrowserName} Message:{message}", LogRecordCategory.Browser);
         }
 
         /// <summary>
@@ -207,11 +208,12 @@ namespace LinguaHelper
             var themeManager = ThemeManagerLoader.LoadThemeManager();
             themeManager.ApplyTheme(this);
             tabControl1.DisplayStyle = theme == ColorTheme.Dark ? TabStyle.Dark : TabStyle.Default;
-            SetColorThemeForAllUnits(theme);
+
+            SetColorThemeForAllUnits(theme, themeManager.CurrentColors.BackColor);
             ReloadAllBrowsers();
         }
 
-        private void SetColorThemeForAllUnits(ColorTheme theme)
+        private void SetColorThemeForAllUnits(ColorTheme theme, Color backColor)
         {
             foreach (var unit in _units)
             {
@@ -307,6 +309,11 @@ namespace LinguaHelper
         private void ShowInfoMessage(string message)
         {
             MessageBox.Show(message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        private bool AskForConfirmationWarning(string message)
+        {
+            var result = MessageBox.Show(message, Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Warning,MessageBoxDefaultButton.Button2);
+            return result == DialogResult.Yes;
         }
         private void StartProcess(string path)
         {
@@ -856,9 +863,12 @@ namespace LinguaHelper
                 Locale = "en-US,en",
                 AcceptLanguageList = "en-US,en",
                 PersistSessionCookies = false,
+                
             };
             settingsBrowser.CefCommandLineArgs.Remove("mute-audio");
             settingsBrowser.CefCommandLineArgs.Add("enable-media-stream", "1");
+            settingsBrowser.CefCommandLineArgs.Add("allow-universal-access-from-files" , "1");
+            settingsBrowser.CefCommandLineArgs.Add("allow-file-access-from-files", "1");
             settingsBrowser.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.5672.93 Safari/537.36 CefSharp Browser/" + Cef.CefSharpVersion;
             Cef.Initialize(settingsBrowser);
         }
@@ -987,10 +997,6 @@ namespace LinguaHelper
         {
             CefInit();
             await VirtualDesktopPSInitAsync();
-           // _foreColor = ForeColor;
-            //_backColor = BackColor;
-            //_colorThemes = new();
-
             LoadSettings();
             InitHotKeys();
             InitBrowsers();
@@ -1002,11 +1008,12 @@ namespace LinguaHelper
             FillCategoriesComboBox();
             InitHistoryListView();
             FillHistoryListView();
-
-            if (MM_LoginToOALDOnStart.Checked)
-                LoginToOALD("test");
-
-            //GoBrowsers("test", false, false, false, true);
+            ActivateUnits();
+            foreach (var unit in _units)
+            {
+                unit.LoadDefaultPage();
+            }
+           
             ActivateTabsIfNeeded();
             SetThemeFromSettings();
         }
@@ -1085,9 +1092,10 @@ namespace LinguaHelper
 
         void SetLoginToOALDOnStart(bool predicate)
         {
-            var stt = Settings.Default;
-            stt.OALDLoginOnStart = predicate;
-            stt.Save();
+            throw new NotFiniteNumberException();
+            //var stt = Settings.Default;
+            //stt.OALDLoginOnStart = predicate;
+            //stt.Save();
         }
         [SupportedOSPlatform("windows")]
         private void MM_LoginToOALDOnStart_Click(object sender, EventArgs e)
@@ -1116,7 +1124,12 @@ namespace LinguaHelper
         [SupportedOSPlatform("windows")]
         private void MM_ForceLoadFromBrowseField_Click(object sender, EventArgs e)
         {
-            SetForceLoadFromBrowseField(((ToolStripMenuItem)sender).Checked);
+            var item = (ToolStripMenuItem)sender;
+            if (item.Checked && !AskForConfirmationWarning("This option allows all the browsers to load at the same time. It is not recommened behaviour. It may cause a ban for some services. Do you agree to enable this option?"))
+            {
+                item.Checked = false;
+            }
+            SetForceLoadFromBrowseField(item.Checked);
         }
 
         bool _previousDesktopAuto = true;
@@ -1198,16 +1211,24 @@ namespace LinguaHelper
         }
         private void MM_showOnlyTodayEntries_Click(object sender, EventArgs e)
         {
+            var stt = Settings.Default;
+            stt.ShowOnlyTodaysEntries = MM_showOnlyTodayEntries.Checked;
+            stt.Save();
+            ToggleShowOnlyTodayMenuItems();
+            FillHistoryListView();
+        }
+        /// <summary>
+        /// Depends on the state of the <see cref="MM_showOnlyTodayEntries"/> sets the state of the main menu history items and other filters. Does NOT fill the history list view.
+        /// </summary>
+        private void ToggleShowOnlyTodayMenuItems()
+        {
             if (MM_showOnlyTodayEntries.Checked)
             {
                 MM_UseDateFilter.Checked = false;
                 SetDateTimeFilterNow();
                 SwitchVisibleDateTimeFilter(false);
             }
-
-            FillHistoryListView();
         }
-
         private void MM_About_Click(object sender, EventArgs e)
         {
             new AboutForm().ShowDialog();
@@ -1315,16 +1336,11 @@ namespace LinguaHelper
         private void LoadSettings()
         {
             var stt = Settings.Default;
-            MM_LoginToOALDOnStart.Checked = stt.OALDLoginOnStart;
             MM_ForceLoadFromBrowseField.Checked = stt.ForceLoadFromBrowse;
             MM_SpeakOnBrowsingOALD.Checked = stt.SpeakOnBrowsingOALD;
             MM_ActivateTabsAfterAppStarts.Checked = stt.ActivateTabsAfterAppStarts;
-
-           // _colorThemes.Clear();
-            //_colorThemes.Add(ColorTheme.Dark, new(ColorTheme.Dark, stt.DarkForeground, stt.DarkBackground));
-            //_colorThemes.Add(ColorTheme.Light, new(ColorTheme.Light, _foreColor, _backColor));
-
-            //_currentColorTheme = stt.DarkTheme ? ColorTheme.Dark : ColorTheme.Light;
+            MM_showOnlyTodayEntries.Checked = stt.ShowOnlyTodaysEntries;
+            ToggleShowOnlyTodayMenuItems();
         }
 
 
@@ -1368,7 +1384,7 @@ namespace LinguaHelper
         private void AutoLayoutUnit(TableLayoutPanel panel, DictionaryTranslatorUnit unit)
         {
             panel.Controls.Add(unit.Dictionary.Browser, 0, 0);
-            panel.Controls.Add(unit.Translator.Browser, 1, 0);
+            panel.Controls.Add(unit.Translator.Browser, 1, 0); 
         }
 
         private void InitTabs()
@@ -1444,6 +1460,14 @@ namespace LinguaHelper
         }
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            ActivateUnits();
+        }
+
+        /// <summary>
+        /// Activate all the units according to the ruels: if the tab is active, the unit.translator is activated, otherwise deactivated. Dictionaries are always activated.
+        /// </summary>
+        private void ActivateUnits()
+        {
             var curUnit = tabControl1.TabPages[tabControl1.SelectedIndex].Tag as DictionaryTranslatorUnit;
             foreach (var unit in _units)
             {
@@ -1451,9 +1475,11 @@ namespace LinguaHelper
                     unit.Translator.Activate();
                 else
                     unit.Translator.Deactivate();
-            }
 
+                unit.Dictionary.Activate();
+            }
         }
+
         //enum UnitName
         //{
         //    Oald,

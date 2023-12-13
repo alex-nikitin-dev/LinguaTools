@@ -5,7 +5,12 @@ async function bindCefSharpObjects() {
 	}
 }
 function setItem(itemId, itemValue) {
-	document.getElementById(itemId).value = itemValue;
+	try {
+		document.getElementById(itemId).value = itemValue;
+	}
+	catch (e) {
+		sendErrorMessage(e);
+	}
 }
 function removeElementsRecoursive(element, iterator) {
 	element.remove();
@@ -50,4 +55,8 @@ function clickElementById(id) {
 
 function isJsInjected() {
 	return true;
+}
+function setDefaultPageText(text) 
+{
+	document.getElementById("main-text").innerText = text;
 }
