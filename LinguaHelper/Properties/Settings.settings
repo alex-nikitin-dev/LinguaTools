@@ -45,7 +45,7 @@
       <Value Profile="(Default)">ErrorsLog.log</Value>
     </Setting>
     <Setting Name="ActivateTabsAfterAppStarts" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="DarkSelectedBackground" Type="System.String" Scope="User">
       <Value Profile="(Default)">#3d3d3d</Value>

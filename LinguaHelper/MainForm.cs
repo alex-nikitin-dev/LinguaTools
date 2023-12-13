@@ -92,18 +92,24 @@ namespace LinguaHelper
         {
             foreach (var unit in _units)
             {
-                unit.Dictionary.Browser.StopFinding(true);
+                if (unit.Dictionary.Browser.IsBrowserInitialized)
+                    unit.Dictionary.Browser.StopFinding(true);
             }
+        }
+        private DictionaryTranslatorUnit GetCurrentUnit()
+        {
+            return tabControl1.TabPages[tabControl1.SelectedIndex].Tag as DictionaryTranslatorUnit;
         }
 
-        private void StartFinding(string text)
+        /// <summary>
+        /// Continue finding in the current browser
+        /// </summary>
+        private void ContinueFinding(string text, bool findNext)
         {
-            foreach (var unit in _units)
-            {
-                unit.Dictionary.Browser.Find(txtFindText.Text, true, false, false);
-            }
+            if (GetCurrentUnit().Dictionary.Browser.IsBrowserInitialized)
+                GetCurrentUnit().Dictionary.Browser.Find(text, true, false, findNext);
         }
-        private void FindInDictionaries(string text)
+        private void FindInDictionaries(string text, bool findNext)
         {
             if (text.Length <= 0)
             {
@@ -112,21 +118,23 @@ namespace LinguaHelper
             }
             else
             {
-                StartFinding(text);
+                ContinueFinding(text, findNext);
             }
         }
 
         private void txtFindText_KeyUp(object sender, KeyEventArgs e)
         {
-            FindInDictionaries(txtFindText.Text);
+            if ((e.KeyCode & Keys.Enter) != Keys.Enter)
+            {
+                FindInDictionaries(txtFindText.Text, false);
+            }
         }
 
         private void txtFindText_KeyDown(object sender, KeyEventArgs e)
         {
             if ((e.KeyCode & Keys.Enter) == Keys.Enter)
             {
-                StopFinding();
-                FindInDictionaries(txtFindText.Text);
+                FindInDictionaries(txtFindText.Text, true);
             }
         }
         private void LoginToOALD(string gotoAfterLoading = null)
@@ -503,17 +511,21 @@ namespace LinguaHelper
                 Invoke(new UpdateItemInHistoryListViewDelegate(UpdateItemInHistoryListView), oldItem, updatedItem);
                 return;
             }
-
+            //this event handler is called when the item is updated in the history, so the item is already in the history.
+            //item must be added to the list view if it is not there (because there might be a date filter)
+            var isCategoryNew = string.CompareOrdinal(oldItem.Category, updatedItem.Category) != 0;
             var li = FindHistoryListViewItem(oldItem.Phrase, oldItem.Category);
             if (li != null)
             {
                 li.SubItems[0].Text = updatedItem.Phrase;
                 li.SubItems[1].Text = updatedItem.Category;
                 li.SubItems[2].Text = updatedItem.Date.ToString(_dateTimeFormat, CultureInfo.InvariantCulture);
-
-                var isCategoryNew = string.CompareOrdinal(oldItem.Category, updatedItem.Category) != 0;
                 AddCategoryIfNeed(isCategoryNew, updatedItem.Category);
                 ProceedAfterAddOrUpdatedHistoryListView();
+            }
+            else
+            {
+                AddItemAndGroupToHistoryListView(updatedItem, isCategoryNew);
             }
         }
 
@@ -1057,7 +1069,7 @@ namespace LinguaHelper
         {
             txtFindText.Text = "";
             txtFindText.Focus();
-            FindInDictionaries("");
+            FindInDictionaries("", false);
         }
         [SupportedOSPlatform("windows")]
         private void btnClearFind_Click(object sender, EventArgs e)
@@ -1461,6 +1473,8 @@ namespace LinguaHelper
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
             ActivateUnits();
+            StopFinding();
+            FindInDictionaries(txtFindText.Text, false);
         }
 
         /// <summary>
