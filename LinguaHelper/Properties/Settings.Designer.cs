@@ -238,5 +238,17 @@ namespace LinguaHelper.Properties {
                 this["ShowOnlyTodaysEntries"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int TranslateOnSelection {
+            get {
+                return ((int)(this["TranslateOnSelection"]));
+            }
+            set {
+                this["TranslateOnSelection"] = value;
+            }
+        }
     }
 }

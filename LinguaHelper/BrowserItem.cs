@@ -46,6 +46,8 @@ namespace LinguaHelper
         public string Url => _url;
         private string _defaultPagePath;
         private string _defaultWelcomeText;
+        private readonly bool _defaultTranslateOnSelection;
+        public bool TranslateOnSelection { get; set; }
         private BrowserItem(ChromiumWebBrowser browser,
             string url,
             string browserName,
@@ -57,6 +59,7 @@ namespace LinguaHelper
             string requestParams = null,
             string defaultPagePath = null,
             string defaultWelcomeText = null,
+            bool translateOnSelection = false,
             bool legacyBinding = false)
         {
             _browser = browser;
@@ -80,6 +83,8 @@ namespace LinguaHelper
             _requestParams = requestParams;
             _defaultPagePath = Path.Exists(Path.GetFullPath(defaultPagePath)) ? defaultPagePath : null;
             _defaultWelcomeText = defaultWelcomeText;
+            TranslateOnSelection = translateOnSelection;
+            _defaultTranslateOnSelection = translateOnSelection;
             _browserJS = browserJS;
             _browser.JavascriptObjectRepository.Settings.LegacyBindingEnabled = legacyBinding;
             _needSetColorTheme = true;
@@ -107,6 +112,7 @@ namespace LinguaHelper
             string requestParams = null,
             string defaultPagePath = null,
             string defaultWelcomeText = null,
+            bool translateOnSelection = false,
             ColorTheme theme = ColorTheme.Light)
             : this(new ChromiumWebBrowser(),
                   url,
@@ -118,7 +124,8 @@ namespace LinguaHelper
                   loginUrl,
                   requestParams,
                   defaultPagePath,
-                  defaultWelcomeText)
+                  defaultWelcomeText,
+                  translateOnSelection)
         {
             _browser.Dock = DockStyle.Fill;
             if (File.Exists(cssDarkThemePath))
@@ -129,6 +136,11 @@ namespace LinguaHelper
         #endregion
 
         #region public Actions
+        public void ResetTranslateOnSelection()
+        {
+            TranslateOnSelection = _defaultTranslateOnSelection;
+        }
+
         bool _userLoadCommand;
         public void Go(string text,bool isUserCommand, bool force = false)
         {
@@ -202,10 +214,15 @@ namespace LinguaHelper
             Active = false;
         }
 
-        public void ReLoad(bool force = false)
+        public void ReLoad(bool force = false, bool ignoreCache = true, bool userCommand = false)
         {
-            if (_browser.IsBrowserInitialized && (IsLoadAllowed() || force || IsDefaultPageLoaded))
-                _browser.Reload();
+            _userLoadCommand = userCommand;
+            if (_browser.IsBrowserInitialized && (IsLoadAllowed() || force) && !IsDefaultPageLoaded)
+                _browser.Reload(ignoreCache);
+            else if (_browser.IsBrowserInitialized && IsDefaultPageLoaded)
+                LoadDefaultPage();
+            else
+                OnBrowerErrorOccured(this, $"Cannot reload browser: Name: {BrowserName} Address: {_browser.Address}");            
         }
         //public void ReloadJSCode(BrowserJS browserJS)
         //{

@@ -1,9 +1,11 @@
 ﻿using CefSharp;
 using System;
 using System.Diagnostics;
+using System.Runtime.Versioning;
 using System.Windows.Forms;
 namespace LinguaHelper
 {
+    [SupportedOSPlatform("windows")]
     public class KeyboardHandler : IKeyboardHandler
     {
         /// <inheritdoc/>>
@@ -24,7 +26,7 @@ namespace LinguaHelper
             isKeyboardShortcut = false;
 
             // Don't deal with TABs by default:
-            // TODO: Are there any additional ones we need to be careful of?
+            // _TODO: Are there any additional ones we need to be careful of?
             // i.e. Escape, Return, etc...?
             if (windowsKeyCode == VK_TAB || windowsKeyCode == VK_LEFT || windowsKeyCode == VK_UP || windowsKeyCode == VK_DOWN || windowsKeyCode == VK_RIGHT)
             {
@@ -105,7 +107,7 @@ namespace LinguaHelper
 
             if (state == PreProcessControlState.MessageNeeded)
             {
-                // TODO: Determine how to track MessageNeeded for OnKeyEvent.
+                // _TODO: Determine how to track MessageNeeded for OnKeyEvent.
                 isKeyboardShortcut = true;
             }
             else if (state == PreProcessControlState.MessageProcessed)
@@ -125,7 +127,7 @@ namespace LinguaHelper
         {
             var result = false;
             Debug.WriteLine("OnKeyEvent: KeyType: {0} 0x{1:X} Modifiers: {2}", type, windowsKeyCode, modifiers);
-            // TODO: Handle MessageNeeded cases here somehow.
+            // _TODO: Handle MessageNeeded cases here somehow.
             return result;
         }
     }

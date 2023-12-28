@@ -50,6 +50,9 @@
             MM_ForceLoadFromBrowseField = new System.Windows.Forms.ToolStripMenuItem();
             MM_SpeakOnBrowsingOALD = new System.Windows.Forms.ToolStripMenuItem();
             MM_ActivateTabsAfterAppStarts = new System.Windows.Forms.ToolStripMenuItem();
+            MM_ReloadAll = new System.Windows.Forms.ToolStripMenuItem();
+            MM_TranslateOnSelection = new System.Windows.Forms.ToolStripMenuItem();
+            MM_TranslateOnSelectionCurrent = new System.Windows.Forms.ToolStripMenuItem();
             historyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             MM_save = new System.Windows.Forms.ToolStripMenuItem();
             MM_saveAsCopy = new System.Windows.Forms.ToolStripMenuItem();
@@ -93,6 +96,7 @@
             controlPanel = new System.Windows.Forms.TableLayoutPanel();
             btnClearFind = new System.Windows.Forms.Button();
             tabControl1 = new System.Windows.Forms.CustomTabControl();
+            MM_ResetTranslateOnSelection = new System.Windows.Forms.ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -197,7 +201,7 @@
             // 
             // mainToolStripMenuItem
             // 
-            mainToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { MM_NeedUrbanDictionary, loginToOALDToolStripMenuItem, MM_LoginToOALDOnStart, setOALDCredentialsToolStripMenuItem, MM_ForceLoadFromBrowseField, MM_SpeakOnBrowsingOALD, MM_ActivateTabsAfterAppStarts });
+            mainToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { MM_NeedUrbanDictionary, loginToOALDToolStripMenuItem, MM_LoginToOALDOnStart, setOALDCredentialsToolStripMenuItem, MM_ForceLoadFromBrowseField, MM_SpeakOnBrowsingOALD, MM_ActivateTabsAfterAppStarts, MM_ReloadAll, MM_TranslateOnSelection, MM_TranslateOnSelectionCurrent });
             mainToolStripMenuItem.Name = "mainToolStripMenuItem";
             mainToolStripMenuItem.Size = new System.Drawing.Size(91, 29);
             mainToolStripMenuItem.Text = "Browser";
@@ -266,6 +270,34 @@
             MM_ActivateTabsAfterAppStarts.Size = new System.Drawing.Size(502, 34);
             MM_ActivateTabsAfterAppStarts.Text = "Activate Tabs After App Starts";
             MM_ActivateTabsAfterAppStarts.Click += activateTabsAfterAppStartsToolStripMenuItem_Click;
+            // 
+            // MM_ReloadAll
+            // 
+            MM_ReloadAll.Name = "MM_ReloadAll";
+            MM_ReloadAll.Size = new System.Drawing.Size(502, 34);
+            MM_ReloadAll.Text = "Reload all";
+            MM_ReloadAll.Click += MM_ReloadAll_Click;
+            // 
+            // MM_TranslateOnSelection
+            // 
+            MM_TranslateOnSelection.Checked = true;
+            MM_TranslateOnSelection.CheckOnClick = true;
+            MM_TranslateOnSelection.CheckState = System.Windows.Forms.CheckState.Indeterminate;
+            MM_TranslateOnSelection.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { MM_ResetTranslateOnSelection });
+            MM_TranslateOnSelection.Name = "MM_TranslateOnSelection";
+            MM_TranslateOnSelection.Size = new System.Drawing.Size(502, 34);
+            MM_TranslateOnSelection.Text = "Translate on selection (All Browsers)";
+            MM_TranslateOnSelection.Click += MM_TranslateOnSelection_Click;
+            // 
+            // MM_TranslateOnSelectionCurrent
+            // 
+            MM_TranslateOnSelectionCurrent.Checked = true;
+            MM_TranslateOnSelectionCurrent.CheckOnClick = true;
+            MM_TranslateOnSelectionCurrent.CheckState = System.Windows.Forms.CheckState.Checked;
+            MM_TranslateOnSelectionCurrent.Name = "MM_TranslateOnSelectionCurrent";
+            MM_TranslateOnSelectionCurrent.Size = new System.Drawing.Size(502, 34);
+            MM_TranslateOnSelectionCurrent.Text = "Translate on selection (Current Browser)";
+            MM_TranslateOnSelectionCurrent.Click += MM_TranslateOnSelectionCurrent_Click;
             // 
             // historyToolStripMenuItem
             // 
@@ -375,14 +407,14 @@
             // darkToolStripMenuItem
             // 
             darkToolStripMenuItem.Name = "darkToolStripMenuItem";
-            darkToolStripMenuItem.Size = new System.Drawing.Size(153, 34);
+            darkToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             darkToolStripMenuItem.Text = "Dark";
             darkToolStripMenuItem.Click += darkToolStripMenuItem_Click;
             // 
             // lightToolStripMenuItem
             // 
             lightToolStripMenuItem.Name = "lightToolStripMenuItem";
-            lightToolStripMenuItem.Size = new System.Drawing.Size(153, 34);
+            lightToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             lightToolStripMenuItem.Text = "Light";
             lightToolStripMenuItem.Click += lightToolStripMenuItem_Click;
             // 
@@ -704,6 +736,13 @@
             tabControl1.TabIndex = 4;
             tabControl1.SelectedIndexChanged += tabControl1_SelectedIndexChanged;
             // 
+            // MM_ResetTranslateOnSelection
+            // 
+            MM_ResetTranslateOnSelection.Name = "MM_ResetTranslateOnSelection";
+            MM_ResetTranslateOnSelection.Size = new System.Drawing.Size(331, 34);
+            MM_ResetTranslateOnSelection.Text = "Reset Translate on Selection";
+            MM_ResetTranslateOnSelection.Click += MM_ResetTranslateOnSelection_Click;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
@@ -804,6 +843,10 @@
         private System.Windows.Forms.ToolStripMenuItem showJSErrorsToolStripMenuItem;
         private System.Windows.Forms.ToolStripStatusLabel stError;
         private System.Windows.Forms.ToolStripMenuItem MM_ActivateTabsAfterAppStarts;
+        private System.Windows.Forms.ToolStripMenuItem MM_ReloadAll;
+        private System.Windows.Forms.ToolStripMenuItem MM_TranslateOnSelection;
+        private System.Windows.Forms.ToolStripMenuItem MM_TranslateOnSelectionCurrent;
+        private System.Windows.Forms.ToolStripMenuItem MM_ResetTranslateOnSelection;
     }
 }
 

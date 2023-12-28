@@ -1,5 +1,4 @@
-﻿using LinguaHelper.Properties;
-using System;
+﻿using System;
 using System.IO;
 using System.Text.Json.Serialization;
 

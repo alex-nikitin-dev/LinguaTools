@@ -24,7 +24,8 @@
       "loginUrl": "https://www.oxfordlearnersdictionaries.com/account/login",
       "requestParams": null,
       "defaultPagePath": "Browser Settings/Default/Default.html",
-      "defaultWelcomeText": "Oxford Advanced Learner's Dictionary"
+      "defaultWelcomeText": "Oxford Advanced Learner's Dictionary",
+      "translateOnSelection" :  false
     },
     "translator": {
       "url": "https://translate.google.am/?op=translate&sl=en&tl=ru&hl=en&text=",
@@ -66,7 +67,8 @@
       "loginUrl": null,
       "requestParams": null,
       "defaultPagePath": "Browser Settings/Default/Default.html",
-      "defaultWelcomeText": "Cambridge Dictionary"
+      "defaultWelcomeText": "Cambridge Dictionary",
+      "translateOnSelection": false
     },
     "translator": {
       "url": "https://translate.google.am/?op=translate&sl=en&tl=ru&hl=en&text=",
@@ -108,7 +110,8 @@
       "loginUrl": null,
       "requestParams": null,
       "defaultPagePath": "Browser Settings/Default/Default.html",
-      "defaultWelcomeText": "Wikipedia"
+      "defaultWelcomeText": "Wikipedia",
+      "translateOnSelection": true
     },
     "translator": {
       "url": "https://translate.google.am/?op=translate&sl=en&tl=ru&hl=en&text=",
@@ -150,7 +153,8 @@
       "loginUrl": null,
       "requestParams": null,
       "defaultPagePath": "Browser Settings/Default/Default.html",
-      "defaultWelcomeText": "Google search"
+      "defaultWelcomeText": "Google search",
+      "translateOnSelection": true
     },
     "translator": {
       "url": "https://translate.google.am/?op=translate&sl=en&tl=ru&hl=en&text=",

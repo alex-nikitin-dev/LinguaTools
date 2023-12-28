@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Windows.Forms;
 
 namespace LinguaHelper
 {
+    [SupportedOSPlatform("windows")]
     public static class Extensions
     {
         [DllImport("user32.dll")]

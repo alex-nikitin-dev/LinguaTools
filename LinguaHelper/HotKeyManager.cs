@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Windows.Forms;
 
 namespace LinguaHelper
 {
-
+    [SupportedOSPlatform("windows")]
     public static class HotKeyManager
     {
 

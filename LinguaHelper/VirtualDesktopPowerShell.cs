@@ -50,6 +50,15 @@ namespace LinguaHelper
             return Convert.ToInt32(result[0].BaseObject);
         }
 
+        /// <summary>
+        /// Warning: cancelling the current operation cause the powershell to throw an exception (PipelineStoppedException).
+        /// </summary>
+        /// <returns></returns>
+        public static async Task CancelCurrentOperationAsync()
+        {
+            var powerShell = await PowerShellTask;
+            powerShell.CancelCurrentOperation();
+        }
 
         ///// <summary>
         ///// Returns the virtual desktop that contains the window with the given handle.

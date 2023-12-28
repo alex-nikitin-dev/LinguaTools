@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Management.Automation;
 using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -22,11 +23,6 @@ namespace LinguaHelper
         private int? _hotKeyGo;
         private int? _hotKeySwitch;
         private int? _hotKeyShow;
-
-       // private Color _foreColor;
-       // private Color _backColor;
-       // ColorTheme _currentColorTheme = ColorTheme.Light;
-        Dictionary<ColorTheme, ColorThemeProvider> _colorThemes;
 
         private ListView _lstHistory;
         private History _history;
@@ -217,11 +213,11 @@ namespace LinguaHelper
             themeManager.ApplyTheme(this);
             tabControl1.DisplayStyle = theme == ColorTheme.Dark ? TabStyle.Dark : TabStyle.Default;
 
-            SetColorThemeForAllUnits(theme, themeManager.CurrentColors.BackColor);
+            SetColorThemeForAllUnits(theme);
             ReloadAllBrowsers();
         }
 
-        private void SetColorThemeForAllUnits(ColorTheme theme, Color backColor)
+        private void SetColorThemeForAllUnits(ColorTheme theme)
         {
             foreach (var unit in _units)
             {
@@ -320,7 +316,7 @@ namespace LinguaHelper
         }
         private bool AskForConfirmationWarning(string message)
         {
-            var result = MessageBox.Show(message, Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Warning,MessageBoxDefaultButton.Button2);
+            var result = MessageBox.Show(message, Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
             return result == DialogResult.Yes;
         }
         private void StartProcess(string path)
@@ -356,7 +352,7 @@ namespace LinguaHelper
 
         private void ActivateTabsIfNeeded()
         {
-            if(Settings.Default.ActivateTabsAfterAppStarts)
+            if (Settings.Default.ActivateTabsAfterAppStarts)
                 ActivateTabs();
         }
         private void ActivateTabs()
@@ -371,6 +367,7 @@ namespace LinguaHelper
         #endregion
 
         #region Global hot keys
+        // private CancellationTokenSource _switchDesktopsCts = new CancellationTokenSource();
         async void HotKeyManager_HotKeyPressed(object sender, HotKeyEventArgs e)
         {
             if (InvokeRequired)
@@ -874,12 +871,11 @@ namespace LinguaHelper
             {
                 Locale = "en-US,en",
                 AcceptLanguageList = "en-US,en",
-                PersistSessionCookies = false,
-                
+                //PersistSessionCookies = false,
             };
             settingsBrowser.CefCommandLineArgs.Remove("mute-audio");
             settingsBrowser.CefCommandLineArgs.Add("enable-media-stream", "1");
-            settingsBrowser.CefCommandLineArgs.Add("allow-universal-access-from-files" , "1");
+            settingsBrowser.CefCommandLineArgs.Add("allow-universal-access-from-files", "1");
             settingsBrowser.CefCommandLineArgs.Add("allow-file-access-from-files", "1");
             settingsBrowser.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.5672.93 Safari/537.36 CefSharp Browser/" + Cef.CefSharpVersion;
             Cef.Initialize(settingsBrowser);
@@ -1015,6 +1011,7 @@ namespace LinguaHelper
             InitTabs();
             await InitMainMenuItems();
             InitFirstTabSelection();
+            ForceTranslateOnSelection();
             InitHistory();
             SetDateTimeFilterNow();
             FillCategoriesComboBox();
@@ -1025,13 +1022,114 @@ namespace LinguaHelper
             {
                 unit.LoadDefaultPage();
             }
-           
+
             ActivateTabsIfNeeded();
             SetThemeFromSettings();
         }
         #endregion
 
         #region Main menu click handlers
+        private void MM_ResetTranslateOnSelection_Click(object sender, EventArgs e)
+        {
+            foreach(var unit in _units)
+                unit.ResetTranslateOnSelection();
+            SetTranslateOnSelectionIndeterminate();
+            SetMenuItemTranslateOnSelectionCurrent();
+        }
+
+        private void SetTranslateOnSelectionIndeterminate()
+        {
+            MM_TranslateOnSelection.CheckState = CheckState.Indeterminate;
+            SaveTranslateOnSelectionOption();
+        }
+        private void MM_TranslateOnSelectionCurrent_Click(object sender, EventArgs e)
+        {
+            var currentUnit = GetCurrentUnit();
+            if (currentUnit == null)
+            {
+                MM_TranslateOnSelectionCurrent.Checked = !MM_TranslateOnSelectionCurrent.Checked;
+                return;
+            }
+
+            currentUnit.Dictionary.TranslateOnSelection = MM_TranslateOnSelectionCurrent.Checked;
+            SetTranslateOnSelectionIndeterminate();
+        }
+
+        private void MM_TranslateOnSelection_Click(object sender, EventArgs e)
+        {
+            SaveTranslateOnSelectionOption();
+            ForceTranslateOnSelection();
+        }
+
+        private void ForceTranslateOnSelection()
+        {
+            SetTranslateOnSelectionAllBrowsers();
+            SetMenuItemTranslateOnSelectionCurrent();
+        }
+
+        private void SetTranslateOnSelectionAllBrowsers()
+        {
+            var state = GetTranslateOnSelectionOption();
+            foreach (var unit in _units)
+            {
+                switch (state)
+                {
+                    case CheckState.Unchecked:
+                        unit.Dictionary.TranslateOnSelection = false;
+                        break;
+                    case CheckState.Checked:
+                        unit.Dictionary.TranslateOnSelection = true;
+                        break;
+                }
+            }
+        }
+
+        private CheckState GetTranslateOnSelectionOption()
+        {
+            var stt = Settings.Default;
+            switch (stt.TranslateOnSelection)
+            {
+                case 0:
+                    return CheckState.Unchecked;
+                case 1:
+                    return CheckState.Checked;
+                case 2:
+                    return CheckState.Indeterminate;
+                default:
+                    throw new Exception("Unknown value of TranslateOnSelection option");
+            }
+        }
+
+
+        private void SaveTranslateOnSelectionOption()
+        {
+            var stt = Settings.Default;
+            switch (MM_TranslateOnSelection.CheckState)
+            {
+                case CheckState.Unchecked:
+                    stt.TranslateOnSelection = 0;
+                    break;
+                case CheckState.Checked:
+                    stt.TranslateOnSelection = 1;
+                    break;
+                case CheckState.Indeterminate:
+                    stt.TranslateOnSelection = 2;
+                    break;
+            }
+            stt.Save();
+        }
+
+        private void SetMenuItemTranslateOnSelectionCurrent()
+        {
+            var currentUnit = GetCurrentUnit();
+            if (currentUnit != null)
+                MM_TranslateOnSelectionCurrent.Checked = currentUnit.Dictionary.TranslateOnSelection;
+        }
+
+        private void MM_ReloadAll_Click(object sender, EventArgs e)
+        {
+            ReloadAllBrowsers();
+        }
         private void darkToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetColorTheme(ColorTheme.Dark);
@@ -1352,6 +1450,7 @@ namespace LinguaHelper
             MM_SpeakOnBrowsingOALD.Checked = stt.SpeakOnBrowsingOALD;
             MM_ActivateTabsAfterAppStarts.Checked = stt.ActivateTabsAfterAppStarts;
             MM_showOnlyTodayEntries.Checked = stt.ShowOnlyTodaysEntries;
+            MM_TranslateOnSelection.CheckState = GetTranslateOnSelectionOption();
             ToggleShowOnlyTodayMenuItems();
         }
 
@@ -1396,7 +1495,7 @@ namespace LinguaHelper
         private void AutoLayoutUnit(TableLayoutPanel panel, DictionaryTranslatorUnit unit)
         {
             panel.Controls.Add(unit.Dictionary.Browser, 0, 0);
-            panel.Controls.Add(unit.Translator.Browser, 1, 0); 
+            panel.Controls.Add(unit.Translator.Browser, 1, 0);
         }
 
         private void InitTabs()
@@ -1473,6 +1572,7 @@ namespace LinguaHelper
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
             ActivateUnits();
+            SetMenuItemTranslateOnSelectionCurrent();
             StopFinding();
             FindInDictionaries(txtFindText.Text, false);
         }
@@ -1482,7 +1582,10 @@ namespace LinguaHelper
         /// </summary>
         private void ActivateUnits()
         {
-            var curUnit = tabControl1.TabPages[tabControl1.SelectedIndex].Tag as DictionaryTranslatorUnit;
+            var curUnit = GetCurrentUnit();
+            if (curUnit == null)
+                return;
+
             foreach (var unit in _units)
             {
                 if (unit == curUnit)
@@ -1507,14 +1610,25 @@ namespace LinguaHelper
         [SupportedOSPlatform("windows")]
         private async Task SwitchDesktops()
         {
-            var thisAppDesktopIndex = await VirtualDesktopPowerShell.GetDesktopIndexFromHandleAsync(Handle);
-            var currentDesktopIndex = await VirtualDesktopPowerShell.GetCurrentDesktopIndexAsync();
+            //TODO: check if cancelling is needed!
+            await VirtualDesktopPowerShell.CancelCurrentOperationAsync();
 
-            if (thisAppDesktopIndex != currentDesktopIndex || !await ReturnToPreviousDesktop())
+            try
             {
-                //This app is not on the current desktop or there is no previous desktop, so need to switch to the desktop where this app is
-                await ShowThisAppDesktop(thisAppDesktopIndex, currentDesktopIndex);
+                var thisAppDesktopIndex = await VirtualDesktopPowerShell.GetDesktopIndexFromHandleAsync(Handle);
+                var currentDesktopIndex = await VirtualDesktopPowerShell.GetCurrentDesktopIndexAsync();
+
+                if (thisAppDesktopIndex != currentDesktopIndex || !await ReturnToPreviousDesktop())
+                {
+                    //This app is not on the current desktop or there is no previous desktop, so need to switch to the desktop where this app is
+                    await ShowThisAppDesktop(thisAppDesktopIndex, currentDesktopIndex);
+                }
             }
+            catch (PipelineStoppedException)
+            {
+
+            }
+
         }
 
         [SupportedOSPlatform("windows")]
