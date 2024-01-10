@@ -19,18 +19,18 @@ The primary goals of LinguaHelper are:
 
 LinguaHelper is designed with efficiency and convenience in mind. The key aspects of its usefulness include:
 
-- **Minimizing Interaction Time**: The software significantly reduces the time needed to switch between a language learning application and a web browser. It streamlines interactions with websites and simplifies data entry processes, allowing users to remain focused on their learning without the disruption of constantly switching contexts.
+
+- **Minimizing Interaction Time**: The software significantly reduces the time required to interact with multiple web resources and streamlines data entry processes. Future updates will enable users to perform all actions within the same window and directly modify working documents in the app, further reducing time spent on various user actions.
 
 - **Detailed Learning History (In Development)**: We are working on a feature to store comprehensive learning histories complete with contextual information. This will enable learners to track their progress over time and revisit specific learning materials as needed.
 
-- **Automated Data Gathering (In Development)**: Utilizing AI, LinguaHelper is being enhanced to automate the collection of data from web resources. This feature is especially beneficial for educational purposes, such as automatically generating annotations or comments in books or articles being studied.
+- **Automated  Data Retrieving and Annotations Generating according to user-defined settings (In Development)**: LinguaHelper is being enhanced to automate data retrieving from web resources. This feature is especially beneficial for such purposes as generating annotations (using user-defined settings) for a text (books, articles) being studied.
 
-- **Automated Text Commenting (In Development)**: Another exciting feature in the works is the AI-powered capability to automatically comment on texts. Whether it's a plain text file, PDF, or a DOCX document, this functionality aims to provide insightful, AI-generated commentary to assist in the learning and comprehension process.
+- **Fully Automated Text Commenting (In Development)**: Another exciting feature in the works is the AI-powered capability to automatically comment on texts. Whether it's a plain text file, PDF, or a DOCX document, this functionality aims to provide insightful, AI-generated or/and AI-retrieved from web resources commentary to assist in the learning and comprehension process.
 
 These features and developments underscore our commitment to creating a tool that not only enhances language learning but also seamlessly integrates into the learner's workflow, thereby making the process more engaging and effective.
 
 ## Key Features
-
 - **Web-Resource Automation**: By incorporating a chromium-based component, LinguaHelper automates interactions with web resources. It leverages custom Java Script APIs and JSON settings to provide a tailored browsing experience for language studies.
 
 - **Dynamic User Interface**: The Windows Forms-based UI of LinguaHelper is dynamic and responsive, adjusting in real-time based on JSON settings. This flexibility ensures a learning environment that can adapt to the user’s needs.
