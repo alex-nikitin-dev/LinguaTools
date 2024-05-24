@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Management.Automation;
 using System.Threading.Tasks;
 
@@ -171,6 +172,12 @@ namespace LinguaHelper
                     throw new InvalidOperationException($"Error during execution: {errorOutput}");
                 }
             }
+        }
+
+        public static async Task ScriptExecuteAsync(string path)
+        {
+            var powerShell = await PowerShellTask;
+            await powerShell.ExecuteCommandAsync($"& '{path}'");
         }
     }
 }

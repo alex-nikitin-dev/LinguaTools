@@ -52,6 +52,7 @@
             MM_ActivateTabsAfterAppStarts = new System.Windows.Forms.ToolStripMenuItem();
             MM_ReloadAll = new System.Windows.Forms.ToolStripMenuItem();
             MM_TranslateOnSelection = new System.Windows.Forms.ToolStripMenuItem();
+            MM_ResetTranslateOnSelection = new System.Windows.Forms.ToolStripMenuItem();
             MM_TranslateOnSelectionCurrent = new System.Windows.Forms.ToolStripMenuItem();
             historyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             MM_save = new System.Windows.Forms.ToolStripMenuItem();
@@ -96,7 +97,6 @@
             controlPanel = new System.Windows.Forms.TableLayoutPanel();
             btnClearFind = new System.Windows.Forms.Button();
             tabControl1 = new System.Windows.Forms.CustomTabControl();
-            MM_ResetTranslateOnSelection = new System.Windows.Forms.ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -289,6 +289,13 @@
             MM_TranslateOnSelection.Text = "Translate on selection (All Browsers)";
             MM_TranslateOnSelection.Click += MM_TranslateOnSelection_Click;
             // 
+            // MM_ResetTranslateOnSelection
+            // 
+            MM_ResetTranslateOnSelection.Name = "MM_ResetTranslateOnSelection";
+            MM_ResetTranslateOnSelection.Size = new System.Drawing.Size(331, 34);
+            MM_ResetTranslateOnSelection.Text = "Reset Translate on Selection";
+            MM_ResetTranslateOnSelection.Click += MM_ResetTranslateOnSelection_Click;
+            // 
             // MM_TranslateOnSelectionCurrent
             // 
             MM_TranslateOnSelectionCurrent.Checked = true;
@@ -407,14 +414,14 @@
             // darkToolStripMenuItem
             // 
             darkToolStripMenuItem.Name = "darkToolStripMenuItem";
-            darkToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            darkToolStripMenuItem.Size = new System.Drawing.Size(153, 34);
             darkToolStripMenuItem.Text = "Dark";
             darkToolStripMenuItem.Click += darkToolStripMenuItem_Click;
             // 
             // lightToolStripMenuItem
             // 
             lightToolStripMenuItem.Name = "lightToolStripMenuItem";
-            lightToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            lightToolStripMenuItem.Size = new System.Drawing.Size(153, 34);
             lightToolStripMenuItem.Text = "Light";
             lightToolStripMenuItem.Click += lightToolStripMenuItem_Click;
             // 
@@ -735,13 +742,6 @@
             tabControl1.Size = new System.Drawing.Size(1896, 1024);
             tabControl1.TabIndex = 4;
             tabControl1.SelectedIndexChanged += tabControl1_SelectedIndexChanged;
-            // 
-            // MM_ResetTranslateOnSelection
-            // 
-            MM_ResetTranslateOnSelection.Name = "MM_ResetTranslateOnSelection";
-            MM_ResetTranslateOnSelection.Size = new System.Drawing.Size(331, 34);
-            MM_ResetTranslateOnSelection.Text = "Reset Translate on Selection";
-            MM_ResetTranslateOnSelection.Click += MM_ResetTranslateOnSelection_Click;
             // 
             // MainForm
             // 

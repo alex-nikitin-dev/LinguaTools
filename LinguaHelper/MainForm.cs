@@ -414,7 +414,7 @@ namespace LinguaHelper
         }
         private void updateToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ReloadHistoryAndRefillListViewDialog();
+            ReloadHistoryWithConfirmation();
         }
         private void cbxCategory_KeyDown(object sender, KeyEventArgs e)
         {
@@ -428,16 +428,9 @@ namespace LinguaHelper
             }
         }
 
-        private void ReloadHistoryAndRefillListViewDialog()
-        {
-            var sure = MessageBox.Show(@"You will lose all unsaved data. Are you sure?", Application.ProductName,
-                MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (sure == DialogResult.Yes)
-            {
-                _history.LoadData(Settings.Default.DataPath);
-                FillHistoryListView();
-            }
-        }
+        /// <summary>
+        /// This method is called when the history object is created
+        /// </summary>
         private void InitHistory()
         {
             _history = new History(_dateTimeFormat,
@@ -591,15 +584,10 @@ namespace LinguaHelper
             await Task.Run(() =>
             {
                 var stt = Settings.Default;
-                if (string.IsNullOrEmpty(stt.HistoryBackupPath))
-                    return;
-                var dir = Path.GetDirectoryName(stt.HistoryBackupPath);
-                if (!Directory.Exists(dir))
-                    return;
-                if (!File.Exists(stt.TaskFilePath))
+                if (string.IsNullOrEmpty(stt.HistoryBackupPath) || !Directory.Exists(Path.GetDirectoryName(stt.HistoryBackupPath)) || !File.Exists(stt.TaskFilePath))
                     return;
 
-                File.Copy(stt.TaskFilePath, Path.Combine(dir, Path.GetFileName(stt.TaskFilePath) ?? throw new InvalidOperationException()), true);
+                File.Copy(stt.TaskFilePath, Path.Combine(Path.GetDirectoryName(stt.HistoryBackupPath), Path.GetFileName(stt.TaskFilePath)), true);
             });
         }
         #endregion
@@ -711,7 +699,12 @@ namespace LinguaHelper
 
         private void DeleteHistoryItem(object sender, EventArgs e)
         {
-            if (_lstHistory.SelectedItems.Count == 0) return;
+            if (_lstHistory.SelectedItems.Count == 0)
+            {
+                MessageBox.Show(@"No item is selected, there is nothing to delete. First select an item in the history list", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+                
             var sure = MessageBox.Show(@"The selected entry will be deleted from the history. Are you sure?", Application.ProductName,
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (sure == DialogResult.Yes)
@@ -729,10 +722,23 @@ namespace LinguaHelper
 
         private void UpdateHistoryListView(object sender, EventArgs e)
         {
-            UpdateHistoryListView();
+            ReloadHistoryWithConfirmation();
         }
 
-        void UpdateHistoryListView()
+        private void ReloadHistoryWithConfirmation()
+        {
+            var sure = MessageBox.Show(@"You're about to reload your history data. You will lose all unsaved data. Are you sure?", Application.ProductName,
+                MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
+            if (sure == DialogResult.Yes)
+            {
+                ReloadHistory();
+            }
+        }
+
+        /// <summary>
+        /// This code reload the history without any confirmation
+        /// </summary>
+        private void ReloadHistory()
         {
             _history.LoadData(Settings.Default.DataPath);
             FillHistoryListView();
@@ -911,6 +917,25 @@ namespace LinguaHelper
             {
                 ShowErrorMessage("An exception occured during installation of Virtual Desktop module.");
                 CloseWithoutPrompt();
+            }
+
+            //TODO: exctract to a new method
+            try
+            {
+                // Get the full path to the application's executable
+                string exeDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                // Define the filename of the script in the application's root directory
+                string scriptFilename = "preparepowershell.ps1";
+                // Combine them to get the full path to the script
+                string path = Path.Combine(exeDirectory, scriptFilename);
+                if (File.Exists(path))
+                {
+                    await VirtualDesktopPowerShell.ScriptExecuteAsync(path);
+                }
+            }
+            catch (Exception)
+            {
+                ShowErrorMessage("An exception occured during initialization of Virtual Desktop module.");
             }
         }
 
