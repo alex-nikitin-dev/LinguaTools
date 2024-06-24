@@ -161,6 +161,7 @@ namespace LinguaHelper
         }
         private void InitBrowsers()
         {
+            //TODO: add Browser Settings\\Browsers.json to the settings
             _units = JsonConvert.DeserializeObject<List<DictionaryTranslatorUnit>>(File.ReadAllText("Browser Settings\\Browsers.json"));
             foreach (var unit in _units)
             {
@@ -1719,5 +1720,6 @@ namespace LinguaHelper
             await ReturnToPreviousDesktop();
         }
         #endregion
+
     }
 }
