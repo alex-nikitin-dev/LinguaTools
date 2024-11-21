@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net9.0-windows7.0</TargetFramework>
     <OutputType>WinExe</OutputType>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -97,11 +97,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CefSharp.WinForms.NETCore" Version="128.4.90" />
+    <PackageReference Include="CefSharp.WinForms.NETCore" Version="130.1.90" />
     <PackageReference Include="chromiumembeddedframework.runtime.win-arm64" />
     <PackageReference Include="chromiumembeddedframework.runtime.win-x64" />
     <PackageReference Include="chromiumembeddedframework.runtime.win-x86" />
-    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.4.5" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.4.6" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CustomTabControl\CustomTabControl.csproj" />
@@ -117,15 +117,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="128.4.9" />
+    <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="130.1.9" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="128.4.9" />
+    <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="130.1.9" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="128.4.9" />
+    <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="130.1.9" />
   </ItemGroup>
   <!--<UsingTask TaskName="RemoveUnwantedRuntimes" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
     <ParameterGroup>

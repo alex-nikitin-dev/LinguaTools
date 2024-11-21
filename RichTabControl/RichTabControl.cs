@@ -3,14 +3,18 @@ using System.Drawing;
 using System.Runtime.Versioning;
 using System.Windows.Forms;
 using ThemeManagement;
+using System.ComponentModel;
 namespace RichControls
 {
     [SupportedOSPlatform("windows")]
     public class RichTabControl : TabControl, IThemeable
     {
         #region properties
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        
         public ThemeManager ThemeManager { get; private set; }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Theme CurrentTheme
         {
             get
