@@ -97,7 +97,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CefSharp.WinForms.NETCore" Version="130.1.90" />
+    <PackageReference Include="CefSharp.WinForms.NETCore" Version="131.3.50" />
     <PackageReference Include="chromiumembeddedframework.runtime.win-arm64" />
     <PackageReference Include="chromiumembeddedframework.runtime.win-x64" />
     <PackageReference Include="chromiumembeddedframework.runtime.win-x86" />
@@ -117,15 +117,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="130.1.9" />
+    <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="131.3.5" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="130.1.9" />
+    <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="131.3.5" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="130.1.9" />
+    <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="131.3.5" />
   </ItemGroup>
   <!--<UsingTask TaskName="RemoveUnwantedRuntimes" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
     <ParameterGroup>
