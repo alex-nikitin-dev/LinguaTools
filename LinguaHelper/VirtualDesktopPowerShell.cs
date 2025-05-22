@@ -137,13 +137,20 @@ namespace LinguaHelper
             var result = await powerShell.ExecuteCommandAsync("Get-Module -ListAvailable -Name VirtualDesktop");
             return result.Count > 0;
         }
-
-        public static async Task InstallVirtualDesktopAsync()
+        //public static async Task InstallVirtualDesktopAsync()
+        //{
+        //    await ExecuteAsAdminAsync("Install-Module -Name VirtualDesktop -Scope CurrentUser -Force -Confirm:$false");
+        //}
+        public static async Task CleanInstallVirtualDesktopAsync()
+        {
+            await ExecuteAsAdminAsync("Get-Module -ListAvailable -Name VirtualDesktop | ForEach-Object { Remove-Item -Recurse -Force $_.ModuleBase } ; Install-Module -Name VirtualDesktop -Force -AllowClobber -Scope CurrentUser");
+        }
+        private static async Task ExecuteAsAdminAsync(string command)
         {
             var startInfo = new ProcessStartInfo
             {
                 FileName = "pwsh",
-                Arguments = "-NoProfile -Command \"Install-Module -Name VirtualDesktop -Scope CurrentUser -Force -Confirm:$false\"",
+                Arguments = $"-NoProfile -Command \"{command}\"",
                 Verb = "runas", // This will run the process as administrator
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
@@ -165,7 +172,6 @@ namespace LinguaHelper
 
                 await tcs.Task;
 
-                // Optionally, you can check the process.ExitCode here for any errors
                 if (process.ExitCode != 0)
                 {
                     var errorOutput = await process.StandardError.ReadToEndAsync();

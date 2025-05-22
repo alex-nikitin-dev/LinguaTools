@@ -705,7 +705,7 @@ namespace LinguaHelper
                 MessageBox.Show(@"No item is selected, there is nothing to delete. First select an item in the history list", Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-                
+
             var sure = MessageBox.Show(@"The selected entry will be deleted from the history. Are you sure?", Application.ProductName,
                 MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (sure == DialogResult.Yes)
@@ -892,34 +892,43 @@ namespace LinguaHelper
             FillFirstTabComboBox();
             FirstTabComboboxSelectFromSettings();
         }
+        private bool CleanInstallVirtualDesktop()
+        {
+            var result = MessageBox.Show(@"This application needs Virtual Desktop Module to be installed. To read more about Virtual Desktop module for powershell you can go to https://github.com/MScholtes/PSVirtualDesktop. If you decide to deny the installation, the application will be closed. Continue installing the module (answer Yes is recommended)?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (result == DialogResult.Yes)
+            {
+                using var installForm = new InstallForm();
+                installForm.ShowDialog(this); // Blocking call until install is done
 
+                // Now it's safe to show the result
+                if (installForm.InstallSucceeded)
+                {
+                    MessageBox.Show("Installation completed successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return true;
+                }
+                else
+                {
+                    MessageBox.Show("Installation failed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            return false;
+        }
         [SupportedOSPlatform("windows")]
         private async Task VirtualDesktopPSInitAsync()
         {
             _previousDesktopIndex = -1;
-            try
+
+            if (!await VirtualDesktopPowerShell.IsVirtualDesktopInstalled() && !CleanInstallVirtualDesktop())
             {
-                if (!await VirtualDesktopPowerShell.IsVirtualDesktopInstalled())
-                {
-                    var result = MessageBox.Show(@"To continue using this application Virtual Desktop Module is needed to be installed. To read more about Virtual Desktop module for powershell you can go to https://github.com/MScholtes/PSVirtualDesktop. If you decide to deny the installation, the application will be closed. Continue installing the module (answer Yes is recommended)?", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                    if (result == DialogResult.Yes)
-                    {
-                        var controls = ShowProgressBar("Please wait while the Virtual Desktop module is being installed...");
-                        await VirtualDesktopPowerShell.InstallVirtualDesktopAsync();
-                        RemoveControls(controls);
-                    }
-                    else
-                    {
-                        CloseWithoutPrompt();
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                ShowErrorMessage("An exception occured during installation of Virtual Desktop module.");
                 CloseWithoutPrompt();
+                return;
             }
 
+            await PreparePowershell();
+        }
+        private async Task PreparePowershell()
+        {
             //TODO: exctract to a new method
             try
             {
@@ -939,7 +948,6 @@ namespace LinguaHelper
                 ShowErrorMessage("An exception occured during initialization of Virtual Desktop module.");
             }
         }
-
         private void RemoveControls(List<Control> controls)
         {
             foreach (var control in controls)
@@ -1055,9 +1063,14 @@ namespace LinguaHelper
         #endregion
 
         #region Main menu click handlers
+        private void MM_CleanInstallVirtualDesktop_Click(object sender, EventArgs e)
+        {
+            CleanInstallVirtualDesktop();
+        }
+
         private void MM_ResetTranslateOnSelection_Click(object sender, EventArgs e)
         {
-            foreach(var unit in _units)
+            foreach (var unit in _units)
                 unit.ResetTranslateOnSelection();
             SetTranslateOnSelectionIndeterminate();
             SetMenuItemTranslateOnSelectionCurrent();
@@ -1721,5 +1734,6 @@ namespace LinguaHelper
         }
         #endregion
 
+       
     }
 }

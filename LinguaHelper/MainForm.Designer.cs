@@ -97,6 +97,7 @@
             controlPanel = new System.Windows.Forms.TableLayoutPanel();
             btnClearFind = new System.Windows.Forms.Button();
             tabControl1 = new System.Windows.Forms.CustomTabControl();
+            MM_CleanInstallVirtualDesktop = new System.Windows.Forms.ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -427,7 +428,7 @@
             // 
             // optionsToolStripMenuItem
             // 
-            optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { MM_HotKeyEnabled });
+            optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { MM_HotKeyEnabled, MM_CleanInstallVirtualDesktop });
             optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             optionsToolStripMenuItem.Size = new System.Drawing.Size(92, 29);
             optionsToolStripMenuItem.Text = "Options";
@@ -438,7 +439,7 @@
             MM_HotKeyEnabled.CheckOnClick = true;
             MM_HotKeyEnabled.CheckState = System.Windows.Forms.CheckState.Checked;
             MM_HotKeyEnabled.Name = "MM_HotKeyEnabled";
-            MM_HotKeyEnabled.Size = new System.Drawing.Size(245, 34);
+            MM_HotKeyEnabled.Size = new System.Drawing.Size(397, 34);
             MM_HotKeyEnabled.Text = "Hot Key Enabled";
             // 
             // windowToolStripMenuItem
@@ -743,6 +744,13 @@
             tabControl1.TabIndex = 4;
             tabControl1.SelectedIndexChanged += tabControl1_SelectedIndexChanged;
             // 
+            // MM_CleanInstallVirtualDesktop
+            // 
+            MM_CleanInstallVirtualDesktop.Name = "MM_CleanInstallVirtualDesktop";
+            MM_CleanInstallVirtualDesktop.Size = new System.Drawing.Size(397, 34);
+            MM_CleanInstallVirtualDesktop.Text = "Clean Installation of Virtual Desktop";
+            MM_CleanInstallVirtualDesktop.Click += MM_CleanInstallVirtualDesktop_Click;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
@@ -847,6 +855,7 @@
         private System.Windows.Forms.ToolStripMenuItem MM_TranslateOnSelection;
         private System.Windows.Forms.ToolStripMenuItem MM_TranslateOnSelectionCurrent;
         private System.Windows.Forms.ToolStripMenuItem MM_ResetTranslateOnSelection;
+        private System.Windows.Forms.ToolStripMenuItem MM_CleanInstallVirtualDesktop;
     }
 }
 
