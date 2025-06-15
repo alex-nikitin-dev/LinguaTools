@@ -1,4 +1,5 @@
 ﻿using CefSharp;
+using CefSharp.DevTools.IO;
 using CefSharp.WinForms;
 using LinguaHelper.Properties;
 using Newtonsoft.Json;
@@ -9,8 +10,10 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Management.Automation;
+using System.Net.Http;
 using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -151,6 +154,8 @@ namespace LinguaHelper
             {
                 unit.Go(text, isUserCommand, force);
             }
+
+            FireGroq(text);
         }
         void ReloadAllBrowsers()
         {
@@ -1046,6 +1051,7 @@ namespace LinguaHelper
             await InitMainMenuItems();
             InitFirstTabSelection();
             ForceTranslateOnSelection();
+            InitAIView();
             InitHistory();
             SetDateTimeFilterNow();
             FillCategoriesComboBox();
@@ -1550,6 +1556,7 @@ namespace LinguaHelper
                 tabControl1.TabPages[dictionaryName].Tag = unit;
                 tabControl1.TabPages[dictionaryName]?.Controls.Add(table);
             }
+            tabControl1.TabPages.Add("AIView", "AI View");
             tabControl1.TabPages.Add("tabHistory", "History");
 
             ShowUrban(MM_NeedUrbanDictionary.Checked);
@@ -1734,6 +1741,117 @@ namespace LinguaHelper
         }
         #endregion
 
-       
+        #region AI View
+
+        GroqApiClient _groqApiClient;
+        void InitAIView()
+        {
+            var richbox = new RichTextBox
+            {
+                Dock = DockStyle.Fill,
+                ReadOnly = true,
+                Font = new Font("Arial", 12, FontStyle.Regular)
+            };
+            tabControl1.TabPages["AIView"]?.Controls.Add(richbox);
+            richbox.Text = "AI View is not initialized. Please set your Groq API key in the settings.";
+
+            InitGroqApiClient();
+        }
+        void InitGroqApiClient()
+        {
+            var key = Settings.Default.GroqAIKey;
+            if (string.IsNullOrEmpty(key)) return;
+            _groqApiClient = new GroqApiClient(key);
+        }
+
+        private CancellationTokenSource? _cts = null;
+        private readonly object _lock = new();
+
+        public void FireGroq(string text)
+        {
+            if (_groqApiClient == null)
+            {
+                return;
+            }
+            CancellationToken token;
+
+            lock (_lock)
+            {
+                // Cancel previous request if any
+                if (_cts != null)
+                {
+                    _cts.Cancel();
+                    _cts.Dispose();
+                }
+
+                // Create new CTS for new request
+                _cts = new CancellationTokenSource();
+                token = _cts.Token;
+            }
+
+            _ = ExecuteGroqAsync(text, token);
+        }
+
+        /// <summary>
+        /// Executes a Groq API request to explain English text in Russian and updates the UI with the result.
+        /// </summary>
+        /// <param name="text">The English text to send to the Groq API for explanation.</param>
+        /// <param name="cancellationToken">Token to observe for cancellation of the API request.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        private async Task ExecuteGroqAsync(string text, CancellationToken cancellationToken)
+        {
+            try
+            {
+                // Execute API call asynchronously without capturing synchronization context
+                string result = await _groqApiClient
+                    .ExplainEnglishTextInRussianAsync(text, cancellationToken)
+                    .ConfigureAwait(false);
+
+                // Marshal UI update back to the main thread without blocking
+                tabControl1.BeginInvoke((MethodInvoker)(() =>
+                {
+                    // Retrieve the RichTextBox control in the "AIView" tab
+                    if (tabControl1.TabPages.ContainsKey("AIView") &&
+                        tabControl1.TabPages["AIView"].Controls.Count > 0 &&
+                        tabControl1.TabPages["AIView"].Controls[0] is RichTextBox richbox)
+                    {
+                        // Display the explanation
+                        richbox.Text = result ?? string.Empty;
+
+                        // Reset selection and scroll to top
+                        richbox.SelectionStart = 0;
+                        richbox.SelectionLength = 0;
+                        richbox.ScrollToCaret();
+                    }
+                }));
+            }
+            catch (OperationCanceledException)
+            {
+                // Cancellation requested by caller - no UI update needed
+                // Optionally, you could notify user or log cancellation
+            }
+            catch (HttpRequestException httpEx)
+            {
+                // Handle HTTP-specific errors (network, timeout, status codes)
+                ShowErrorMessage($"Network error during Groq request: {httpEx.Message}");
+            }
+            catch (JsonException jsonEx)
+            {
+                // Handle JSON parsing errors
+                ShowErrorMessage($"Invalid response format: {jsonEx.Message}");
+            }
+            catch (Exception ex)
+            {
+                // Fallback for any other exceptions
+                ShowErrorMessage($"Unexpected error: {ex.Message}");
+            }
+        }
+
+        #endregion
+
+        private void MM_SetOptionsClick(object sender, EventArgs e)
+        {
+            new SetOptionsForm().ShowDialog();
+        }
     }
 }

@@ -72,6 +72,7 @@
             lightToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             MM_HotKeyEnabled = new System.Windows.Forms.ToolStripMenuItem();
+            MM_CleanInstallVirtualDesktop = new System.Windows.Forms.ToolStripMenuItem();
             windowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             MM_ReturnDesktop = new System.Windows.Forms.ToolStripMenuItem();
             toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -97,7 +98,7 @@
             controlPanel = new System.Windows.Forms.TableLayoutPanel();
             btnClearFind = new System.Windows.Forms.Button();
             tabControl1 = new System.Windows.Forms.CustomTabControl();
-            MM_CleanInstallVirtualDesktop = new System.Windows.Forms.ToolStripMenuItem();
+            MM_SetOptions = new System.Windows.Forms.ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -428,7 +429,7 @@
             // 
             // optionsToolStripMenuItem
             // 
-            optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { MM_HotKeyEnabled, MM_CleanInstallVirtualDesktop });
+            optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { MM_HotKeyEnabled, MM_CleanInstallVirtualDesktop, MM_SetOptions });
             optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             optionsToolStripMenuItem.Size = new System.Drawing.Size(92, 29);
             optionsToolStripMenuItem.Text = "Options";
@@ -441,6 +442,13 @@
             MM_HotKeyEnabled.Name = "MM_HotKeyEnabled";
             MM_HotKeyEnabled.Size = new System.Drawing.Size(397, 34);
             MM_HotKeyEnabled.Text = "Hot Key Enabled";
+            // 
+            // MM_CleanInstallVirtualDesktop
+            // 
+            MM_CleanInstallVirtualDesktop.Name = "MM_CleanInstallVirtualDesktop";
+            MM_CleanInstallVirtualDesktop.Size = new System.Drawing.Size(397, 34);
+            MM_CleanInstallVirtualDesktop.Text = "Clean Installation of Virtual Desktop";
+            MM_CleanInstallVirtualDesktop.Click += MM_CleanInstallVirtualDesktop_Click;
             // 
             // windowToolStripMenuItem
             // 
@@ -744,12 +752,12 @@
             tabControl1.TabIndex = 4;
             tabControl1.SelectedIndexChanged += tabControl1_SelectedIndexChanged;
             // 
-            // MM_CleanInstallVirtualDesktop
+            // MM_SetOptions
             // 
-            MM_CleanInstallVirtualDesktop.Name = "MM_CleanInstallVirtualDesktop";
-            MM_CleanInstallVirtualDesktop.Size = new System.Drawing.Size(397, 34);
-            MM_CleanInstallVirtualDesktop.Text = "Clean Installation of Virtual Desktop";
-            MM_CleanInstallVirtualDesktop.Click += MM_CleanInstallVirtualDesktop_Click;
+            MM_SetOptions.Name = "MM_SetOptions";
+            MM_SetOptions.Size = new System.Drawing.Size(397, 34);
+            MM_SetOptions.Text = "Set Options";
+            MM_SetOptions.Click += MM_SetOptionsClick;
             // 
             // MainForm
             // 
@@ -856,6 +864,7 @@
         private System.Windows.Forms.ToolStripMenuItem MM_TranslateOnSelectionCurrent;
         private System.Windows.Forms.ToolStripMenuItem MM_ResetTranslateOnSelection;
         private System.Windows.Forms.ToolStripMenuItem MM_CleanInstallVirtualDesktop;
+        private System.Windows.Forms.ToolStripMenuItem MM_SetOptions;
     }
 }
 

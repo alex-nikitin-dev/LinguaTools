@@ -25,6 +25,9 @@
     <Compile Update="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="SetOptionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="ShortcutsForm.cs">
       <SubType>Form</SubType>
     </Compile>
